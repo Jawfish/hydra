@@ -1,17 +1,13 @@
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
 import { useFileStore } from '@/store/store';
+import { toast } from 'sonner';
 
 export function UUIDDisplay() {
-  const { toast } = useToast();
   const { extractedUUIDs } = useFileStore();
 
   const handleCopy = (listType: 'python' | 'plaintext') => {
     if (!extractedUUIDs.length) {
-      toast({
-        title: 'No UUIDs to copy',
-        variant: 'destructive'
-      });
+      toast.warning('No UUIDs to copy');
       return;
     }
 
@@ -24,15 +20,11 @@ export function UUIDDisplay() {
         navigator.clipboard.writeText(extractedUUIDs.join('\n'));
       }
 
-      toast({
-        title: `Copied ${extractedUUIDs.length} UUIDs to clipboard`
-      });
+      toast.success(`Copied ${extractedUUIDs.length} UUIDs to clipboard`);
     } catch (error) {
-      toast({
-        title: 'Error copying to clipboard',
-        description: error instanceof Error ? error.message : 'Unknown error',
-        variant: 'destructive'
-      });
+      toast.error(
+        `Error copying to clipboard: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   };
 

@@ -1,10 +1,12 @@
+import { AppSidebar } from '@/components/AppSidebar';
 import { FieldSelector } from '@/components/FieldSelector';
-import { Metadata } from '@/components/Metadata';
 import { FileUpload } from '@/components/FileUpload';
+import { Metadata } from '@/components/Metadata';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { UUIDDisplay } from '@/components/UUIDDisplay';
 import { UUIDInput } from '@/components/UUIDInput';
-import { Toaster } from '@/components/ui/toaster';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { Toaster } from '@/components/ui/sonner';
 import { getAllPaths, parseJSONL } from '@/lib/jsonl';
 import { extractUUIDs, extractUUIDsFromCSV, extractUUIDsFromJSONL } from '@/lib/uuid';
 import { useFileStore } from '@/store/store';
@@ -100,8 +102,9 @@ function App() {
 
   return (
     <ThemeProvider defaultTheme='system' storageKey='vite-ui-theme'>
-      <div className='flex min-h-screen flex-col items-center p-8'>
-        <div className='w-full max-w-4xl flex flex-col gap-6'>
+      <SidebarProvider>
+        <AppSidebar />
+        <div className='p-8 xl:mx-auto max-w-4xl flex flex-col gap-6'>
           <UUIDInput input={input} onChange={handleInputChange} />
           <FileUpload onUpload={handleFileUpload} />
           <FieldSelector
@@ -113,7 +116,12 @@ function App() {
           <Metadata />
           <UUIDDisplay />
         </div>
-      </div>
+
+        {/* Hack to offset the right side by the sidebar's width */}
+        <div className='hidden 2xl:block'>
+          <AppSidebar />
+        </div>
+      </SidebarProvider>
       <Toaster />
     </ThemeProvider>
   );
