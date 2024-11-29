@@ -3,8 +3,11 @@
  * @param content - Raw JSONL content
  * @returns Array of parsed JSON objects
  */
-export const parseJSONL = (content: string) => {
-  const cleanContent = content.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
+const BOM_REGEX = /^\uFEFF/;
+const CRLF_REGEX = /\r\n/g;
+
+export const parseJsonl = (content: string) => {
+  const cleanContent = content.replace(BOM_REGEX, '').replace(CRLF_REGEX, '\n');
 
   return cleanContent
     .split('\n')

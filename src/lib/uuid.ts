@@ -33,7 +33,7 @@ const getCandidates = (processedText: string): string[] =>
  * @param candidate - Potential UUID string
  * @returns Normalized string with correct hyphen placement
  */
-const normalizeUUID = (candidate: string): string => {
+const normalizeUuid = (candidate: string): string => {
   const trimmed = candidate.replace(/^-+|-+$/g, '');
   return trimmed.replace(/-+/g, '-');
 };
@@ -43,7 +43,7 @@ const normalizeUUID = (candidate: string): string => {
  * @param normalized - Normalized potential UUID string
  * @returns boolean indicating if the string is a valid UUID
  */
-const isValidUUID = (normalized: string): boolean =>
+const isValidUuid = (normalized: string): boolean =>
   normalized.length === 36 && UUID_REGEX.test(normalized);
 
 /**
@@ -51,18 +51,18 @@ const isValidUUID = (normalized: string): boolean =>
  * @param candidates - Array of potential UUID strings
  * @returns Array of valid UUID strings
  */
-const filterValidUUIDs = (candidates: string[]): string[] =>
-  candidates.filter(candidate => isValidUUID(normalizeUUID(candidate)));
+const filterValidUuiDs = (candidates: string[]): string[] =>
+  candidates.filter(candidate => isValidUuid(normalizeUuid(candidate)));
 
 /**
  * Main function that extracts valid UUIDs from a text string
  * @param text - The input text to search for UUIDs
  * @returns An array of valid UUID strings found in the text
  */
-export const extractUUIDs = (text: string): string[] => {
+export const extractUuids = (text: string): string[] => {
   const processed = processText(text);
   const candidates = getCandidates(processed);
-  return filterValidUUIDs(candidates);
+  return filterValidUuiDs(candidates);
 };
 
 /**
@@ -70,7 +70,7 @@ export const extractUUIDs = (text: string): string[] => {
  * @param jsonlContent - String containing JSONL data
  * @returns Array of valid UUIDs found in ID fields
  */
-export const extractUUIDsFromJSONL = (
+export const extractUuidsFromJsonl = (
   jsonlContent: string,
   fieldPath: string
 ): string[] => {
@@ -86,7 +86,7 @@ export const extractUUIDsFromJSONL = (
     }
   });
 
-  return extractUUIDs(idValues.join(' '));
+  return extractUuids(idValues.join(' '));
 };
 
 /**
@@ -94,7 +94,7 @@ export const extractUUIDsFromJSONL = (
  * @param csvContent - String containing CSV data
  * @returns Array of valid UUIDs found in ID column
  */
-export const extractUUIDsFromCSV = (
+export const extractUuidsFromCsv = (
   csvContent: string,
   columnName: string
 ): string[] => {
@@ -103,17 +103,21 @@ export const extractUUIDsFromCSV = (
     .map(line => line.trim())
     .filter(Boolean);
 
-  if (lines.length === 0) return [];
+  if (lines.length === 0) {
+    return [];
+  }
 
   const headers = lines[0].split(',').map(header => header.trim());
   const columnIndex = headers.findIndex(header => header === columnName);
 
-  if (columnIndex === -1) return [];
+  if (columnIndex === -1) {
+    return [];
+  }
 
   const idValues = lines.slice(1).map(line => {
     const columns = line.split(',').map(col => col.trim());
     return columns[columnIndex] || '';
   });
 
-  return extractUUIDs(idValues.join(' '));
+  return extractUuids(idValues.join(' '));
 };

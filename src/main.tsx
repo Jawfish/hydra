@@ -1,12 +1,14 @@
 import './index.scss';
 
+import App from '@/app';
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import reactDom from 'react-dom/client';
 
-import App from './app';
-
-ReactDOM.createRoot(document.querySelector('#root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const rootElement = document.querySelector('#root');
+if (rootElement) {
+  reactDom.createRoot(rootElement).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+}

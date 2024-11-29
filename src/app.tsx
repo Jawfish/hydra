@@ -2,9 +2,9 @@ import { AppSidebar } from '@/components/AppSidebar';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
-import { UUIDExtractor } from '@/views/UUIDExtractor';
 import { MapValues } from '@/views/MapValues';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { UuidExtractor } from '@/views/UuidExtractor';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 function App() {
   return (
@@ -14,9 +14,9 @@ function App() {
           <AppSidebar />
           <div className='p-8 xl:mx-auto w-full max-w-4xl'>
             <Routes>
-              <Route path='/extract' element={<UUIDExtractor />} />
+              <Route path='/extract' element={<UuidExtractor />} />
               <Route path='/map' element={<MapValues />} />
-              <Route path='/' element={<Navigate to='/extract' replace />} />
+              <Route path='/' element={<Navigate to='/extract' replace={true} />} />
             </Routes>
           </div>
 
@@ -31,4 +31,5 @@ function App() {
   );
 }
 
+// biome-ignore lint/style/noDefaultExport: React convention
 export default App;

@@ -2,18 +2,19 @@ import { create } from 'zustand';
 
 interface FileState {
   input: string;
-  extractedUUIDs: string[];
+  extractedUuids: string[];
   fileError: string | null;
+  fileName: string | null;
   jsonlSchema: string[];
   csvHeaders: string[];
   selectedField: string;
   fileContent: string;
   fileType: 'csv' | 'jsonl' | null;
 
-  // Actions
   setInput: (input: string) => void;
-  setExtractedUUIDs: (uuids: string[]) => void;
+  setExtractedUuids: (uuids: string[]) => void;
   setFileError: (error: string | null) => void;
+  setFileName: (name: string | null) => void;
   setJsonlSchema: (schema: string[]) => void;
   setCsvHeaders: (headers: string[]) => void;
   setSelectedField: (field: string) => void;
@@ -24,18 +25,19 @@ interface FileState {
 
 export const useFileStore = create<FileState>(set => ({
   input: '',
-  extractedUUIDs: [],
+  extractedUuids: [],
   fileError: null,
+  fileName: null,
   jsonlSchema: [],
   csvHeaders: [],
   selectedField: '',
   fileContent: '',
   fileType: null,
 
-  // Actions
   setInput: input => set({ input }),
-  setExtractedUUIDs: extractedUUIDs => set({ extractedUUIDs }),
+  setExtractedUuids: extractedUuiDs => set({ extractedUuids: extractedUuiDs }),
   setFileError: fileError => set({ fileError }),
+  setFileName: fileName => set({ fileName }),
   setJsonlSchema: jsonlSchema => set({ jsonlSchema }),
   setCsvHeaders: csvHeaders => set({ csvHeaders }),
   setSelectedField: selectedField => set({ selectedField }),
@@ -44,8 +46,9 @@ export const useFileStore = create<FileState>(set => ({
   resetFileState: () =>
     set({
       input: '',
-      extractedUUIDs: [],
+      extractedUuids: [],
       fileError: null,
+      fileName: null,
       jsonlSchema: [],
       csvHeaders: [],
       selectedField: '',

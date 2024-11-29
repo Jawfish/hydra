@@ -1,12 +1,13 @@
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
+import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import Header from '@/components/Header';
-import { getAllPaths, getValueByPath, parseJSONL } from '@/lib/jsonl';
+import { Textarea } from '@/components/ui/textarea';
+import { getValueByPath, parseJsonl } from '@/lib/jsonl';
 import { useFileStore } from '@/store/store';
+import Papa from 'papaparse';
 import { useState } from 'react';
 import { toast } from 'sonner';
-
 interface MappedValue {
   [key: string]: {
     [key: string]: unknown;
@@ -14,25 +15,11 @@ interface MappedValue {
 }
 
 export function MapValues() {
-  const {
-    setFileError,
-    setJsonlSchema,
-    setCsvHeaders,
-    setFileContent,
-    setFileType,
-    setFileName,
-    resetFileState,
-    fileType,
-    fileName,
-    jsonlSchema,
-    csvHeaders,
-    fileContent
-  } = useFileStore();
+  const { fileType, jsonlSchema, csvHeaders, fileContent } = useFileStore();
 
   const [keyField, setKeyField] = useState<string>('');
   const [valueFields, setValueFields] = useState<string[]>([]);
   const [mappedValues, setMappedValues] = useState<MappedValue[]>([]);
-
 
   const handleKeyFieldSelect = (field: string) => {
     setKeyField(field);
@@ -55,42 +42,44 @@ export function MapValues() {
 
     try {
       if (fileType === 'jsonl') {
-        const objects = parseJSONL(fileContent);
+        const objects = parseJsonl(fileContent);
         const mapped = objects.map(obj => {
           const key = getValueByPath(obj, keyField);
           const values: { [key: string]: unknown } = {};
 
-          valueFields.forEach(field => {
+          for (const field of valueFields) {
             values[field] = getValueByPath(obj, field);
-          });
+          }
 
           return { [key as string]: values };
         });
         setMappedValues(mapped);
       } else if (fileType === 'csv') {
-        const lines = fileContent
-          .split('\n')
-          .map(line => line.trim())
-          .filter(Boolean);
-        const headers = lines[0].split(',').map(header => header.trim());
+        const csvData: string[][] = Papa.parse<string[]>(fileContent, {
+          skipEmptyLines: true
+        }).data;
+        const headers = csvData[0];
+        const rows = csvData.slice(1);
+
         const keyIndex = headers.indexOf(keyField);
-        const valueIndexes = valueFields.map(field => headers.indexOf(field));
+        const valueIndices = valueFields.map(field => headers.indexOf(field));
 
-        const mapped = lines.slice(1).map(line => {
-          const values = line.split(',').map(val => val.trim());
-          const key = values[keyIndex];
-          const mappedValues: { [key: string]: unknown } = {};
+        const mapped = rows.map(row => {
+          const key = row[keyIndex];
+          const values: { [key: string]: unknown } = {};
 
-          valueFields.forEach((field, i) => {
-            mappedValues[field] = values[valueIndexes[i]];
-          });
+          for (const index of valueIndices) {
+            values[headers[index]] = row[index];
+          }
 
-          return { [key]: mappedValues };
+          return { [key as string]: values };
         });
         setMappedValues(mapped);
       }
-    } catch (_error) {
-      toast.error('Error generating mapping');
+    } catch (error) {
+      toast.error(
+        `Error generating mapping: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   };
 
@@ -109,19 +98,21 @@ export function MapValues() {
   };
 
   return (
-    <div className='flex flex-col'>
-      <Header>
-        <Header.Title>Map Values</Header.Title>
-        <Header.Description>
-          Create a mapping of key-value pairs from a CSV or JSONL file
-        </Header.Description>
-      </Header>
-      <>
+    <div className='flex flex-col gap-12'>
+      <div>
+        <div className='mb-6'>
+          <Header>
+            <Header.Title>Map Values</Header.Title>
+            <Header.Description>
+              Create a mapping of key-value pairs from a CSV or JSONL file
+            </Header.Description>
+          </Header>
+        </div>
         <FileUpload />
-      </>
+      </div>
       {fileType && (
-        <>
-          <div className='mb-7 mt-12'>
+        <div className='flex flex-col gap-16'>
+          <div>
             <div className='mb-5'>
               <h3 className='text-lg font-semibold'>Key Field</h3>
               <p className='text-sm text-muted-foreground'>
@@ -156,23 +147,28 @@ export function MapValues() {
             </div>
           </div>
 
-          <div className='flex gap-4 mt-12'>
-            <Button onClick={generateMapping}>Generate Mapping</Button>
-            <Button
-              variant='outline'
-              onClick={copyToClipboard}
-              disabled={mappedValues.length === 0}
-            >
-              Copy to Clipboard
-            </Button>
+          <div className='flex flex-col gap-6'>
+            <div className='flex gap-4'>
+              <Button onClick={generateMapping}>Generate Mapping</Button>
+              <Button
+                variant='outline'
+                onClick={copyToClipboard}
+                disabled={mappedValues.length === 0}
+              >
+                Copy to Clipboard
+              </Button>
+            </div>
+            {mappedValues.length > 0 && (
+              <Textarea
+                id='mappedValues'
+                rows={12}
+                value={JSON.stringify(mappedValues, null, 2)}
+                readOnly={true}
+                className='font-mono'
+              />
+            )}
           </div>
-        </>
-      )}
-
-      {mappedValues.length > 0 && (
-        <pre className='p-4 bg-muted rounded-lg overflow-auto max-h-[400px]'>
-          {JSON.stringify(mappedValues, null, 2)}
-        </pre>
+        </div>
       )}
     </div>
   );

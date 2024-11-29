@@ -1,48 +1,41 @@
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
+import { Header } from '@/components/Header';
 import { Metadata } from '@/components/Metadata';
-import { UUIDDisplay } from '@/components/UUIDDisplay';
-import { UUIDInput } from '@/components/UUIDInput';
-import Header from '@/components/Header';
-import { getAllPaths, parseJSONL } from '@/lib/jsonl';
-import { extractUUIDs, extractUUIDsFromCSV, extractUUIDsFromJSONL } from '@/lib/uuid';
+import { UuidDisplay } from '@/components/UuidDisplay';
+import { UuidInput } from '@/components/UuidInput';
+import { extractUuids, extractUuidsFromCsv, extractUuidsFromJsonl } from '@/lib/uuid';
 import { useFileStore } from '@/store/store';
 
-export function UUIDExtractor() {
+export function UuidExtractor() {
   const {
     setInput,
-    setExtractedUUIDs,
-    setFileError,
-    setJsonlSchema,
-    setCsvHeaders,
+    setExtractedUuids,
     setSelectedField,
-    setFileContent,
-    setFileType,
     resetFileState,
     input,
     fileType,
     jsonlSchema,
     csvHeaders,
     selectedField,
-    extractedUUIDs
+    extractedUuids
   } = useFileStore();
-
 
   const handleFieldSelection = (field: string) => {
     setSelectedField(field);
     if (fileType === 'jsonl') {
-      const uuids = extractUUIDsFromJSONL(useFileStore.getState().fileContent, field);
-      setExtractedUUIDs(uuids);
+      const uuids = extractUuidsFromJsonl(useFileStore.getState().fileContent, field);
+      setExtractedUuids(uuids);
     } else if (fileType === 'csv') {
-      const uuids = extractUUIDsFromCSV(useFileStore.getState().fileContent, field);
-      setExtractedUUIDs(uuids);
+      const uuids = extractUuidsFromCsv(useFileStore.getState().fileContent, field);
+      setExtractedUuids(uuids);
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value;
     setInput(newText);
-    setExtractedUUIDs(extractUUIDs(newText));
+    setExtractedUuids(extractUuids(newText));
 
     if (fileType) {
       resetFileState();
@@ -57,7 +50,7 @@ export function UUIDExtractor() {
           Extract UUIDs from pasted text or uploaded CSV/JSONL files
         </Header.Description>
       </Header>
-      <UUIDInput input={input} onChange={handleInputChange} />
+      <UuidInput input={input} onChange={handleInputChange} className='mb-4 mt-6' />
       <FileUpload />
       {fileType && (
         <>
@@ -71,13 +64,13 @@ export function UUIDExtractor() {
           />
         </>
       )}
-      {extractedUUIDs.length > 0 && (
+      {extractedUuids.length > 0 && (
         <>
           <h3 className='font-semibold mt-12'>Extraction results</h3>
           <Metadata />
         </>
       )}
-      <UUIDDisplay />
+      <UuidDisplay />
     </div>
   );
 }

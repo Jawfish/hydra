@@ -1,17 +1,15 @@
 import { Textarea } from '@/components/ui/textarea';
-import React from 'react';
+import type React from 'react';
 
-interface UUIDInputProps {
+interface UuidInputProps {
   input: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  className?: string;
 }
 
-export function UUIDInput({ input, onChange }: UUIDInputProps) {
+export function UuidInput({ input, onChange, className }: UuidInputProps) {
   return (
-    <div className='flex flex-col gap-6'>
-      <label htmlFor='uuidInput' className='block text-lg font-medium'>
-        Enter text containing UUIDs or select a CSV/JSONL file
-      </label>
+    <div className={`flex flex-col gap-6 ${className}`}>
       <Textarea
         id='uuidInput'
         rows={6}

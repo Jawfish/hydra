@@ -15,12 +15,12 @@ import {
 const items = [
   {
     title: 'Extract UUIDs',
-    url: '/uuid-extractor',
+    url: '/extract',
     icon: IdCard
   },
   {
     title: 'Map Values',
-    url: '/map-values',
+    url: '/map',
     icon: MapIcon
   }
 ];
@@ -35,7 +35,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map(item => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild={true}>
                     <Link to={item.url}>
                       <item.icon />
                       <span>{item.title}</span>

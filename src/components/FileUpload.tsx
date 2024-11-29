@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
+import { getAllPaths, parseJsonl } from '@/lib/jsonl';
 import { useFileStore } from '@/store/store';
-import { getAllPaths, parseJSONL } from '@/lib/jsonl';
-import React from 'react';
+import type React from 'react';
 
 export function FileUpload() {
   const {
@@ -20,7 +20,9 @@ export function FileUpload() {
     resetFileState();
 
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     try {
       let content = await file.text();
@@ -41,7 +43,7 @@ export function FileUpload() {
       setFileName(file.name);
 
       if (type === 'jsonl') {
-        const parsedObjects = parseJSONL(content);
+        const parsedObjects = parseJsonl(content);
         if (parsedObjects.length === 0) {
           setFileError('No valid JSONL data found in file');
           return;
@@ -68,30 +70,24 @@ export function FileUpload() {
   };
 
   return (
-    <div className="space-y-2">
-      <Button asChild variant="secondary">
-        <label className="cursor-pointer">
+    <div className='space-y-2 flex gap-4'>
+      <Button asChild={true} variant='secondary'>
+        <label className='cursor-pointer'>
           Select CSV/JSONL
           <input
-            type="file"
-            accept=".csv,.jsonl"
-            className="hidden"
+            type='file'
+            accept='.csv,.jsonl'
+            className='hidden'
             onChange={handleFileUpload}
           />
         </label>
       </Button>
-      
+
       {fileName && (
-        <p className="text-sm text-muted-foreground">
-          Selected file: {fileName}
-        </p>
+        <p className='text-sm text-muted-foreground'>Selected file: {fileName}</p>
       )}
-      
-      {fileError && (
-        <p className="text-sm text-destructive">
-          {fileError}
-        </p>
-      )}
+
+      {fileError && <p className='text-sm text-destructive'>{fileError}</p>}
     </div>
   );
 }
