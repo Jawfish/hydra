@@ -1,16 +1,12 @@
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
+import { ThemeProvider } from '@/components/ThemeProvider';
 import { UUIDDisplay } from '@/components/UUIDDisplay';
 import { UUIDInput } from '@/components/UUIDInput';
-import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
-import {
-  extractUUIDs,
-  extractUUIDsFromCSV,
-  extractUUIDsFromJSONL,
-  getAllPaths,
-  parseJSONL
-} from '@/lib/extractUuids';
+import { getAllPaths } from '@/lib/jsonl';
+import { parseJSONL } from '@/lib/jsonl';
+import { extractUUIDs, extractUUIDsFromCSV, extractUUIDsFromJSONL } from '@/lib/uuid';
 import { useState } from 'react';
 
 function App() {
