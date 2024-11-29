@@ -94,15 +94,38 @@ function App() {
     }
   };
 
+  const {
+    input,
+    fileType,
+    jsonlSchema,
+    csvHeaders,
+    selectedField,
+    fileContent,
+    extractedUUIDs
+  } = useFileStore();
+
   return (
     <ThemeProvider defaultTheme='system' storageKey='vite-ui-theme'>
       <div className='flex min-h-screen flex-col items-center p-8'>
         <div className='w-full max-w-4xl flex flex-col gap-6'>
-          <UUIDInput onChange={handleInputChange} />
+          <UUIDInput 
+            input={input} 
+            onChange={handleInputChange} 
+          />
           <FileUpload onUpload={handleFileUpload} />
-          <FieldSelector onFieldSelect={handleFieldSelection} />
-          <FileMetadata />
-          <UUIDDisplay />
+          <FieldSelector
+            fileType={fileType}
+            fields={fileType === 'jsonl' ? jsonlSchema : csvHeaders}
+            selectedField={selectedField}
+            onFieldSelect={handleFieldSelection}
+          />
+          <FileMetadata 
+            fileType={fileType} 
+            fileContent={fileContent} 
+          />
+          <UUIDDisplay 
+            uuids={extractedUUIDs} 
+          />
         </div>
       </div>
       <Toaster />
