@@ -5,30 +5,26 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { UUIDDisplay } from '@/components/UUIDDisplay';
 import { UUIDInput } from '@/components/UUIDInput';
 import { Toaster } from '@/components/ui/toaster';
-import { getAllPaths } from '@/lib/jsonl';
-import { parseJSONL } from '@/lib/jsonl';
+import { getAllPaths, parseJSONL } from '@/lib/jsonl';
 import { extractUUIDs, extractUUIDsFromCSV, extractUUIDsFromJSONL } from '@/lib/uuid';
-import { useState } from 'react';
+import { useFileStore } from '@/store/store';
 
 function App() {
-  const [input, setInput] = useState('');
-  const [extractedUUIDs, setExtractedUUIDs] = useState<string[]>([]);
-  const [fileError, setFileError] = useState<string | null>(null);
-  const [jsonlSchema, setJsonlSchema] = useState<string[]>([]);
-  const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
-  const [selectedField, setSelectedField] = useState<string>('');
-  const [fileContent, setFileContent] = useState<string>('');
-  const [fileType, setFileType] = useState<'csv' | 'jsonl' | null>(null);
+  const {
+    setInput,
+    setExtractedUUIDs,
+    setFileError,
+    setJsonlSchema,
+    setCsvHeaders,
+    setSelectedField,
+    setFileContent,
+    setFileType,
+    resetFileState,
+    fileType
+  } = useFileStore();
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput('');
-    setExtractedUUIDs([]);
-    setFileError(null);
-    setJsonlSchema([]);
-    setCsvHeaders([]);
-    setSelectedField('');
-    setFileContent('');
-    setFileType(null);
+    resetFileState();
 
     const file = e.target.files?.[0];
     if (!file) return;
@@ -80,10 +76,10 @@ function App() {
   const handleFieldSelection = (field: string) => {
     setSelectedField(field);
     if (fileType === 'jsonl') {
-      const uuids = extractUUIDsFromJSONL(fileContent, field);
+      const uuids = extractUUIDsFromJSONL(useFileStore.getState().fileContent, field);
       setExtractedUUIDs(uuids);
     } else if (fileType === 'csv') {
-      const uuids = extractUUIDsFromCSV(fileContent, field);
+      const uuids = extractUUIDsFromCSV(useFileStore.getState().fileContent, field);
       setExtractedUUIDs(uuids);
     }
   };
@@ -94,12 +90,7 @@ function App() {
     setExtractedUUIDs(extractUUIDs(newText));
 
     if (fileType) {
-      setFileType(null);
-      setFileContent('');
-      setJsonlSchema([]);
-      setCsvHeaders([]);
-      setSelectedField('');
-      setFileError(null);
+      resetFileState();
     }
   };
 
@@ -107,16 +98,11 @@ function App() {
     <ThemeProvider defaultTheme='system' storageKey='vite-ui-theme'>
       <div className='flex min-h-screen flex-col items-center p-8'>
         <div className='w-full max-w-4xl flex flex-col gap-6'>
-          <UUIDInput input={input} onChange={handleInputChange} />
-          <FileUpload onUpload={handleFileUpload} error={fileError} />
-          <FieldSelector
-            fileType={fileType}
-            fields={fileType === 'jsonl' ? jsonlSchema : csvHeaders}
-            selectedField={selectedField}
-            onFieldSelect={handleFieldSelection}
-          />
-          <FileMetadata fileType={fileType} fileContent={fileContent} />
-          <UUIDDisplay uuids={extractedUUIDs} />
+          <UUIDInput onChange={handleInputChange} />
+          <FileUpload onUpload={handleFileUpload} />
+          <FieldSelector onFieldSelect={handleFieldSelection} />
+          <FileMetadata />
+          <UUIDDisplay />
         </div>
       </div>
       <Toaster />

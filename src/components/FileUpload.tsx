@@ -1,12 +1,13 @@
 import { Button } from '@/components/ui/button';
+import { useFileStore } from '@/store/store';
 import React from 'react';
 
 interface FileUploadProps {
   onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  error: string | null;
 }
 
-export function FileUpload({ onUpload, error }: FileUploadProps) {
+export function FileUpload({ onUpload }: FileUploadProps) {
+  const fileError = useFileStore(state => state.fileError);
   return (
     <div className='flex gap-6'>
       <Button asChild variant='secondary'>
