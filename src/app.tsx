@@ -3,6 +3,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import { UUIDExtractor } from '@/views/UUIDExtractor';
+import { MapValues } from '@/views/MapValues';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
           <div className='p-8 xl:mx-auto w-full max-w-4xl'>
             <Routes>
               <Route path='/extract' element={<UUIDExtractor />} />
+              <Route path='/map' element={<MapValues />} />
               <Route path='/' element={<Navigate to='/extract' replace />} />
             </Routes>
           </div>
