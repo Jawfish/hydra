@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button';
-import React from 'react';
 
 interface FieldSelectorProps {
   fileType: 'csv' | 'jsonl' | null;
@@ -25,7 +24,7 @@ export function FieldSelector({
         {fields.map(field => (
           <Button
             key={field}
-            variant={selectedField === field ? 'default' : 'outline'}
+            variant={selectedField === field ? 'default' : 'secondary'}
             onClick={() => onFieldSelect(field)}
           >
             {field}

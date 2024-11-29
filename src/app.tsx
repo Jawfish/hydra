@@ -1,4 +1,5 @@
 import { FieldSelector } from '@/components/FieldSelector';
+import { FileMetadata } from '@/components/FileMetadata';
 import { FileUpload } from '@/components/FileUpload';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { UUIDDisplay } from '@/components/UUIDDisplay';
@@ -113,6 +114,10 @@ function App() {
             fields={fileType === 'jsonl' ? jsonlSchema : csvHeaders}
             selectedField={selectedField}
             onFieldSelect={handleFieldSelection}
+          />
+          <FileMetadata 
+            fileType={fileType}
+            fileContent={fileContent}
           />
           <UUIDDisplay uuids={extractedUUIDs} />
         </div>
