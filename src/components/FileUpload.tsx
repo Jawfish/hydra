@@ -4,13 +4,14 @@ import React from 'react';
 
 interface FileUploadProps {
   onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  className?: string;
 }
 
-export function FileUpload({ onUpload }: FileUploadProps) {
-  const fileError = useFileStore(state => state.fileError);
+export function FileUpload({ onUpload, className }: FileUploadProps) {
+  const { fileError } = useFileStore();
 
   return (
-    <div className='flex gap-6'>
+    <div className={className}>
       <Button asChild variant='secondary'>
         <label className='cursor-pointer'>
           Select CSV/JSONL

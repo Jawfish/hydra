@@ -3,8 +3,9 @@ import { FileUpload } from '@/components/FileUpload';
 import { Metadata } from '@/components/Metadata';
 import { UUIDDisplay } from '@/components/UUIDDisplay';
 import { UUIDInput } from '@/components/UUIDInput';
-import { extractUUIDs, extractUUIDsFromCSV, extractUUIDsFromJSONL } from '@/lib/uuid';
+import Header from '@/components/Header';
 import { getAllPaths, parseJSONL } from '@/lib/jsonl';
+import { extractUUIDs, extractUUIDsFromCSV, extractUUIDsFromJSONL } from '@/lib/uuid';
 import { useFileStore } from '@/store/store';
 
 export function UUIDExtractor() {
@@ -22,7 +23,8 @@ export function UUIDExtractor() {
     fileType,
     jsonlSchema,
     csvHeaders,
-    selectedField
+    selectedField,
+    extractedUUIDs
   } = useFileStore();
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,16 +99,33 @@ export function UUIDExtractor() {
   };
 
   return (
-    <div className='flex flex-col gap-6'>
+    <div className='flex flex-col'>
+      <Header>
+        <Header.Title>Extract UUIDs</Header.Title>
+        <Header.Description>
+          Extract UUIDs from pasted text or uploaded CSV/JSONL files
+        </Header.Description>
+      </Header>
       <UUIDInput input={input} onChange={handleInputChange} />
-      <FileUpload onUpload={handleFileUpload} />
-      <FieldSelector
-        fileType={fileType}
-        fields={fileType === 'jsonl' ? jsonlSchema : csvHeaders}
-        selectedField={selectedField}
-        onFieldSelect={handleFieldSelection}
-      />
-      <Metadata />
+      <FileUpload className='mt-4' onUpload={handleFileUpload} />
+      {fileType && (
+        <>
+          <h3 className='font-semibold mt-12 mb-4'>
+            Select {fileType === 'jsonl' ? 'field' : 'column'} to extract UUIDs from
+          </h3>
+          <FieldSelector
+            fields={fileType === 'jsonl' ? jsonlSchema : csvHeaders}
+            selectedField={selectedField}
+            onFieldSelect={handleFieldSelection}
+          />
+        </>
+      )}
+      {extractedUUIDs.length > 0 && (
+        <>
+          <h3 className='font-semibold mt-12'>Extraction results</h3>
+          <Metadata />
+        </>
+      )}
       <UUIDDisplay />
     </div>
   );
