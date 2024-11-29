@@ -115,10 +115,7 @@ function App() {
             selectedField={selectedField}
             onFieldSelect={handleFieldSelection}
           />
-          <FileMetadata 
-            fileType={fileType}
-            fileContent={fileContent}
-          />
+          <FileMetadata fileType={fileType} fileContent={fileContent} />
           <UUIDDisplay uuids={extractedUUIDs} />
         </div>
       </div>
