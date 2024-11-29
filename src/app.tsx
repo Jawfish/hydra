@@ -1,5 +1,5 @@
 import { FieldSelector } from '@/components/FieldSelector';
-import { FileMetadata } from '@/components/FileMetadata';
+import { Metadata } from '@/components/Metadata';
 import { FileUpload } from '@/components/FileUpload';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { UUIDDisplay } from '@/components/UUIDDisplay';
@@ -11,7 +11,6 @@ import { useFileStore } from '@/store/store';
 
 function App() {
   const {
-    // Actions
     setInput,
     setExtractedUUIDs,
     setFileError,
@@ -21,14 +20,11 @@ function App() {
     setFileContent,
     setFileType,
     resetFileState,
-    // State
     input,
     fileType,
     jsonlSchema,
     csvHeaders,
-    selectedField,
-    fileContent,
-    extractedUUIDs
+    selectedField
   } = useFileStore();
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,15 +98,11 @@ function App() {
     }
   };
 
-
   return (
     <ThemeProvider defaultTheme='system' storageKey='vite-ui-theme'>
       <div className='flex min-h-screen flex-col items-center p-8'>
         <div className='w-full max-w-4xl flex flex-col gap-6'>
-          <UUIDInput 
-            input={input} 
-            onChange={handleInputChange} 
-          />
+          <UUIDInput input={input} onChange={handleInputChange} />
           <FileUpload onUpload={handleFileUpload} />
           <FieldSelector
             fileType={fileType}
@@ -118,13 +110,8 @@ function App() {
             selectedField={selectedField}
             onFieldSelect={handleFieldSelection}
           />
-          <FileMetadata 
-            fileType={fileType} 
-            fileContent={fileContent} 
-          />
-          <UUIDDisplay 
-            uuids={extractedUUIDs} 
-          />
+          <Metadata />
+          <UUIDDisplay />
         </div>
       </div>
       <Toaster />

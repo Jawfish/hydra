@@ -9,7 +9,7 @@ interface FileState {
   selectedField: string;
   fileContent: string;
   fileType: 'csv' | 'jsonl' | null;
-  
+
   // Actions
   setInput: (input: string) => void;
   setExtractedUUIDs: (uuids: string[]) => void;
@@ -22,7 +22,7 @@ interface FileState {
   resetFileState: () => void;
 }
 
-export const useFileStore = create<FileState>((set) => ({
+export const useFileStore = create<FileState>(set => ({
   input: '',
   extractedUUIDs: [],
   fileError: null,
@@ -33,22 +33,23 @@ export const useFileStore = create<FileState>((set) => ({
   fileType: null,
 
   // Actions
-  setInput: (input) => set({ input }),
-  setExtractedUUIDs: (extractedUUIDs) => set({ extractedUUIDs }),
-  setFileError: (fileError) => set({ fileError }),
-  setJsonlSchema: (jsonlSchema) => set({ jsonlSchema }),
-  setCsvHeaders: (csvHeaders) => set({ csvHeaders }),
-  setSelectedField: (selectedField) => set({ selectedField }),
-  setFileContent: (fileContent) => set({ fileContent }),
-  setFileType: (fileType) => set({ fileType }),
-  resetFileState: () => set({
-    input: '',
-    extractedUUIDs: [],
-    fileError: null,
-    jsonlSchema: [],
-    csvHeaders: [],
-    selectedField: '',
-    fileContent: '',
-    fileType: null,
-  }),
+  setInput: input => set({ input }),
+  setExtractedUUIDs: extractedUUIDs => set({ extractedUUIDs }),
+  setFileError: fileError => set({ fileError }),
+  setJsonlSchema: jsonlSchema => set({ jsonlSchema }),
+  setCsvHeaders: csvHeaders => set({ csvHeaders }),
+  setSelectedField: selectedField => set({ selectedField }),
+  setFileContent: fileContent => set({ fileContent }),
+  setFileType: fileType => set({ fileType }),
+  resetFileState: () =>
+    set({
+      input: '',
+      extractedUUIDs: [],
+      fileError: null,
+      jsonlSchema: [],
+      csvHeaders: [],
+      selectedField: '',
+      fileContent: '',
+      fileType: null
+    })
 }));

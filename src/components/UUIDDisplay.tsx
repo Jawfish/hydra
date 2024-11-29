@@ -1,16 +1,13 @@
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
+import { useFileStore } from '@/store/store';
 
-interface UUIDDisplayProps {
-  uuids: string[];
-}
-
-export function UUIDDisplay({ uuids }: UUIDDisplayProps) {
+export function UUIDDisplay() {
   const { toast } = useToast();
+  const { extractedUUIDs } = useFileStore();
 
   const handleCopy = (listType: 'python' | 'plaintext') => {
-    if (!uuids.length) {
+    if (!extractedUUIDs.length) {
       toast({
         title: 'No UUIDs to copy',
         variant: 'destructive'
@@ -20,13 +17,15 @@ export function UUIDDisplay({ uuids }: UUIDDisplayProps) {
 
     try {
       if (listType === 'python') {
-        navigator.clipboard.writeText(`[${uuids.map(uuid => `'${uuid}'`).join(', ')}]`);
+        navigator.clipboard.writeText(
+          `[${extractedUUIDs.map(uuid => `'${uuid}'`).join(', ')}]`
+        );
       } else {
-        navigator.clipboard.writeText(uuids.join('\n'));
+        navigator.clipboard.writeText(extractedUUIDs.join('\n'));
       }
 
       toast({
-        title: `Copied ${uuids.length} UUIDs to clipboard`
+        title: `Copied ${extractedUUIDs.length} UUIDs to clipboard`
       });
     } catch (error) {
       toast({
@@ -39,19 +38,7 @@ export function UUIDDisplay({ uuids }: UUIDDisplayProps) {
 
   return (
     <div className='flex flex-col gap-6'>
-      <h2 className='text-lg font-medium'>Extracted {uuids.length} UUIDs</h2>
-      {uuids.length > 0 ? (
-        <ScrollArea className='h-[200px] rounded-md border p-4 list-none'>
-          {uuids.map((uuid, index) => (
-            <li key={index} className='rounded p-2 font-mono'>
-              {uuid}
-            </li>
-          ))}
-        </ScrollArea>
-      ) : (
-        <p className='text-zinc-500'>No UUIDs found in the text</p>
-      )}
-      {uuids.length > 0 && (
+      {extractedUUIDs.length > 0 && (
         <div className='flex gap-2'>
           <Button
             variant='secondary'

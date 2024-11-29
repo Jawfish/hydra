@@ -8,7 +8,7 @@ interface FileUploadProps {
 
 export function FileUpload({ onUpload }: FileUploadProps) {
   const fileError = useFileStore(state => state.fileError);
-  
+
   return (
     <div className='flex gap-6'>
       <Button asChild variant='secondary'>
@@ -23,9 +23,7 @@ export function FileUpload({ onUpload }: FileUploadProps) {
         </label>
       </Button>
       {fileError && (
-        <p className='text-red-500 text-sm flex flex-col justify-center'>
-          {fileError}
-        </p>
+        <p className='text-red-500 text-sm flex flex-col justify-center'>{fileError}</p>
       )}
     </div>
   );
