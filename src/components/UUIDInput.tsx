@@ -10,7 +10,7 @@ export function UUIDInput({ input, onChange }: UUIDInputProps) {
   return (
     <div className='flex flex-col gap-6'>
       <label htmlFor='uuidInput' className='block text-lg font-medium'>
-        Enter text containing UUIDs
+        Enter text containing UUIDs or upload a CSV/JSONL file
       </label>
       <Textarea
         id='uuidInput'
