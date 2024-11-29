@@ -110,7 +110,9 @@ export function FileUpload() {
       </Button>
 
       {fileName && (
-        <p className='text-sm text-muted-foreground'>Selected file: {fileName}</p>
+        <p className='text-sm text-muted-foreground'>
+          Selected file: <strong className='font-medium'>{fileName}</strong>
+        </p>
       )}
 
       {fileError && <p className='text-sm text-destructive'>{fileError}</p>}

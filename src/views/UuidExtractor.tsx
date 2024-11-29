@@ -2,6 +2,7 @@ import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Metadata } from '@/components/Metadata';
+import { Separator } from '@/components/ui/separator';
 import { UuidDisplay } from '@/components/UuidDisplay';
 import { UuidInput } from '@/components/UuidInput';
 import { extractUuids, extractUuidsFromCsv, extractUuidsFromJsonl } from '@/lib/uuid';
@@ -50,11 +51,12 @@ export function UuidExtractor() {
           Extract UUIDs from pasted text or uploaded CSV/JSONL files
         </Header.Description>
       </Header>
-      <UuidInput input={input} onChange={handleInputChange} className='mb-4 mt-6' />
+      <UuidInput input={input} onChange={handleInputChange} className='mb-4 mt-10' />
       <FileUpload />
       {fileType && (
         <>
-          <h3 className='font-semibold mt-12 mb-4'>
+          <Separator className='my-14 h-[1px]' />
+          <h3 className='font-semibold mb-4'>
             Select {fileType === 'jsonl' ? 'field' : 'column'} to extract UUIDs from
           </h3>
           <FieldSelector
@@ -66,7 +68,8 @@ export function UuidExtractor() {
       )}
       {extractedUuids.length > 0 && (
         <>
-          <h3 className='font-semibold mt-12'>Extraction results</h3>
+          <Separator className='my-14 h-[1px]' />
+          <h3 className='font-semibold'>Extraction results</h3>
           <Metadata />
         </>
       )}

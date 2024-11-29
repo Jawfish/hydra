@@ -2,6 +2,7 @@ import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { getValueByPath, parseJsonl } from '@/lib/jsonl';
 import { useFileStore } from '@/store/store';
@@ -53,7 +54,9 @@ export function MapValues() {
 
           return { [key as string]: values };
         });
+
         setMappedValues(mapped);
+        toast.success(`Generated mapping for ${mapped.length} objects`);
       } else if (fileType === 'csv') {
         const csvData: string[][] = Papa.parse<string[]>(fileContent, {
           skipEmptyLines: true
@@ -74,7 +77,9 @@ export function MapValues() {
 
           return { [key as string]: values };
         });
+
         setMappedValues(mapped);
+        toast.success(`Generated mapping for ${mapped.length} rows`);
       }
     } catch (error) {
       toast.error(
@@ -98,9 +103,9 @@ export function MapValues() {
   };
 
   return (
-    <div className='flex flex-col gap-12'>
+    <div className='flex flex-col'>
       <div>
-        <div className='mb-6'>
+        <div className='mb-10'>
           <Header>
             <Header.Title>Map Values</Header.Title>
             <Header.Description>
@@ -111,64 +116,66 @@ export function MapValues() {
         <FileUpload />
       </div>
       {fileType && (
-        <div className='flex flex-col gap-16'>
-          <div>
-            <div className='mb-5'>
-              <h3 className='text-lg font-semibold'>Key Field</h3>
-              <p className='text-sm text-muted-foreground'>
-                Select a field to use as the key in the mapping
-              </p>
-            </div>
-            <FieldSelector
-              fields={fileType === 'jsonl' ? jsonlSchema : csvHeaders}
-              selectedField={keyField}
-              onFieldSelect={handleKeyFieldSelect}
-            />
-          </div>
-
-          <div>
-            <div className='mb-5'>
-              <h3 className='text-lg font-semibold'>Value Fields</h3>
-              <p className='text-sm text-muted-foreground'>
-                Select one or more fields to use as values in the mapping
-              </p>
-            </div>
-            <div className='flex flex-wrap gap-2'>
-              {(fileType === 'jsonl' ? jsonlSchema : csvHeaders).map(field => (
-                <Button
-                  key={field}
-                  variant={valueFields.includes(field) ? 'default' : 'outline'}
-                  onClick={() => handleValueFieldSelect(field)}
-                  className='h-8'
-                >
-                  {field}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <div className='flex flex-col gap-6'>
-            <div className='flex gap-4'>
-              <Button onClick={generateMapping}>Generate Mapping</Button>
-              <Button
-                variant='outline'
-                onClick={copyToClipboard}
-                disabled={mappedValues.length === 0}
-              >
-                Copy to Clipboard
-              </Button>
-            </div>
-            {mappedValues.length > 0 && (
-              <Textarea
-                id='mappedValues'
-                rows={12}
-                value={JSON.stringify(mappedValues, null, 2)}
-                readOnly={true}
-                className='font-mono'
+        <>
+          <Separator className='my-14 h-[1px]' />
+          <div className='flex flex-col gap-14'>
+            <div>
+              <div className='mb-5'>
+                <h3 className='text-lg font-semibold'>Key Field</h3>
+                <p className='text-sm text-muted-foreground'>
+                  Select a field to use as the key in the mapping
+                </p>
+              </div>
+              <FieldSelector
+                fields={fileType === 'jsonl' ? jsonlSchema : csvHeaders}
+                selectedField={keyField}
+                onFieldSelect={handleKeyFieldSelect}
               />
-            )}
+            </div>
+            <Separator />
+            <div>
+              <div className='mb-5'>
+                <h3 className='text-lg font-semibold'>Value Fields</h3>
+                <p className='text-sm text-muted-foreground'>
+                  Select one or more fields to use as values in the mapping
+                </p>
+              </div>
+              <div className='flex flex-wrap gap-2'>
+                {(fileType === 'jsonl' ? jsonlSchema : csvHeaders).map(field => (
+                  <Button
+                    key={field}
+                    variant={valueFields.includes(field) ? 'default' : 'outline'}
+                    onClick={() => handleValueFieldSelect(field)}
+                    className='h-8'
+                  >
+                    {field}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div className='flex flex-col gap-6 bg-muted p-6 -m-6 mt-6 rounded-md'>
+              <div className='flex gap-4'>
+                <Button onClick={generateMapping}>Generate Mapping</Button>
+                <Button
+                  variant='outline'
+                  onClick={copyToClipboard}
+                  disabled={mappedValues.length === 0}
+                >
+                  Copy to Clipboard
+                </Button>
+              </div>
+              {mappedValues.length > 0 && (
+                <Textarea
+                  id='mappedValues'
+                  rows={12}
+                  value={JSON.stringify(mappedValues, null, 2)}
+                  readOnly={true}
+                  className='font-mono bg-white rounded-md resize-none'
+                />
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
