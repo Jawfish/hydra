@@ -4,8 +4,12 @@ import { useFileStore } from '@/store/store';
 import type React from 'react';
 
 const determineFileType = (fileName: string): 'csv' | 'jsonl' | null => {
-  if (fileName.toLowerCase().endsWith('.csv')) return 'csv';
-  if (fileName.toLowerCase().endsWith('.jsonl')) return 'jsonl';
+  if (fileName.toLowerCase().endsWith('.csv')) {
+    return 'csv';
+  }
+  if (fileName.toLowerCase().endsWith('.jsonl')) {
+    return 'jsonl';
+  }
   return null;
 };
 
@@ -19,13 +23,13 @@ const processJsonlContent = (
     setFileError('No valid JSONL data found in file');
     return false;
   }
-  
+
   const paths = getAllPaths(parsedObjects[0]);
   if (paths.length === 0) {
     setFileError('No valid fields found in JSONL data');
     return false;
   }
-  
+
   setJsonlSchema(paths);
   return true;
 };
@@ -57,7 +61,9 @@ export function FileUpload() {
     resetFileState();
 
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     try {
       const fileType = determineFileType(file.name);
@@ -66,9 +72,7 @@ export function FileUpload() {
         return;
       }
 
-      const content = (await file.text())
-        .replace(/\r\n/g, '\n')
-        .replace(/\r/g, '\n');
+      const content = (await file.text()).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
       setFileType(fileType);
       setFileContent(content);
@@ -76,7 +80,9 @@ export function FileUpload() {
 
       if (fileType === 'jsonl') {
         const success = processJsonlContent(content, setJsonlSchema, setFileError);
-        if (!success) return;
+        if (!success) {
+          return;
+        }
       } else {
         processCsvContent(content, setCsvHeaders);
       }
