@@ -27,55 +27,6 @@ export function UUIDExtractor() {
     extractedUUIDs
   } = useFileStore();
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    resetFileState();
-
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      let content = await file.text();
-      const type = file.name.toLowerCase().endsWith('.csv')
-        ? 'csv'
-        : file.name.toLowerCase().endsWith('.jsonl')
-          ? 'jsonl'
-          : null;
-
-      if (!type) {
-        setFileError('Please upload a .csv or .jsonl file');
-        return;
-      }
-
-      content = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-      setFileType(type);
-      setFileContent(content);
-
-      if (type === 'jsonl') {
-        const parsedObjects = parseJSONL(content);
-        if (parsedObjects.length === 0) {
-          setFileError('No valid JSONL data found in file');
-          return;
-        }
-        const paths = getAllPaths(parsedObjects[0]);
-        if (paths.length > 0) {
-          setJsonlSchema(paths);
-        } else {
-          setFileError('No valid fields found in JSONL data');
-        }
-      } else {
-        const firstLine = content.split('\n')[0];
-        if (firstLine) {
-          setCsvHeaders(firstLine.split(',').map(header => header.trim()));
-        }
-      }
-    } catch (error) {
-      setFileError(
-        `Error processing file: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
-    } finally {
-      e.target.value = '';
-    }
-  };
 
   const handleFieldSelection = (field: string) => {
     setSelectedField(field);
@@ -107,7 +58,7 @@ export function UUIDExtractor() {
         </Header.Description>
       </Header>
       <UUIDInput input={input} onChange={handleInputChange} />
-      <FileUpload className='mt-4' onUpload={handleFileUpload} />
+      <FileUpload />
       {fileType && (
         <>
           <h3 className='font-semibold mt-12 mb-4'>
