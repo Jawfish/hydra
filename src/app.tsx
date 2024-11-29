@@ -11,6 +11,7 @@ import { useFileStore } from '@/store/store';
 
 function App() {
   const {
+    // Actions
     setInput,
     setExtractedUUIDs,
     setFileError,
@@ -20,7 +21,14 @@ function App() {
     setFileContent,
     setFileType,
     resetFileState,
-    fileType
+    // State
+    input,
+    fileType,
+    jsonlSchema,
+    csvHeaders,
+    selectedField,
+    fileContent,
+    extractedUUIDs
   } = useFileStore();
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,15 +102,6 @@ function App() {
     }
   };
 
-  const {
-    input,
-    fileType,
-    jsonlSchema,
-    csvHeaders,
-    selectedField,
-    fileContent,
-    extractedUUIDs
-  } = useFileStore();
 
   return (
     <ThemeProvider defaultTheme='system' storageKey='vite-ui-theme'>
