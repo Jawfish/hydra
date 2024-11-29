@@ -13,9 +13,8 @@ function App() {
           <AppSidebar />
           <div className='p-8 xl:mx-auto w-full max-w-4xl'>
             <Routes>
-              <Route path='/uuid-extractor' element={<UUIDExtractor />} />
-              <Route path='/' element={<Navigate to='/uuid-extractor' replace />} />
-              {/* Add more routes here as you create new views */}
+              <Route path='/extract' element={<UUIDExtractor />} />
+              <Route path='/' element={<Navigate to='/extract' replace />} />
             </Routes>
           </div>
 
