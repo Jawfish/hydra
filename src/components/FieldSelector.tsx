@@ -1,37 +1,57 @@
-import { Button } from '@/components/ui/button';
-import React from 'react';
+import { Label } from '@/components/Label';
+import type { JSX } from 'react';
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/shadcn/components/ui/select';
 interface FieldSelectorProps {
-  fileType: 'csv' | 'jsonl' | null;
   fields: string[];
   selectedField: string;
   onFieldSelect: (field: string) => void;
+  label?: string;
+  placeholder?: string;
+  disabled?: boolean;
+  className?: string;
 }
 
 export function FieldSelector({
-  fileType,
   fields,
   selectedField,
-  onFieldSelect
-}: FieldSelectorProps) {
-  if (fields.length === 0) return null;
+  onFieldSelect,
+  label,
+  placeholder = 'Select field',
+  disabled = false,
+  className
+}: FieldSelectorProps): JSX.Element | null {
+  // Filter out empty fields and ensure they're strings
+  const validFields = fields.filter(field => field && field.trim() !== '');
+
+  // Only return null if there are NO valid fields
+  if (validFields.length === 0) {
+    return null;
+  }
 
   return (
-    <div className='flex flex-col gap-4'>
-      <h2 className='text-lg font-medium'>
-        Select {fileType === 'jsonl' ? 'field' : 'column'} containing UUIDs
-      </h2>
-      <div className='flex flex-wrap gap-2'>
-        {fields.map(field => (
-          <Button
-            key={field}
-            variant={selectedField === field ? 'default' : 'outline'}
-            onClick={() => onFieldSelect(field)}
-          >
-            {field}
-          </Button>
-        ))}
-      </div>
+    <div className={className}>
+      {label && (
+        <Label htmlFor={label?.toLowerCase().replace(/[^a-z-]/g, '')}>{label}</Label>
+      )}
+      <Select value={selectedField} onValueChange={onFieldSelect} disabled={disabled}>
+        <SelectTrigger className='w-full min-w-0 truncate' disabled={disabled}>
+          <SelectValue placeholder={placeholder} className='truncate' />
+        </SelectTrigger>
+        <SelectContent>
+          {validFields.map(field => (
+            <SelectItem key={field} value={field} className='w-full truncate'>
+              {field}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

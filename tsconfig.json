@@ -11,15 +11,17 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "noEmit": true,
+    "noImplicitAny": true,
     "paths": {
       "@/*": ["./src/*"]
     },
     "skipLibCheck": true,
     "strict": true,
+    "strictNullChecks": true,
     "target": "ESNext",
     "useDefineForClassFields": true
   },
-  "include": ["src"],
+  "include": ["src", "src/lib/.test.ts"],
   "references": [
     {
       "path": "./tsconfig.node.json"
