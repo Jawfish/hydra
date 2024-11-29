@@ -13,7 +13,7 @@ export function FileUpload({ onUpload }: FileUploadProps) {
     <div className='flex gap-6'>
       <Button asChild variant='secondary'>
         <label className='cursor-pointer'>
-          Upload CSV/JSONL
+          Select CSV/JSONL
           <input
             type='file'
             accept='.csv,.jsonl'
