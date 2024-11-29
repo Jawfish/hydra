@@ -1,4 +1,4 @@
-import { IdCard } from 'lucide-react';
+import { IdCard, Map as MapIcon } from 'lucide-react';
 
 import {
   Sidebar,
@@ -16,6 +16,11 @@ const items = [
     title: 'Extract UUIDs',
     url: '#',
     icon: IdCard
+  },
+  {
+    title: 'Map Values',
+    url: '#',
+    icon: MapIcon
   }
 ];
 
