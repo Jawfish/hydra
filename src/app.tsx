@@ -104,7 +104,7 @@ function App() {
     <ThemeProvider defaultTheme='system' storageKey='vite-ui-theme'>
       <SidebarProvider>
         <AppSidebar />
-        <div className='p-8 xl:mx-auto max-w-4xl flex flex-col gap-6'>
+        <div className='p-8 xl:mx-auto w-full max-w-4xl flex flex-col gap-6'>
           <UUIDInput input={input} onChange={handleInputChange} />
           <FileUpload onUpload={handleFileUpload} />
           <FieldSelector
