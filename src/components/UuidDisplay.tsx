@@ -29,14 +29,14 @@ export function UuidDisplay() {
   };
 
   return (
-    <div className='flex flex-col gap-6 mt-12'>
+    <div className='flex flex-col gap-6 mt-12 bg-muted p-6 -m-6 rounded-md'>
       {extractedUuids.length > 0 && (
         <div className='flex gap-2'>
           <Button className='w-min' onClick={() => handleCopy('python')}>
             Copy as Python list
           </Button>
           <Button
-            variant='secondary'
+            variant='outline'
             className='w-min'
             onClick={() => handleCopy('plaintext')}
           >

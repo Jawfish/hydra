@@ -71,17 +71,17 @@ export function UuidExtractor() {
           <Separator className='my-14 h-[1px]' />
           <h3 className='font-semibold'>Extraction results</h3>
           <Metadata />
+          <UuidDisplay />
         </>
       )}
       {((fileType && selectedField) || input) && extractedUuids.length === 0 && (
         <>
           <Separator className='my-14 h-[1px]' />
           <div className='text-muted-foreground'>
-            <p>No UUIDs found in the input text or file</p>
+            <p>No UUIDs found</p>
           </div>
         </>
       )}
-      <UuidDisplay />
     </div>
   );
 }
