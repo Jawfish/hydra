@@ -6,10 +6,10 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
+  SidebarSeparator
 } from '@/components/ui/sidebar';
 
 const items = [
@@ -30,18 +30,20 @@ export function AppSidebar() {
     <Sidebar collapsible='icon'>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Tools</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map(item => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild={true}>
-                    <Link to={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                <>
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild={true}>
+                      <Link to={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  {items.indexOf(item) < items.length - 1 && <SidebarSeparator />}
+                </>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
