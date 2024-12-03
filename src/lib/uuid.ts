@@ -1,4 +1,5 @@
 import { getValueByPath } from '@/lib/jsonl';
+import Papa from 'papaparse';
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -98,26 +99,11 @@ export const extractUuidsFromCsv = (
   csvContent: string,
   columnName: string
 ): string[] => {
-  const lines = csvContent
-    .split('\n')
-    .map(line => line.trim())
-    .filter(Boolean);
+  const parsedContent = Papa.parse(csvContent, { header: true });
 
-  if (lines.length === 0) {
-    return [];
-  }
-
-  const headers = lines[0].split(',').map(header => header.trim());
-  const columnIndex = headers.findIndex(header => header === columnName);
-
-  if (columnIndex === -1) {
-    return [];
-  }
-
-  const idValues = lines.slice(1).map(line => {
-    const columns = line.split(',').map(col => col.trim());
-    return columns[columnIndex] || '';
-  });
+  const idValues = (parsedContent.data as Record<string, string>[]).map(
+    row => row[columnName] || ''
+  );
 
   return extractUuids(idValues.join(' '));
 };

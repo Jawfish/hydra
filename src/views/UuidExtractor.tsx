@@ -2,9 +2,9 @@ import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Metadata } from '@/components/Metadata';
-import { Separator } from '@/components/ui/separator';
 import { UuidDisplay } from '@/components/UuidDisplay';
 import { UuidInput } from '@/components/UuidInput';
+import { Separator } from '@/components/ui/separator';
 import { extractUuids, extractUuidsFromCsv, extractUuidsFromJsonl } from '@/lib/uuid';
 import { useFileStore } from '@/store/store';
 
