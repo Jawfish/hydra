@@ -44,7 +44,7 @@ export function UuidExtractor() {
   };
 
   return (
-    <div className='flex flex-col'>
+    <div className='flex flex-col mb-12'>
       <Header>
         <Header.Title>Extract UUIDs</Header.Title>
         <Header.Description>

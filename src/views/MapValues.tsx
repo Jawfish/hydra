@@ -103,7 +103,7 @@ export function MapValues() {
   };
 
   return (
-    <div className='flex flex-col'>
+    <div className='flex flex-col mb-12'>
       <div>
         <div className='mb-10'>
           <Header>
@@ -170,7 +170,7 @@ export function MapValues() {
                   rows={12}
                   value={JSON.stringify(mappedValues, null, 2)}
                   readOnly={true}
-                  className='font-mono bg-white rounded-md resize-none'
+                  className='font-mono rounded-md resize-none'
                 />
               )}
             </div>
