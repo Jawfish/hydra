@@ -1,4 +1,4 @@
-import { Bot, FileJson, IdCard, Map as MapIcon } from 'lucide-react';
+import { Bot, FileJson, FileText, IdCard, Map as MapIcon } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -33,6 +33,11 @@ const items = [
     title: 'JSONL to CSV',
     url: '/convert',
     icon: FileJson
+  },
+  {
+    title: 'Backfill CSV',
+    url: '/backfill',
+    icon: FileText
   }
 ];
 
