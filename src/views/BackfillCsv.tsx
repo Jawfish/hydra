@@ -105,20 +105,23 @@ export function BackfillCsv() {
         <div>
           <h3 className='text-lg font-semibold mb-4'>Primary CSV (To Be Updated)</h3>
           <div className='flex items-center gap-4'>
-            <input
-              type="file"
-              accept=".csv"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleFileUpload(file, true);
-              }}
-              className="block w-full text-sm text-slate-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-full file:border-0
-                file:text-sm file:font-semibold
-                file:bg-violet-50 file:text-violet-700
-                hover:file:bg-violet-100"
-            />
+            <Button
+              variant="outline"
+              asChild
+            >
+              <label className="cursor-pointer">
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFileUpload(file, true);
+                  }}
+                  className="hidden"
+                />
+                Choose File
+              </label>
+            </Button>
           </div>
           {primaryHeaders.length > 0 && (
             <div className='mt-6 flex flex-col gap-6'>
@@ -148,20 +151,23 @@ export function BackfillCsv() {
         <div>
           <h3 className='text-lg font-semibold mb-4'>Secondary CSV (Source of Data)</h3>
           <div className='flex items-center gap-4'>
-            <input
-              type="file"
-              accept=".csv"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleFileUpload(file, false);
-              }}
-              className="block w-full text-sm text-slate-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-full file:border-0
-                file:text-sm file:font-semibold
-                file:bg-violet-50 file:text-violet-700
-                hover:file:bg-violet-100"
-            />
+            <Button
+              variant="outline"
+              asChild
+            >
+              <label className="cursor-pointer">
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFileUpload(file, false);
+                  }}
+                  className="hidden"
+                />
+                Choose File
+              </label>
+            </Button>
           </div>
           {secondaryHeaders.length > 0 && (
             <div className='mt-6 flex flex-col gap-6'>
