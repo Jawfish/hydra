@@ -1,20 +1,21 @@
 import { FieldSelector } from '@/components/FieldSelector';
-import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { getValueByPath, parseJsonl } from '@/lib/jsonl';
+import { parseJsonl } from '@/lib/jsonl';
 import { normalizeString } from '@/lib/utils';
 import Papa from 'papaparse';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-export function BackfillCsv() {
+export function Backfill() {
   // State for primary file
   const [primaryCsv, setPrimaryCsv] = useState<string>('');
   const [primaryHeaders, setPrimaryHeaders] = useState<string[]>([]);
   const [primarySchema, setPrimarySchema] = useState<string[]>([]);
-  const [primaryFileType, setPrimaryFileType] = useState<'csv' | 'json' | 'jsonl' | null>(null);
+  const [primaryFileType, setPrimaryFileType] = useState<
+    'csv' | 'json' | 'jsonl' | null
+  >(null);
   const [primaryMatchColumn, setPrimaryMatchColumn] = useState<string>('');
   const [primaryTargetColumn, setPrimaryTargetColumn] = useState<string>('');
 
@@ -22,35 +23,42 @@ export function BackfillCsv() {
   const [secondaryCsv, setSecondaryCsv] = useState<string>('');
   const [secondaryHeaders, setSecondaryHeaders] = useState<string[]>([]);
   const [secondarySchema, setSecondarySchema] = useState<string[]>([]);
-  const [secondaryFileType, setSecondaryFileType] = useState<'csv' | 'json' | 'jsonl' | null>(null);
+  const [secondaryFileType, setSecondaryFileType] = useState<
+    'csv' | 'json' | 'jsonl' | null
+  >(null);
   const [secondaryMatchColumn, setSecondaryMatchColumn] = useState<string>('');
   const [secondarySourceColumn, setSecondarySourceColumn] = useState<string>('');
 
-  const extractJsonSchema = (obj: any, prefix = ''): string[] => {
+  const extractJsonSchema = (obj: Record<string, unknown>, prefix = ''): string[] => {
     let schema: string[] = [];
-    
+
     for (const [key, value] of Object.entries(obj)) {
       const path = prefix ? `${prefix}.${key}` : key;
-      
+
       if (value && typeof value === 'object' && !Array.isArray(value)) {
-        schema = [...schema, path, ...extractJsonSchema(value, path)];
+        schema = [
+          ...schema,
+          path,
+          ...extractJsonSchema(value as Record<string, unknown>, path)
+        ];
       } else {
         schema.push(path);
       }
     }
-    
+
     return schema;
   };
 
   const handleFileUpload = (file: File, isPrimary: boolean) => {
     const reader = new FileReader();
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ignore
     reader.onload = e => {
       const content = e.target?.result as string;
-      
+
       if (file.name.endsWith('.csv')) {
         const result = Papa.parse(content, { header: true });
         const headers = Object.keys(result.data[0] || {});
-        
+
         if (isPrimary) {
           setPrimaryCsv(content);
           setPrimaryHeaders(headers);
@@ -63,7 +71,7 @@ export function BackfillCsv() {
       } else if (file.name.endsWith('.jsonl')) {
         const objects = parseJsonl(content);
         const schema = extractJsonSchema(objects[0]);
-        
+
         if (isPrimary) {
           setPrimaryCsv(content);
           setPrimarySchema(schema);
@@ -77,7 +85,7 @@ export function BackfillCsv() {
         const data = JSON.parse(content);
         const objects = Array.isArray(data) ? data : [data];
         const schema = extractJsonSchema(objects[0]);
-        
+
         if (isPrimary) {
           setPrimaryCsv(content);
           setPrimarySchema(schema);
@@ -220,7 +228,9 @@ export function BackfillCsv() {
 
         {/* Secondary CSV Section */}
         <div>
-          <h3 className='text-lg font-semibold mb-4'>Secondary File (Source of Data)</h3>
+          <h3 className='text-lg font-semibold mb-4'>
+            Secondary File (Source of Data)
+          </h3>
           <div className='flex items-center gap-4'>
             <Button variant='secondary' asChild={true}>
               <label className='cursor-pointer'>
@@ -244,7 +254,9 @@ export function BackfillCsv() {
               <div>
                 <h4 className='font-medium mb-2'>Match Field</h4>
                 <FieldSelector
-                  fields={secondaryFileType === 'csv' ? secondaryHeaders : secondarySchema}
+                  fields={
+                    secondaryFileType === 'csv' ? secondaryHeaders : secondarySchema
+                  }
                   selectedField={secondaryMatchColumn}
                   onFieldSelect={setSecondaryMatchColumn}
                 />
@@ -252,7 +264,9 @@ export function BackfillCsv() {
               <div>
                 <h4 className='font-medium mb-2'>Source Field</h4>
                 <FieldSelector
-                  fields={secondaryFileType === 'csv' ? secondaryHeaders : secondarySchema}
+                  fields={
+                    secondaryFileType === 'csv' ? secondaryHeaders : secondarySchema
+                  }
                   selectedField={secondarySourceColumn}
                   onFieldSelect={setSecondarySourceColumn}
                 />
