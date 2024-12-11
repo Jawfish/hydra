@@ -36,6 +36,8 @@ export function AiProcessor() {
   const [selectedModel, setSelectedModel] = useState<string>(CLAUDE_MODELS[0].id);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState<number>(0);
+  const [languageColumnName, setLanguageColumnName] = useState<string>('Language');
+  const [translationColumnName, setTranslationColumnName] = useState<string>('Translated Text');
 
   const handleColumnSelect = (column: string) => {
     setSelectedColumn(column);
@@ -65,6 +67,23 @@ export function AiProcessor() {
       });
 
       const parsedData = Papa.parse(fileContent, { header: true });
+      const existingColumns = Object.keys(parsedData.data[0] || {});
+
+      if (existingColumns.includes(languageColumnName) || existingColumns.includes(translationColumnName)) {
+        toast.error('Output column names conflict with existing columns in the CSV');
+        return;
+      }
+
+      if (!languageColumnName.trim() || !translationColumnName.trim()) {
+        toast.error('Output column names cannot be empty');
+        return;
+      }
+
+      if (languageColumnName === translationColumnName) {
+        toast.error('Output column names must be different');
+        return;
+      }
+
       const rows = parsedData.data as Record<string, string>[];
       const processedRows = [];
       
@@ -87,9 +106,9 @@ export function AiProcessor() {
             });
 
             const translatedRow = { ...row };
-            // Add language and translation columns
-            translatedRow['Language'] = language;
-            translatedRow['Translated Text'] = response.content[0].text;
+            // Add language and translation columns using configured names
+            translatedRow[languageColumnName] = language;
+            translatedRow[translationColumnName] = response.content[0].text;
             processedRows.push(translatedRow);
 
             completedOperations++;
@@ -97,8 +116,8 @@ export function AiProcessor() {
           } catch (error) {
             console.error(`Error processing translation to ${language}:`, error);
             const errorRow = { ...row };
-            errorRow['Language'] = language;
-            errorRow['Translated Text'] = 'Error processing translation';
+            errorRow[languageColumnName] = language;
+            errorRow[translationColumnName] = 'Error processing translation';
             processedRows.push(errorRow);
             completedOperations++;
           }
@@ -175,6 +194,33 @@ export function AiProcessor() {
               />
             </div>
 
+            <div>
+              <h3 className='text-lg font-semibold mb-4'>Output Column Names</h3>
+              <div className='flex flex-col gap-4 max-w-md'>
+                <div>
+                  <label htmlFor="languageColumn" className="block text-sm font-medium mb-2">
+                    Language Column Name
+                  </label>
+                  <Input
+                    id="languageColumn"
+                    placeholder="Language"
+                    value={languageColumnName}
+                    onChange={(e) => setLanguageColumnName(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="translationColumn" className="block text-sm font-medium mb-2">
+                    Translation Column Name
+                  </label>
+                  <Input
+                    id="translationColumn"
+                    placeholder="Translated Text"
+                    value={translationColumnName}
+                    onChange={(e) => setTranslationColumnName(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
 
             <div className='flex flex-col gap-4'>
               <Button
