@@ -12,7 +12,7 @@ export function BackfillCsv() {
   const [primaryHeaders, setPrimaryHeaders] = useState<string[]>([]);
   const [primaryMatchColumn, setPrimaryMatchColumn] = useState<string>('');
   const [primaryTargetColumn, setPrimaryTargetColumn] = useState<string>('');
-  
+
   // State for secondary CSV
   const [secondaryCsv, setSecondaryCsv] = useState<string>('');
   const [secondaryHeaders, setSecondaryHeaders] = useState<string[]>([]);
@@ -21,7 +21,7 @@ export function BackfillCsv() {
 
   const handleFileUpload = (file: File, isPrimary: boolean) => {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       const content = e.target?.result as string;
       if (isPrimary) {
         setPrimaryCsv(content);
@@ -37,24 +37,40 @@ export function BackfillCsv() {
   };
 
   const processBackfill = () => {
-    if (!primaryCsv || !secondaryCsv) {
+    if (!(primaryCsv && secondaryCsv)) {
       toast.error('Please upload both CSV files');
       return;
     }
 
-    if (!primaryMatchColumn || !secondaryMatchColumn || !primaryTargetColumn || !secondarySourceColumn) {
+    if (
+      !(
+        primaryMatchColumn &&
+        secondaryMatchColumn &&
+        primaryTargetColumn &&
+        secondarySourceColumn
+      )
+    ) {
       toast.error('Please select all required columns');
       return;
     }
 
     try {
       // Parse both CSVs
-      const primaryData = Papa.parse(primaryCsv, { header: true }).data as Record<string, string>[];
-      const secondaryData = Papa.parse(secondaryCsv, { header: true }).data as Record<string, string>[];
+      const primaryData = Papa.parse(primaryCsv, { header: true }).data as Record<
+        string,
+        string
+      >[];
+      const secondaryData = Papa.parse(secondaryCsv, { header: true }).data as Record<
+        string,
+        string
+      >[];
 
       // Create lookup map from secondary CSV
       const lookupMap = new Map(
-        secondaryData.map(row => [row[secondaryMatchColumn], row[secondarySourceColumn]])
+        secondaryData.map(row => [
+          row[secondaryMatchColumn],
+          row[secondarySourceColumn]
+        ])
       );
 
       // Process primary CSV
@@ -105,19 +121,18 @@ export function BackfillCsv() {
         <div>
           <h3 className='text-lg font-semibold mb-4'>Primary CSV (To Be Updated)</h3>
           <div className='flex items-center gap-4'>
-            <Button
-              variant="outline"
-              asChild
-            >
-              <label className="cursor-pointer">
+            <Button variant='outline' asChild={true}>
+              <label className='cursor-pointer'>
                 <input
-                  type="file"
-                  accept=".csv"
-                  onChange={(e) => {
+                  type='file'
+                  accept='.csv'
+                  onChange={e => {
                     const file = e.target.files?.[0];
-                    if (file) handleFileUpload(file, true);
+                    if (file) {
+                      handleFileUpload(file, true);
+                    }
                   }}
-                  className="hidden"
+                  className='hidden'
                 />
                 Choose File
               </label>
@@ -151,19 +166,18 @@ export function BackfillCsv() {
         <div>
           <h3 className='text-lg font-semibold mb-4'>Secondary CSV (Source of Data)</h3>
           <div className='flex items-center gap-4'>
-            <Button
-              variant="outline"
-              asChild
-            >
-              <label className="cursor-pointer">
+            <Button variant='outline' asChild={true}>
+              <label className='cursor-pointer'>
                 <input
-                  type="file"
-                  accept=".csv"
-                  onChange={(e) => {
+                  type='file'
+                  accept='.csv'
+                  onChange={e => {
                     const file = e.target.files?.[0];
-                    if (file) handleFileUpload(file, false);
+                    if (file) {
+                      handleFileUpload(file, false);
+                    }
                   }}
-                  className="hidden"
+                  className='hidden'
                 />
                 Choose File
               </label>
@@ -194,13 +208,16 @@ export function BackfillCsv() {
         <Button
           onClick={processBackfill}
           disabled={
-            !primaryCsv ||
-            !secondaryCsv ||
-            !primaryMatchColumn ||
-            !secondaryMatchColumn ||
-            !primaryTargetColumn ||
-            !secondarySourceColumn
+            !(
+              primaryCsv &&
+              secondaryCsv &&
+              primaryMatchColumn &&
+              secondaryMatchColumn &&
+              primaryTargetColumn &&
+              secondarySourceColumn
+            )
           }
+          className='max-w-min'
         >
           Process Backfill
         </Button>
