@@ -44,11 +44,6 @@ export function AiProcessor() {
       return;
     }
 
-    if (!apiKey) {
-      toast.error('Please enter your Anthropic API key');
-      return;
-    }
-
     if (!fileContent || fileType !== 'csv') {
       toast.error('Please upload a CSV file first');
       return;
@@ -80,43 +75,49 @@ export function AiProcessor() {
       }
 
       const rows = parsedData.data as Record<string, string>[];
-      const processedRows = [];
+      const processedRows: Record<string, string>[] = [];
 
-      // Calculate total operations for progress
+      // Calculate total operations
       const totalOperations = rows.length * LANGUAGES.length;
       let completedOperations = 0;
 
-      for (const row of rows) {
-        // Create translations for each language
-        for (const language of LANGUAGES) {
-          try {
-            const response = await anthropic.messages.create({
-              max_tokens: 1024,
-              messages: [{
-                role: 'user',
-                content: row[selectedColumn]
-              }],
-              model: "claude-3-5-sonnet-latest",
-              system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
-            });
+      // Process rows in chunks to avoid overwhelming the browser
+      const CHUNK_SIZE = 5; // Process 5 rows at a time
+      
+      for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
+        const chunk = rows.slice(i, i + CHUNK_SIZE);
+        const chunkPromises = chunk.flatMap(row =>
+          LANGUAGES.map(async (language) => {
+            try {
+              const response = await anthropic.messages.create({
+                max_tokens: 1024,
+                messages: [{
+                  role: 'user',
+                  content: row[selectedColumn]
+                }],
+                model: "claude-3-5-sonnet-latest",
+                system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
+              });
 
-            const translatedRow = { ...row };
-            // Add language and translation columns using configured names
-            translatedRow[languageColumnName] = language;
-            translatedRow[translationColumnName] = response.content[0].text;
-            processedRows.push(translatedRow);
+              const translatedRow = { ...row };
+              translatedRow[languageColumnName] = language;
+              translatedRow[translationColumnName] = response.content[0].text;
+              return translatedRow;
+            } catch (error) {
+              console.error(`Error processing translation to ${language}:`, error);
+              const errorRow = { ...row };
+              errorRow[languageColumnName] = language;
+              errorRow[translationColumnName] = 'Error processing translation';
+              return errorRow;
+            } finally {
+              completedOperations++;
+              setProgress(Math.round((completedOperations / totalOperations) * 100));
+            }
+          })
+        );
 
-            completedOperations++;
-            setProgress(Math.round((completedOperations / totalOperations) * 100));
-          } catch (error) {
-            console.error(`Error processing translation to ${language}:`, error);
-            const errorRow = { ...row };
-            errorRow[languageColumnName] = language;
-            errorRow[translationColumnName] = 'Error processing translation';
-            processedRows.push(errorRow);
-            completedOperations++;
-          }
-        }
+        const chunkResults = await Promise.all(chunkPromises);
+        processedRows.push(...chunkResults);
       }
 
       const csv = Papa.unparse(processedRows);
