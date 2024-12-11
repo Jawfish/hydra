@@ -2,6 +2,7 @@ import { FieldSelector } from '@/components/FieldSelector';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { normalizeString } from '@/lib/utils';
 import Papa from 'papaparse';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -68,7 +69,7 @@ export function BackfillCsv() {
       // Create lookup map from secondary CSV
       const lookupMap = new Map(
         secondaryData.map(row => [
-          row[secondaryMatchColumn],
+          normalizeString(row[secondaryMatchColumn]),
           row[secondarySourceColumn]
         ])
       );
@@ -77,7 +78,7 @@ export function BackfillCsv() {
       const updatedData = primaryData.map(row => {
         const newRow = { ...row };
         if (!row[primaryTargetColumn] || row[primaryTargetColumn].trim() === '') {
-          const matchValue = row[primaryMatchColumn];
+          const matchValue = normalizeString(row[primaryMatchColumn]);
           const backfillValue = lookupMap.get(matchValue);
           if (backfillValue) {
             newRow[primaryTargetColumn] = backfillValue;
