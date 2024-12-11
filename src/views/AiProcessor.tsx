@@ -5,10 +5,10 @@ import { Progress } from "@/components/ui/progress";
 
 const LANGUAGES = [
   "German",
-  "Spanish", 
+  "Spanish",
   "French",
   "Italian",
-  "Portuguese", 
+  "Portuguese",
   "Japanese",
   "Korean"
 ] as const;
@@ -23,18 +23,12 @@ import { useFileStore } from '@/store/store';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const CLAUDE_MODELS = [
-  { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus' },
-  { id: 'claude-3-sonnet-20240229', name: 'Claude 3 Sonnet' },
-  { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku' },
-  { id: 'claude-2.1', name: 'Claude 2.1' }
-] as const;
+
 
 export function AiProcessor() {
   const { fileType, csvHeaders, fileContent } = useFileStore();
   const [selectedColumn, setSelectedColumn] = useState<string>('');
   const [apiKey, setApiKey] = useState<string>('');
-  const [selectedModel, setSelectedModel] = useState<string>(CLAUDE_MODELS[0].id);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState<number>(0);
   const [languageColumnName, setLanguageColumnName] = useState<string>('Language');
@@ -87,7 +81,7 @@ export function AiProcessor() {
 
       const rows = parsedData.data as Record<string, string>[];
       const processedRows = [];
-      
+
       // Calculate total operations for progress
       const totalOperations = rows.length * LANGUAGES.length;
       let completedOperations = 0;
@@ -102,7 +96,7 @@ export function AiProcessor() {
                 role: 'user',
                 content: row[selectedColumn]
               }],
-              model: selectedModel,
+              model: "claude-3-5-sonnet-latest",
               system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
             });
 
@@ -170,21 +164,7 @@ export function AiProcessor() {
               />
             </div>
 
-            <div>
-              <h3 className='text-lg font-semibold mb-4'>Select Model</h3>
-              <Select value={selectedModel} onValueChange={setSelectedModel}>
-                <SelectTrigger className="max-w-md">
-                  <SelectValue placeholder="Select a model" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CLAUDE_MODELS.map((model) => (
-                    <SelectItem key={model.id} value={model.id}>
-                      {model.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+
 
             <div>
               <h3 className='text-lg font-semibold mb-4'>Select Column to Process</h3>
