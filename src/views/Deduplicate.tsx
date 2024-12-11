@@ -8,19 +8,23 @@ import Papa from 'papaparse';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-export function DeduplicateCsv() {
+export function Deduplicate() {
   // State for primary file
   const [primaryFile, setPrimaryFile] = useState<string>('');
   const [primaryHeaders, setPrimaryHeaders] = useState<string[]>([]);
   const [primarySchema, setPrimarySchema] = useState<string[]>([]);
-  const [primaryFileType, setPrimaryFileType] = useState<'csv' | 'json' | 'jsonl' | null>(null);
+  const [primaryFileType, setPrimaryFileType] = useState<
+    'csv' | 'json' | 'jsonl' | null
+  >(null);
   const [primaryMatchColumn, setPrimaryMatchColumn] = useState<string>('');
 
   // State for secondary file
   const [secondaryFile, setSecondaryFile] = useState<string>('');
   const [secondaryHeaders, setSecondaryHeaders] = useState<string[]>([]);
   const [secondarySchema, setSecondarySchema] = useState<string[]>([]);
-  const [secondaryFileType, setSecondaryFileType] = useState<'csv' | 'json' | 'jsonl' | null>(null);
+  const [secondaryFileType, setSecondaryFileType] = useState<
+    'csv' | 'json' | 'jsonl' | null
+  >(null);
   const [secondaryMatchColumn, setSecondaryMatchColumn] = useState<string>('');
 
   const extractJsonSchema = (obj: Record<string, unknown>, prefix = ''): string[] => {
@@ -28,7 +32,11 @@ export function DeduplicateCsv() {
     for (const [key, value] of Object.entries(obj)) {
       const path = prefix ? `${prefix}.${key}` : key;
       if (value && typeof value === 'object' && !Array.isArray(value)) {
-        schema = [...schema, path, ...extractJsonSchema(value as Record<string, unknown>, path)];
+        schema = [
+          ...schema,
+          path,
+          ...extractJsonSchema(value as Record<string, unknown>, path)
+        ];
       } else {
         schema.push(path);
       }
@@ -104,37 +112,66 @@ export function DeduplicateCsv() {
     try {
       // Create set of values from secondary file
       const secondaryValues = new Set();
-      
+
       if (secondaryFileType === 'csv') {
-        const data = Papa.parse(secondaryFile, { header: true }).data as Record<string, string>[];
-        data.forEach(row => secondaryValues.add(normalizeString(row[secondaryMatchColumn])));
+        const data = Papa.parse(secondaryFile, { header: true }).data as Record<
+          string,
+          string
+        >[];
+        data.forEach(row =>
+          secondaryValues.add(normalizeString(row[secondaryMatchColumn]))
+        );
       } else {
-        const data = secondaryFileType === 'jsonl' ? parseJsonl(secondaryFile) : JSON.parse(secondaryFile);
+        const data =
+          secondaryFileType === 'jsonl'
+            ? parseJsonl(secondaryFile)
+            : JSON.parse(secondaryFile);
         const objects = Array.isArray(data) ? data : [data];
-        objects.forEach(obj => secondaryValues.add(normalizeString(getValueByPath(obj, secondaryMatchColumn))));
+        objects.forEach(obj =>
+          secondaryValues.add(
+            normalizeString(getValueByPath(obj, secondaryMatchColumn))
+          )
+        );
       }
 
       // Process primary file
       let result;
       if (primaryFileType === 'csv') {
-        const data = Papa.parse(primaryFile, { header: true }).data as Record<string, string>[];
-        result = data.filter(row => !secondaryValues.has(normalizeString(row[primaryMatchColumn])));
+        const data = Papa.parse(primaryFile, { header: true }).data as Record<
+          string,
+          string
+        >[];
+        result = data.filter(
+          row => !secondaryValues.has(normalizeString(row[primaryMatchColumn]))
+        );
         const output = Papa.unparse(result);
         return downloadFile(output, 'csv');
       } else {
-        const data = primaryFileType === 'jsonl' ? parseJsonl(primaryFile) : JSON.parse(primaryFile);
+        const data =
+          primaryFileType === 'jsonl'
+            ? parseJsonl(primaryFile)
+            : JSON.parse(primaryFile);
         const objects = Array.isArray(data) ? data : [data];
-        result = objects.filter(obj => !secondaryValues.has(normalizeString(getValueByPath(obj, primaryMatchColumn))));
+        result = objects.filter(
+          obj =>
+            !secondaryValues.has(
+              normalizeString(getValueByPath(obj, primaryMatchColumn))
+            )
+        );
         const output = JSON.stringify(result, null, 2);
         return downloadFile(output, 'json');
       }
     } catch (error) {
-      toast.error(`Error processing files: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(
+        `Error processing files: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   };
 
   const downloadFile = (content: string, type: 'csv' | 'json') => {
-    const blob = new Blob([content], { type: type === 'csv' ? 'text/csv' : 'application/json' });
+    const blob = new Blob([content], {
+      type: type === 'csv' ? 'text/csv' : 'application/json'
+    });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -159,7 +196,9 @@ export function DeduplicateCsv() {
       <div className='flex flex-col gap-14'>
         {/* Primary File Section */}
         <div>
-          <h3 className='text-lg font-semibold mb-4'>Primary File (To Be Deduplicated)</h3>
+          <h3 className='text-lg font-semibold mb-4'>
+            Primary File (To Be Deduplicated)
+          </h3>
           <div className='flex items-center gap-4'>
             <Button variant='secondary' asChild={true}>
               <label className='cursor-pointer'>
@@ -192,7 +231,9 @@ export function DeduplicateCsv() {
 
         {/* Secondary File Section */}
         <div>
-          <h3 className='text-lg font-semibold mb-4'>Secondary File (Reference for Duplicates)</h3>
+          <h3 className='text-lg font-semibold mb-4'>
+            Secondary File (Reference for Duplicates)
+          </h3>
           <div className='flex items-center gap-4'>
             <Button variant='secondary' asChild={true}>
               <label className='cursor-pointer'>
@@ -213,7 +254,9 @@ export function DeduplicateCsv() {
             <div className='mt-6'>
               <h4 className='font-medium mb-2'>Match Field</h4>
               <FieldSelector
-                fields={secondaryFileType === 'csv' ? secondaryHeaders : secondarySchema}
+                fields={
+                  secondaryFileType === 'csv' ? secondaryHeaders : secondarySchema
+                }
                 selectedField={secondaryMatchColumn}
                 onFieldSelect={setSecondaryMatchColumn}
               />
@@ -223,7 +266,14 @@ export function DeduplicateCsv() {
 
         <Button
           onClick={processDeduplicate}
-          disabled={!(primaryFile && secondaryFile && primaryMatchColumn && secondaryMatchColumn)}
+          disabled={
+            !(
+              primaryFile &&
+              secondaryFile &&
+              primaryMatchColumn &&
+              secondaryMatchColumn
+            )
+          }
           className='max-w-min'
         >
           Process Deduplication
