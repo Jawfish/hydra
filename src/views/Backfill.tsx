@@ -303,7 +303,7 @@ export function Backfill() {
               <label className='cursor-pointer'>
                 <input
                   type='file'
-                  accept='.csv'
+                  accept='.csv,.json,.jsonl'
                   onChange={e => {
                     const file = e.target.files?.[0];
                     if (file) {
