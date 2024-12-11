@@ -1,4 +1,4 @@
-import { IdCard, Map as MapIcon } from 'lucide-react';
+import { Bot, IdCard, Map as MapIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import {
@@ -22,6 +22,11 @@ const items = [
     title: 'Map Values',
     url: '/map',
     icon: MapIcon
+  },
+  {
+    title: 'AI Processor',
+    url: '/process',
+    icon: Bot
   }
 ];
 
