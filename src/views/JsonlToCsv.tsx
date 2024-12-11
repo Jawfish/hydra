@@ -77,7 +77,7 @@ export function JsonlToCsv() {
       {fileType === 'jsonl' && (
         <>
           <Separator className='my-14 h-[1px]' />
-          <div className='flex flex-col gap-4'>
+          <div className='flex flex-col gap-4 max-w-min'>
             <Button onClick={convertToCsv}>Convert to CSV</Button>
           </div>
         </>
