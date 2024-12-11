@@ -1,4 +1,4 @@
-import { Bot, IdCard, Map as MapIcon } from 'lucide-react';
+import { Bot, FileJson, IdCard, Map as MapIcon } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -28,6 +28,11 @@ const items = [
     title: 'Translate',
     url: '/translate',
     icon: Bot
+  },
+  {
+    title: 'JSONL to CSV',
+    url: '/convert',
+    icon: FileJson
   }
 ];
 

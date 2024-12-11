@@ -2,6 +2,7 @@ import { AppSidebar } from '@/components/AppSidebar';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
+import { JsonlToCsv } from '@/views/JsonlToCsv';
 import { MapValues } from '@/views/MapValues';
 import { Translate } from '@/views/Translate';
 import { UuidExtractor } from '@/views/UuidExtractor';
@@ -18,6 +19,7 @@ function App() {
               <Route path='/extract' element={<UuidExtractor />} />
               <Route path='/map' element={<MapValues />} />
               <Route path='/translate' element={<Translate />} />
+              <Route path='/convert' element={<JsonlToCsv />} />
               <Route path='/' element={<Navigate to='/extract' replace={true} />} />
             </Routes>
           </div>
