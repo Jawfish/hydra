@@ -6,6 +6,12 @@ import Papa from 'papaparse';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+interface FieldAnalysisDetail {
+  identifier: string;
+  value: string;
+  isEmpty: boolean;
+}
+
 interface FileStats {
   fileName: string;
   fileType: 'csv' | 'json' | 'jsonl';
@@ -18,10 +24,39 @@ interface FileStats {
   }[];
   schema?: string[];
   headers?: string[];
+  fileContent: string;
 }
 
 export function Stats() {
   const [stats, setStats] = useState<FileStats | null>(null);
+  const [selectedIdentifier, setSelectedIdentifier] = useState<string>('');
+  const [selectedAnalysisField, setSelectedAnalysisField] = useState<string>('');
+  const [fieldAnalysis, setFieldAnalysis] = useState<FieldAnalysisDetail[]>([]);
+
+  const analyzeFieldDetails = (field: string, identifierField: string) => {
+    if (!stats || !field || !identifierField) return;
+
+    const details: FieldAnalysisDetail[] = [];
+    const data = stats.fileType === 'csv' 
+      ? (Papa.parse(stats.fileContent, { header: true }).data as any[])
+      : parseJsonl(stats.fileContent);
+
+    data.forEach(row => {
+      const fieldValue = typeof row === 'object' ? getValueByPath(row, field) : row[field];
+      const identifier = typeof row === 'object' ? getValueByPath(row, identifierField) : row[identifierField];
+      
+      const stringValue = String(fieldValue).trim();
+      const isEmpty = stringValue === '' || fieldValue === null || fieldValue === undefined;
+
+      details.push({
+        identifier: String(identifier),
+        value: isEmpty ? '' : stringValue,
+        isEmpty
+      });
+    });
+
+    setFieldAnalysis(details.filter(d => d.isEmpty));
+  };
 
   const extractJsonSchema = (obj: Record<string, unknown>, prefix = ''): string[] => {
     let schema: string[] = [];
@@ -87,7 +122,8 @@ export function Stats() {
             fileType: 'csv',
             rowCount: result.data.length,
             fields,
-            headers
+            headers,
+            fileContent: content
           });
         } else if (file.name.endsWith('.jsonl')) {
           const objects = parseJsonl(content);
@@ -101,7 +137,8 @@ export function Stats() {
             fileType: 'jsonl',
             rowCount: objects.length,
             fields,
-            schema
+            schema,
+            fileContent: content
           });
         } else if (file.name.endsWith('.json')) {
           const data = JSON.parse(content);
@@ -116,7 +153,8 @@ export function Stats() {
             fileType: 'json',
             rowCount: objects.length,
             fields,
-            schema
+            schema,
+            fileContent: content
           });
         }
         
@@ -208,6 +246,61 @@ export function Stats() {
                 </div>
               </ScrollArea>
             </div>
+
+            {stats && (
+              <div className='rounded-lg border p-4'>
+                <h3 className='font-medium mb-4'>Detailed Analysis</h3>
+                <div className='flex gap-4 mb-4'>
+                  <div className='flex flex-col gap-2'>
+                    <label className='text-sm font-medium'>Identifier Field</label>
+                    <select 
+                      className='rounded-md border p-2'
+                      value={selectedIdentifier}
+                      onChange={(e) => setSelectedIdentifier(e.target.value)}
+                    >
+                      <option value="">Select identifier field...</option>
+                      {(stats.headers || stats.schema)?.map(field => (
+                        <option key={field} value={field}>{field}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className='flex flex-col gap-2'>
+                    <label className='text-sm font-medium'>Analyze Field</label>
+                    <select 
+                      className='rounded-md border p-2'
+                      value={selectedAnalysisField}
+                      onChange={(e) => {
+                        setSelectedAnalysisField(e.target.value);
+                        analyzeFieldDetails(e.target.value, selectedIdentifier);
+                      }}
+                    >
+                      <option value="">Select field to analyze...</option>
+                      {(stats.headers || stats.schema)?.map(field => (
+                        <option key={field} value={field}>{field}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {fieldAnalysis.length > 0 && (
+                  <div>
+                    <h4 className='text-sm font-medium mb-2'>
+                      Records with empty values in {selectedAnalysisField}
+                    </h4>
+                    <ScrollArea className='h-[200px]'>
+                      <div className='space-y-2'>
+                        {fieldAnalysis.map((detail, index) => (
+                          <div key={index} className='text-sm'>
+                            {selectedIdentifier}: {detail.identifier}
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
