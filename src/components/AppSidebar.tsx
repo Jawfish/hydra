@@ -1,3 +1,4 @@
+import React from 'react';
 import { Bot, IdCard, Map as MapIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -38,8 +39,8 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map(item => (
-                <>
-                  <SidebarMenuItem key={item.title}>
+                <React.Fragment key={item.title}>
+                  <SidebarMenuItem>
                     <SidebarMenuButton asChild={true}>
                       <Link to={item.url}>
                         <item.icon />
@@ -48,7 +49,7 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   {items.indexOf(item) < items.length - 1 && <SidebarSeparator />}
-                </>
+                </React.Fragment>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
