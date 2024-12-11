@@ -1,4 +1,4 @@
-import { Bot, FileJson, FileText, FileX, IdCard, Map as MapIcon } from 'lucide-react';
+import { BarChart, Bot, FileJson, FileText, FileX, IdCard, Map as MapIcon } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -43,6 +43,11 @@ const items = [
     title: 'Deduplicate',
     url: '/deduplicate',
     icon: FileX
+  },
+  {
+    title: 'Stats',
+    url: '/stats',
+    icon: BarChart
   }
 ];
 
