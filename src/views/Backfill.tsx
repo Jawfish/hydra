@@ -100,66 +100,110 @@ export function Backfill() {
     reader.readAsText(file);
   };
 
+  const getValueByPath = (obj: any, path: string): any => {
+    return path.split('.').reduce((acc, part) => acc?.[part], obj);
+  };
+
+  const downloadFile = (content: string, type: 'csv' | 'json' | 'jsonl') => {
+    const mimeTypes = {
+      csv: 'text/csv',
+      json: 'application/json',
+      jsonl: 'application/x-jsonlines'
+    };
+
+    const blob = new Blob([content], { type: mimeTypes[type] });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    a.download = `backfilled_${timestamp}.${type}`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   const processBackfill = () => {
     if (!(primaryCsv && secondaryCsv)) {
       toast.error('Please upload both files');
       return;
     }
 
-    if (
-      !(
-        primaryMatchColumn &&
-        secondaryMatchColumn &&
-        primaryTargetColumn &&
-        secondarySourceColumn
-      )
-    ) {
+    if (!(primaryMatchColumn && secondaryMatchColumn && primaryTargetColumn && secondarySourceColumn)) {
       toast.error('Please select all required fields');
       return;
     }
 
     try {
-      // Parse both CSVs
-      const primaryData = Papa.parse(primaryCsv, { header: true }).data as Record<
-        string,
-        string
-      >[];
-      const secondaryData = Papa.parse(secondaryCsv, { header: true }).data as Record<
-        string,
-        string
-      >[];
+      // Create lookup map from secondary file
+      const lookupMap = new Map();
+      if (secondaryFileType === 'csv') {
+        const data = Papa.parse(secondaryCsv, { header: true }).data as Record<string, string>[];
+        data.forEach(row => {
+          lookupMap.set(normalizeString(row[secondaryMatchColumn]), row[secondarySourceColumn]);
+        });
+      } else {
+        const data = secondaryFileType === 'jsonl' ? parseJsonl(secondaryCsv) : JSON.parse(secondaryCsv);
+        const objects = Array.isArray(data) ? data : [data];
+        objects.forEach(obj => {
+          lookupMap.set(
+            normalizeString(getValueByPath(obj, secondaryMatchColumn)),
+            getValueByPath(obj, secondarySourceColumn)
+          );
+        });
+      }
 
-      // Create lookup map from secondary CSV
-      const lookupMap = new Map(
-        secondaryData.map(row => [
-          normalizeString(row[secondaryMatchColumn]),
-          row[secondarySourceColumn]
-        ])
-      );
-
-      // Process primary CSV
-      const updatedData = primaryData.map(row => {
-        const newRow = { ...row };
-        if (!row[primaryTargetColumn] || row[primaryTargetColumn].trim() === '') {
-          const matchValue = normalizeString(row[primaryMatchColumn]);
-          const backfillValue = lookupMap.get(matchValue);
-          if (backfillValue) {
-            newRow[primaryTargetColumn] = backfillValue;
+      // Process primary file
+      if (primaryFileType === 'csv') {
+        const primaryData = Papa.parse(primaryCsv, { header: true }).data as Record<string, string>[];
+        const updatedData = primaryData.map(row => {
+          const newRow = { ...row };
+          if (!row[primaryTargetColumn] || row[primaryTargetColumn].trim() === '') {
+            const matchValue = normalizeString(row[primaryMatchColumn]);
+            const backfillValue = lookupMap.get(matchValue);
+            if (backfillValue) {
+              newRow[primaryTargetColumn] = backfillValue;
+            }
           }
-        }
-        return newRow;
-      });
+          return newRow;
+        });
 
-      // Generate new CSV
-      const csv = Papa.unparse(updatedData);
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      a.download = `backfilled_${timestamp}.csv`;
-      a.click();
-      window.URL.revokeObjectURL(url);
+        // Generate new CSV
+        const csv = Papa.unparse(updatedData);
+        downloadFile(csv, 'csv');
+      } else {
+        const primaryData = primaryFileType === 'jsonl' ? parseJsonl(primaryCsv) : JSON.parse(primaryCsv);
+        const objects = Array.isArray(primaryData) ? primaryData : [primaryData];
+        
+        const updatedData = objects.map(obj => {
+          const newObj = { ...obj };
+          const currentValue = getValueByPath(obj, primaryTargetColumn);
+          if (!currentValue || String(currentValue).trim() === '') {
+            const matchValue = normalizeString(getValueByPath(obj, primaryMatchColumn));
+            const backfillValue = lookupMap.get(matchValue);
+            if (backfillValue) {
+              // Handle nested path updates
+              const parts = primaryTargetColumn.split('.');
+              let current = newObj;
+              for (let i = 0; i < parts.length - 1; i++) {
+                if (!current[parts[i]]) {
+                  current[parts[i]] = {};
+                }
+                current = current[parts[i]];
+              }
+              current[parts[parts.length - 1]] = backfillValue;
+            }
+          }
+          return newObj;
+        });
+
+        // Generate new file in original format
+        if (primaryFileType === 'jsonl') {
+          const jsonl = updatedData.map(obj => JSON.stringify(obj)).join('\n');
+          downloadFile(jsonl, 'jsonl');
+        } else {
+          const json = JSON.stringify(Array.isArray(primaryData) ? updatedData : updatedData[0], null, 2);
+          downloadFile(json, 'json');
+        }
+      }
 
       toast.success('Processing complete! File downloaded.');
     } catch (error) {
