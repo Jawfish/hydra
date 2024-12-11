@@ -3,7 +3,8 @@ import Anthropic from '@anthropic-ai/sdk';
 import Papa from 'papaparse';
 import { Progress } from "@/components/ui/progress";
 
-const LANGUAGES = [
+const ALL_LANGUAGES = [
+  "English",
   "German",
   "Spanish",
   "French",
@@ -13,6 +14,24 @@ const LANGUAGES = [
   "Korean"
 ] as const;
 
+const DEFAULT_ENABLED_LANGUAGES = [
+  "German",
+  "Spanish",
+  "French",
+  "Italian",
+  "Portuguese",
+  "Japanese",
+  "Korean"
+] as const;
+
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { FieldSelector } from '@/components/FieldSelector';
@@ -31,6 +50,9 @@ export function AiProcessor() {
   const [apiKey, setApiKey] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState<number>(0);
+  const [selectedLanguages, setSelectedLanguages] = useState<Set<string>>(
+    new Set(DEFAULT_ENABLED_LANGUAGES)
+  );
   const [languageColumnName, setLanguageColumnName] = useState<string>('Language');
   const [translationColumnName, setTranslationColumnName] = useState<string>('Translated Text');
 
@@ -78,7 +100,7 @@ export function AiProcessor() {
       const processedRows: Record<string, string>[] = [];
 
       // Calculate total operations
-      const totalOperations = rows.length * LANGUAGES.length;
+      const totalOperations = rows.length * selectedLanguages.size;
       let completedOperations = 0;
 
       // Process rows in chunks to avoid overwhelming the browser
@@ -87,7 +109,7 @@ export function AiProcessor() {
       for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
         const chunk = rows.slice(i, i + CHUNK_SIZE);
         const chunkPromises = chunk.flatMap(row =>
-          LANGUAGES.map(async (language) => {
+          Array.from(selectedLanguages).map(async (language) => {
             try {
               const response = await anthropic.messages.create({
                 max_tokens: 1024,
@@ -206,6 +228,42 @@ export function AiProcessor() {
                   />
                 </div>
               </div>
+            </div>
+
+            <div>
+              <h3 className='text-lg font-semibold mb-4'>Languages to Translate To</h3>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-[200px] justify-between">
+                    Select Languages
+                    <span className="text-xs text-muted-foreground">
+                      ({selectedLanguages.size} selected)
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-[200px]">
+                  <DropdownMenuLabel>Available Languages</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {ALL_LANGUAGES.map((language) => (
+                    <DropdownMenuCheckboxItem
+                      key={language}
+                      checked={selectedLanguages.has(language)}
+                      onCheckedChange={(checked) => {
+                        const newSelected = new Set(selectedLanguages);
+                        if (checked) {
+                          newSelected.add(language);
+                        } else {
+                          newSelected.delete(language);
+                        }
+                        setSelectedLanguages(newSelected);
+                      }}
+                      disabled={language === "English"} // English is disabled by default
+                    >
+                      {language}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             <div className='flex flex-col gap-4'>
