@@ -285,6 +285,7 @@ export function Translate() {
               <Button
                 onClick={processCsv}
                 disabled={isProcessing || !selectedColumn || !apiKey}
+                className='max-w-min'
               >
                 {isProcessing ? 'Translating...' : 'Translate CSV'}
               </Button>
