@@ -99,7 +99,7 @@ export function FileUpload() {
     <div className='space-y-2 flex gap-4'>
       <Button asChild={true} variant='secondary'>
         <label className='cursor-pointer'>
-          Select CSV/JSONL
+          Select File
           <input
             type='file'
             accept='.csv,.jsonl'

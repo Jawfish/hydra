@@ -48,7 +48,7 @@ export function UuidExtractor() {
       <Header>
         <Header.Title>Extract UUIDs</Header.Title>
         <Header.Description>
-          Extract UUIDs from pasted text or uploaded CSV/JSONL files
+          Extract UUIDs from pasted text or uploaded CSV or JSONL files
         </Header.Description>
       </Header>
       <UuidInput input={input} onChange={handleInputChange} className='mb-4 mt-10' />
