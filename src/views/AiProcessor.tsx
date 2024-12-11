@@ -83,7 +83,7 @@ export function AiProcessor() {
 
       // Process rows in chunks to avoid overwhelming the browser
       const CHUNK_SIZE = 5; // Process 5 rows at a time
-      
+
       for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
         const chunk = rows.slice(i, i + CHUNK_SIZE);
         const chunkPromises = chunk.flatMap(row =>
@@ -99,8 +99,8 @@ export function AiProcessor() {
                 system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
               });
 
-              const translatedText = response.content[0].type === 'text' 
-                ? response.content[0].text 
+              const translatedText = response.content[0].type === 'text'
+                ? response.content[0].text
                 : '';
 
               const translatedRow = { ...row };
