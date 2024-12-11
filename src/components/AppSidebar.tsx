@@ -40,7 +40,7 @@ const items = [
     icon: FileText
   },
   {
-    title: 'Deduplicate CSV',
+    title: 'Deduplicate',
     url: '/deduplicate',
     icon: FileX
   }

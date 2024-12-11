@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import { Backfill } from '@/views/Backfill';
-import { DeduplicateCsv } from '@/views/Deduplicate';
+import { Deduplicate } from '@/views/Deduplicate';
 import { JsonlToCsv } from '@/views/JsonlToCsv';
 import { MapValues } from '@/views/MapValues';
 import { Translate } from '@/views/Translate';
@@ -25,7 +25,7 @@ function App() {
               <Route path='/translate' element={<Translate />} />
               <Route path='/convert' element={<JsonlToCsv />} />
               <Route path='/backfill' element={<Backfill />} />
-              <Route path='/deduplicate' element={<DeduplicateCsv />} />
+              <Route path='/deduplicate' element={<Deduplicate />} />
               <Route path='/' element={<Navigate to='/extract' replace={true} />} />
             </Routes>
           </div>
