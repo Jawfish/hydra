@@ -1,6 +1,7 @@
 import { FieldSelector } from '@/components/FieldSelector';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { parseJsonl } from '@/lib/jsonl';
 import { normalizeString } from '@/lib/utils';
@@ -18,6 +19,16 @@ export function Backfill() {
   >(null);
   const [primaryMatchColumn, setPrimaryMatchColumn] = useState<string>('');
   const [primaryTargetColumn, setPrimaryTargetColumn] = useState<string>('');
+  const [showResults, setShowResults] = useState(false);
+  const [backfillStats, setBackfillStats] = useState<{
+    totalCount: number;
+    backfilledCount: number;
+    unchangedCount: number;
+  }>({
+    totalCount: 0,
+    backfilledCount: 0,
+    unchangedCount: 0,
+  });
 
   // State for secondary file
   const [secondaryCsv, setSecondaryCsv] = useState<string>('');
@@ -151,9 +162,17 @@ export function Backfill() {
         });
       }
 
+      let stats = {
+        totalCount: 0,
+        backfilledCount: 0,
+        unchangedCount: 0
+      };
+
       // Process primary file
       if (primaryFileType === 'csv') {
         const primaryData = Papa.parse(primaryCsv, { header: true }).data as Record<string, string>[];
+        stats.totalCount = primaryData.length;
+        
         const updatedData = primaryData.map(row => {
           const newRow = { ...row };
           if (!row[primaryTargetColumn] || row[primaryTargetColumn].trim() === '') {
@@ -161,17 +180,22 @@ export function Backfill() {
             const backfillValue = lookupMap.get(matchValue);
             if (backfillValue) {
               newRow[primaryTargetColumn] = backfillValue;
+              stats.backfilledCount++;
+            } else {
+              stats.unchangedCount++;
             }
+          } else {
+            stats.unchangedCount++;
           }
           return newRow;
         });
 
-        // Generate new CSV
         const csv = Papa.unparse(updatedData);
         downloadFile(csv, 'csv');
       } else {
         const primaryData = primaryFileType === 'jsonl' ? parseJsonl(primaryCsv) : JSON.parse(primaryCsv);
         const objects = Array.isArray(primaryData) ? primaryData : [primaryData];
+        stats.totalCount = objects.length;
         
         const updatedData = objects.map(obj => {
           const newObj = { ...obj };
@@ -190,7 +214,12 @@ export function Backfill() {
                 current = current[parts[i]];
               }
               current[parts[parts.length - 1]] = backfillValue;
+              stats.backfilledCount++;
+            } else {
+              stats.unchangedCount++;
             }
+          } else {
+            stats.unchangedCount++;
           }
           return newObj;
         });
@@ -205,6 +234,8 @@ export function Backfill() {
         }
       }
 
+      setBackfillStats(stats);
+      setShowResults(true);
       toast.success('Processing complete! File downloaded.');
     } catch (error) {
       toast.error(
@@ -336,6 +367,19 @@ export function Backfill() {
           Process Backfill
         </Button>
       </div>
+
+      <Dialog open={showResults} onOpenChange={setShowResults}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Backfill Results</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p>Total records: {backfillStats.totalCount}</p>
+            <p>Records backfilled: {backfillStats.backfilledCount}</p>
+            <p>Records unchanged: {backfillStats.unchangedCount}</p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
