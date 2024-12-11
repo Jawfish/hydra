@@ -2,6 +2,16 @@ import { useState } from 'react';
 import Anthropic from '@anthropic-ai/sdk';
 import Papa from 'papaparse';
 
+const LANGUAGES = [
+  "German",
+  "Spanish", 
+  "French",
+  "Italian",
+  "Portuguese", 
+  "Japanese",
+  "Korean"
+] as const;
+
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { FieldSelector } from '@/components/FieldSelector';
@@ -22,7 +32,6 @@ const CLAUDE_MODELS = [
 export function AiProcessor() {
   const { fileType, csvHeaders, fileContent } = useFileStore();
   const [selectedColumn, setSelectedColumn] = useState<string>('');
-  const [newColumnName, setNewColumnName] = useState<string>('');
   const [apiKey, setApiKey] = useState<string>('');
   const [selectedModel, setSelectedModel] = useState<string>(CLAUDE_MODELS[0].id);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -33,8 +42,8 @@ export function AiProcessor() {
   };
 
   const processCSV = async () => {
-    if (!selectedColumn || !newColumnName) {
-      toast.error('Please select a column and provide a name for the new column');
+    if (!selectedColumn || !apiKey) {
+      toast.error('Please select a column and provide your Anthropic API key');
       return;
     }
 
@@ -58,27 +67,41 @@ export function AiProcessor() {
       const parsedData = Papa.parse(fileContent, { header: true });
       const rows = parsedData.data as Record<string, string>[];
       const processedRows = [];
+      
+      // Calculate total operations for progress
+      const totalOperations = rows.length * LANGUAGES.length;
+      let completedOperations = 0;
 
-      for (let i = 0; i < rows.length; i++) {
-        const row = rows[i];
-        try {
-          const response = await anthropic.messages.create({
-            max_tokens: 1024,
-            messages: [{
-              role: 'user',
-              content: `Process this text: ${row[selectedColumn]}`
-            }],
-            model: selectedModel
-          });
+      for (const row of rows) {
+        // Create translations for each language
+        for (const language of LANGUAGES) {
+          try {
+            const response = await anthropic.messages.create({
+              max_tokens: 1024,
+              messages: [{
+                role: 'user',
+                content: row[selectedColumn]
+              }],
+              model: selectedModel,
+              system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
+            });
 
-          const processedRow = { ...row };
-          processedRow[newColumnName] = response.content[0].text;
-          processedRows.push(processedRow);
+            const translatedRow = { ...row };
+            // Add language and translation columns
+            translatedRow['Language'] = language;
+            translatedRow['Translated Text'] = response.content[0].text;
+            processedRows.push(translatedRow);
 
-          setProgress(Math.round(((i + 1) / rows.length) * 100));
-        } catch (error) {
-          console.error(`Error processing row ${i}:`, error);
-          processedRows.push({ ...row, [newColumnName]: 'Error processing row' });
+            completedOperations++;
+            setProgress(Math.round((completedOperations / totalOperations) * 100));
+          } catch (error) {
+            console.error(`Error processing translation to ${language}:`, error);
+            const errorRow = { ...row };
+            errorRow['Language'] = language;
+            errorRow['Translated Text'] = 'Error processing translation';
+            processedRows.push(errorRow);
+            completedOperations++;
+          }
         }
       }
 
@@ -87,7 +110,8 @@ export function AiProcessor() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'processed.csv';
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      a.download = `translated_${timestamp}.csv`;
       a.click();
       window.URL.revokeObjectURL(url);
 
@@ -103,9 +127,9 @@ export function AiProcessor() {
   return (
     <div className='flex flex-col mb-12'>
       <Header>
-        <Header.Title>AI Processor</Header.Title>
+        <Header.Title>CSV Translator</Header.Title>
         <Header.Description>
-          Process CSV data with Claude AI and add results as a new column
+          Translate CSV data into {LANGUAGES.length} languages using Claude AI
         </Header.Description>
       </Header>
 
@@ -151,22 +175,13 @@ export function AiProcessor() {
               />
             </div>
 
-            <div>
-              <h3 className='text-lg font-semibold mb-4'>New Column Name</h3>
-              <Input
-                placeholder="Enter name for the new column"
-                value={newColumnName}
-                onChange={(e) => setNewColumnName(e.target.value)}
-                className="max-w-md"
-              />
-            </div>
 
             <div className='flex flex-col gap-4'>
               <Button
                 onClick={processCSV}
-                disabled={isProcessing || !selectedColumn || !newColumnName || !apiKey}
+                disabled={isProcessing || !selectedColumn || !apiKey}
               >
-                {isProcessing ? `Processing... ${progress}%` : 'Process CSV'}
+                {isProcessing ? `Translating... ${progress}%` : 'Translate CSV'}
               </Button>
             </div>
           </div>
