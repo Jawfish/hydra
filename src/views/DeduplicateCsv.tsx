@@ -34,54 +34,122 @@ export function DeduplicateCsv() {
     reader.readAsText(file);
   };
 
-  const processDeduplicate = () => {
+  const processBackfill = () => {
     if (!(primaryCsv && secondaryCsv)) {
-      toast.error('Please upload both CSV files');
+      toast.error('Please upload both files');
       return;
     }
 
-    if (!(primaryMatchColumn && secondaryMatchColumn)) {
-      toast.error('Please select match columns for both files');
+    if (
+      !(
+        primaryMatchColumn &&
+        secondaryMatchColumn &&
+        primaryTargetColumn &&
+        secondarySourceColumn
+      )
+    ) {
+      toast.error('Please select all required columns');
       return;
     }
 
     try {
-      // Parse both CSVs
-      const primaryData = Papa.parse(primaryCsv, { header: true }).data as Record<
-        string,
-        string
-      >[];
-      const secondaryData = Papa.parse(secondaryCsv, { header: true }).data as Record<
-        string,
-        string
-      >[];
+      // Parse secondary file for lookup
+      let lookupMap = new Map();
+      
+      if (secondaryFileType === 'csv') {
+        const secondaryData = Papa.parse(secondaryCsv, { header: true }).data as Record<
+          string,
+          string
+        >[];
+        lookupMap = new Map(
+          secondaryData.map(row => [
+            normalizeString(row[secondaryMatchColumn]),
+            row[secondarySourceColumn]
+          ])
+        );
+      } else {
+        const secondaryData = secondaryFileType === 'jsonl' 
+          ? parseJsonl(secondaryCsv)
+          : JSON.parse(secondaryCsv);
+        const secondaryObjects = Array.isArray(secondaryData) ? secondaryData : [secondaryData];
+        
+        lookupMap = new Map(
+          secondaryObjects.map(obj => [
+            normalizeString(getValueByPath(obj, secondaryMatchColumn)),
+            getValueByPath(obj, secondarySourceColumn)
+          ])
+        );
+      }
 
-      // Create a Set of values from secondary CSV for O(1) lookup
-      const secondaryValues = new Set(
-        secondaryData.map(row => row[secondaryMatchColumn])
-      );
+      // Process primary file
+      let updatedData;
+      
+      if (primaryFileType === 'csv') {
+        const primaryData = Papa.parse(primaryCsv, { header: true }).data as Record<
+          string,
+          string
+        >[];
+        
+        updatedData = primaryData.map(row => {
+          const newRow = { ...row };
+          if (!row[primaryTargetColumn] || row[primaryTargetColumn].trim() === '') {
+            const matchValue = normalizeString(row[primaryMatchColumn]);
+            const backfillValue = lookupMap.get(matchValue);
+            if (backfillValue) {
+              newRow[primaryTargetColumn] = backfillValue;
+            }
+          }
+          return newRow;
+        });
+      } else {
+        const primaryData = primaryFileType === 'jsonl'
+          ? parseJsonl(primaryCsv)
+          : JSON.parse(primaryCsv);
+        const primaryObjects = Array.isArray(primaryData) ? primaryData : [primaryData];
+        
+        updatedData = primaryObjects.map(obj => {
+          const newObj = { ...obj };
+          const currentValue = getValueByPath(obj, primaryTargetColumn);
+          
+          if (!currentValue || String(currentValue).trim() === '') {
+            const matchValue = normalizeString(getValueByPath(obj, primaryMatchColumn));
+            const backfillValue = lookupMap.get(matchValue);
+            
+            if (backfillValue) {
+              // Set nested value
+              let current = newObj;
+              const parts = primaryTargetColumn.split('.');
+              const lastPart = parts.pop()!;
+              
+              for (const part of parts) {
+                current = current[part] = current[part] || {};
+              }
+              
+              current[lastPart] = backfillValue;
+            }
+          }
+          return newObj;
+        });
+      }
 
-      // Filter primary CSV to keep only rows that don't have matching values in secondary CSV
-      const dedupedData = primaryData.filter(
-        row => !secondaryValues.has(row[primaryMatchColumn])
-      );
-
-      // Generate new CSV
-      const csv = Papa.unparse(dedupedData);
-      const blob = new Blob([csv], { type: 'text/csv' });
+      // Generate output file
+      const output = primaryFileType === 'csv' 
+        ? Papa.unparse(updatedData)
+        : JSON.stringify(updatedData, null, 2);
+      
+      const blob = new Blob([output], { 
+        type: primaryFileType === 'csv' ? 'text/csv' : 'application/json' 
+      });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      a.download = `deduplicated_${timestamp}.csv`;
+      const extension = primaryFileType === 'csv' ? 'csv' : 'json';
+      a.download = `backfilled_${timestamp}.${extension}`;
       a.click();
       window.URL.revokeObjectURL(url);
 
-      toast.success(
-        `Deduplication complete! Removed ${
-          primaryData.length - dedupedData.length
-        } duplicate rows.`
-      );
+      toast.success('Processing complete! File downloaded.');
     } catch (error) {
       toast.error(
         `Error processing files: ${error instanceof Error ? error.message : 'Unknown error'}`
