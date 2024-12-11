@@ -2,8 +2,8 @@ import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { parseJsonl } from '@/lib/jsonl';
 import { useFileStore } from '@/store/store';
-import { parseJsonl, getValueByPath } from '@/lib/jsonl';
 import Papa from 'papaparse';
 import { toast } from 'sonner';
 
@@ -19,17 +19,18 @@ export function JsonlToCsv() {
     try {
       // Parse JSONL content
       const objects = parseJsonl(fileContent);
-      
+
       // Extract all unique keys by flattening the objects
       const flattenedObjects = objects.map(obj => {
         const flattened: Record<string, unknown> = {};
-        const flatten = (obj: any, prefix = '') => {
+        // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: This is not very complex
+        const flatten = (obj: Record<string, unknown>, prefix = '') => {
           for (const key in obj) {
             const value = obj[key];
             const newKey = prefix ? `${prefix}.${key}` : key;
-            
+
             if (value && typeof value === 'object' && !Array.isArray(value)) {
-              flatten(value, newKey);
+              flatten(value as Record<string, unknown>, newKey);
             } else {
               flattened[newKey] = value;
             }
@@ -41,7 +42,7 @@ export function JsonlToCsv() {
 
       // Convert to CSV
       const csv = Papa.unparse(flattenedObjects);
-      
+
       // Download the CSV file
       const blob = new Blob([csv], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
@@ -66,11 +67,11 @@ export function JsonlToCsv() {
         <Header>
           <Header.Title>JSONL to CSV Converter</Header.Title>
           <Header.Description>
-            Convert JSONL files to CSV by flattening all nested objects
+            Convert JSONL files to CSV, flattening nested objects
           </Header.Description>
         </Header>
       </div>
-      
+
       <FileUpload />
 
       {fileType === 'jsonl' && (

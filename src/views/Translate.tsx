@@ -58,6 +58,7 @@ export function Translate() {
     setSelectedColumn(column);
   };
 
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity:
   const processCsv = async () => {
     if (!(selectedColumn && apiKey)) {
       toast.error('Please select a column and provide your Anthropic API key');
@@ -113,6 +114,7 @@ export function Translate() {
           Array.from(selectedLanguages).map(async language => {
             try {
               const response = await anthropic.messages.create({
+                // biome-ignore lint/style/useNamingConvention: This is an external API schema
                 max_tokens: 1024,
                 messages: [
                   {
