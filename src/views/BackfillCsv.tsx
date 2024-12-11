@@ -122,7 +122,7 @@ export function BackfillCsv() {
         <div>
           <h3 className='text-lg font-semibold mb-4'>Primary CSV (To Be Updated)</h3>
           <div className='flex items-center gap-4'>
-            <Button variant='outline' asChild={true}>
+            <Button variant='secondary' asChild={true}>
               <label className='cursor-pointer'>
                 <input
                   type='file'
@@ -135,7 +135,7 @@ export function BackfillCsv() {
                   }}
                   className='hidden'
                 />
-                Choose File
+                Select File
               </label>
             </Button>
           </div>
@@ -167,7 +167,7 @@ export function BackfillCsv() {
         <div>
           <h3 className='text-lg font-semibold mb-4'>Secondary CSV (Source of Data)</h3>
           <div className='flex items-center gap-4'>
-            <Button variant='outline' asChild={true}>
+            <Button variant='secondary' asChild={true}>
               <label className='cursor-pointer'>
                 <input
                   type='file'
@@ -180,7 +180,7 @@ export function BackfillCsv() {
                   }}
                   className='hidden'
                 />
-                Choose File
+                Select File
               </label>
             </Button>
           </div>

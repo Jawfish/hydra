@@ -107,7 +107,7 @@ export function DeduplicateCsv() {
             Primary CSV (To Be Deduplicated)
           </h3>
           <div className='flex items-center gap-4'>
-            <Button variant='outline' asChild={true}>
+            <Button variant='secondary' asChild={true}>
               <label className='cursor-pointer'>
                 <input
                   type='file'
@@ -120,7 +120,7 @@ export function DeduplicateCsv() {
                   }}
                   className='hidden'
                 />
-                Choose File
+                Select File
               </label>
             </Button>
           </div>
@@ -144,7 +144,7 @@ export function DeduplicateCsv() {
             Secondary CSV (Reference for Duplicates)
           </h3>
           <div className='flex items-center gap-4'>
-            <Button variant='outline' asChild={true}>
+            <Button variant='secondary' asChild={true}>
               <label className='cursor-pointer'>
                 <input
                   type='file'
@@ -157,7 +157,7 @@ export function DeduplicateCsv() {
                   }}
                   className='hidden'
                 />
-                Choose File
+                Select File
               </label>
             </Button>
           </div>
