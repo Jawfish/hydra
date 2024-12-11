@@ -257,7 +257,6 @@ export function AiProcessor() {
                         }
                         setSelectedLanguages(newSelected);
                       }}
-                      disabled={language === "English"} // English is disabled by default
                     >
                       {language}
                     </DropdownMenuCheckboxItem>
