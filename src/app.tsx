@@ -2,7 +2,7 @@ import { AppSidebar } from '@/components/AppSidebar';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
-import { AiProcessor } from '@/views/AiProcessor';
+import { Translate } from '@/views/Translate';
 import { MapValues } from '@/views/MapValues';
 import { UuidExtractor } from '@/views/UuidExtractor';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
@@ -17,7 +17,7 @@ function App() {
             <Routes>
               <Route path='/extract' element={<UuidExtractor />} />
               <Route path='/map' element={<MapValues />} />
-              <Route path='/process' element={<AiProcessor />} />
+              <Route path='/translate' element={<Translate />} />
               <Route path='/' element={<Navigate to='/extract' replace={true} />} />
             </Routes>
           </div>

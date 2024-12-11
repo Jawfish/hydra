@@ -24,8 +24,8 @@ const items = [
     icon: MapIcon
   },
   {
-    title: 'AI Processor',
-    url: '/process',
+    title: 'Translate',
+    url: '/translate',
     icon: Bot
   }
 ];

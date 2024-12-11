@@ -44,7 +44,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 
 
-export function AiProcessor() {
+export function Translate() {
   const { fileType, csvHeaders, fileContent } = useFileStore();
   const [selectedColumn, setSelectedColumn] = useState<string>('');
   const [apiKey, setApiKey] = useState<string>('');
@@ -167,13 +167,14 @@ export function AiProcessor() {
 
   return (
     <div className='flex flex-col mb-12'>
+      <div className='mb-10'>
       <Header>
         <Header.Title>CSV Translator</Header.Title>
         <Header.Description>
           Translate CSV data
         </Header.Description>
       </Header>
-
+      </div>
       <FileUpload />
 
       {fileType === 'csv' && (
