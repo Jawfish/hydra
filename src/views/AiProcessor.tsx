@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Anthropic from '@anthropic-ai/sdk';
 import Papa from 'papaparse';
+import { Progress } from "@/components/ui/progress";
 
 const LANGUAGES = [
   "German",
@@ -223,11 +224,19 @@ export function AiProcessor() {
             </div>
 
             <div className='flex flex-col gap-4'>
+              {isProcessing && (
+                <div className="flex flex-col gap-2">
+                  <Progress value={progress} />
+                  <p className="text-sm text-muted-foreground text-center">
+                    {progress}% complete
+                  </p>
+                </div>
+              )}
               <Button
                 onClick={processCSV}
                 disabled={isProcessing || !selectedColumn || !apiKey}
               >
-                {isProcessing ? `Translating... ${progress}%` : 'Translate CSV'}
+                {isProcessing ? 'Translating...' : 'Translate CSV'}
               </Button>
             </div>
           </div>
