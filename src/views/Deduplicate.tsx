@@ -2,189 +2,173 @@ import { FieldSelector } from '@/components/FieldSelector';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { parseJsonl } from '@/lib/jsonl';
+import { normalizeString } from '@/lib/utils';
 import Papa from 'papaparse';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 export function DeduplicateCsv() {
-  // State for primary CSV (the one to be deduplicated)
-  const [primaryCsv, setPrimaryCsv] = useState<string>('');
+  // State for primary file
+  const [primaryFile, setPrimaryFile] = useState<string>('');
   const [primaryHeaders, setPrimaryHeaders] = useState<string[]>([]);
+  const [primarySchema, setPrimarySchema] = useState<string[]>([]);
+  const [primaryFileType, setPrimaryFileType] = useState<'csv' | 'json' | 'jsonl' | null>(null);
   const [primaryMatchColumn, setPrimaryMatchColumn] = useState<string>('');
 
-  // State for secondary CSV (the reference for duplicates)
-  const [secondaryCsv, setSecondaryCsv] = useState<string>('');
+  // State for secondary file
+  const [secondaryFile, setSecondaryFile] = useState<string>('');
   const [secondaryHeaders, setSecondaryHeaders] = useState<string[]>([]);
+  const [secondarySchema, setSecondarySchema] = useState<string[]>([]);
+  const [secondaryFileType, setSecondaryFileType] = useState<'csv' | 'json' | 'jsonl' | null>(null);
   const [secondaryMatchColumn, setSecondaryMatchColumn] = useState<string>('');
+
+  const extractJsonSchema = (obj: Record<string, unknown>, prefix = ''): string[] => {
+    let schema: string[] = [];
+    for (const [key, value] of Object.entries(obj)) {
+      const path = prefix ? `${prefix}.${key}` : key;
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        schema = [...schema, path, ...extractJsonSchema(value as Record<string, unknown>, path)];
+      } else {
+        schema.push(path);
+      }
+    }
+    return schema;
+  };
+
+  const getValueByPath = (obj: any, path: string): any => {
+    return path.split('.').reduce((acc, part) => acc?.[part], obj);
+  };
 
   const handleFileUpload = (file: File, isPrimary: boolean) => {
     const reader = new FileReader();
     reader.onload = e => {
       const content = e.target?.result as string;
-      if (isPrimary) {
-        setPrimaryCsv(content);
+
+      if (file.name.endsWith('.csv')) {
         const result = Papa.parse(content, { header: true });
-        setPrimaryHeaders(Object.keys(result.data[0] || {}));
-      } else {
-        setSecondaryCsv(content);
-        const result = Papa.parse(content, { header: true });
-        setSecondaryHeaders(Object.keys(result.data[0] || {}));
+        const headers = Object.keys(result.data[0] || {});
+
+        if (isPrimary) {
+          setPrimaryFile(content);
+          setPrimaryHeaders(headers);
+          setPrimaryFileType('csv');
+        } else {
+          setSecondaryFile(content);
+          setSecondaryHeaders(headers);
+          setSecondaryFileType('csv');
+        }
+      } else if (file.name.endsWith('.jsonl')) {
+        const objects = parseJsonl(content);
+        const schema = extractJsonSchema(objects[0]);
+
+        if (isPrimary) {
+          setPrimaryFile(content);
+          setPrimarySchema(schema);
+          setPrimaryFileType('jsonl');
+        } else {
+          setSecondaryFile(content);
+          setSecondarySchema(schema);
+          setSecondaryFileType('jsonl');
+        }
+      } else if (file.name.endsWith('.json')) {
+        const data = JSON.parse(content);
+        const objects = Array.isArray(data) ? data : [data];
+        const schema = extractJsonSchema(objects[0]);
+
+        if (isPrimary) {
+          setPrimaryFile(content);
+          setPrimarySchema(schema);
+          setPrimaryFileType('json');
+        } else {
+          setSecondaryFile(content);
+          setSecondarySchema(schema);
+          setSecondaryFileType('json');
+        }
       }
     };
     reader.readAsText(file);
   };
 
-  const processBackfill = () => {
-    if (!(primaryCsv && secondaryCsv)) {
+  const processDeduplicate = () => {
+    if (!(primaryFile && secondaryFile)) {
       toast.error('Please upload both files');
       return;
     }
 
-    if (
-      !(
-        primaryMatchColumn &&
-        secondaryMatchColumn &&
-        primaryTargetColumn &&
-        secondarySourceColumn
-      )
-    ) {
-      toast.error('Please select all required columns');
+    if (!(primaryMatchColumn && secondaryMatchColumn)) {
+      toast.error('Please select match columns for both files');
       return;
     }
 
     try {
-      // Parse secondary file for lookup
-      let lookupMap = new Map();
+      // Create set of values from secondary file
+      const secondaryValues = new Set();
       
       if (secondaryFileType === 'csv') {
-        const secondaryData = Papa.parse(secondaryCsv, { header: true }).data as Record<
-          string,
-          string
-        >[];
-        lookupMap = new Map(
-          secondaryData.map(row => [
-            normalizeString(row[secondaryMatchColumn]),
-            row[secondarySourceColumn]
-          ])
-        );
+        const data = Papa.parse(secondaryFile, { header: true }).data as Record<string, string>[];
+        data.forEach(row => secondaryValues.add(normalizeString(row[secondaryMatchColumn])));
       } else {
-        const secondaryData = secondaryFileType === 'jsonl' 
-          ? parseJsonl(secondaryCsv)
-          : JSON.parse(secondaryCsv);
-        const secondaryObjects = Array.isArray(secondaryData) ? secondaryData : [secondaryData];
-        
-        lookupMap = new Map(
-          secondaryObjects.map(obj => [
-            normalizeString(getValueByPath(obj, secondaryMatchColumn)),
-            getValueByPath(obj, secondarySourceColumn)
-          ])
-        );
+        const data = secondaryFileType === 'jsonl' ? parseJsonl(secondaryFile) : JSON.parse(secondaryFile);
+        const objects = Array.isArray(data) ? data : [data];
+        objects.forEach(obj => secondaryValues.add(normalizeString(getValueByPath(obj, secondaryMatchColumn))));
       }
 
       // Process primary file
-      let updatedData;
-      
+      let result;
       if (primaryFileType === 'csv') {
-        const primaryData = Papa.parse(primaryCsv, { header: true }).data as Record<
-          string,
-          string
-        >[];
-        
-        updatedData = primaryData.map(row => {
-          const newRow = { ...row };
-          if (!row[primaryTargetColumn] || row[primaryTargetColumn].trim() === '') {
-            const matchValue = normalizeString(row[primaryMatchColumn]);
-            const backfillValue = lookupMap.get(matchValue);
-            if (backfillValue) {
-              newRow[primaryTargetColumn] = backfillValue;
-            }
-          }
-          return newRow;
-        });
+        const data = Papa.parse(primaryFile, { header: true }).data as Record<string, string>[];
+        result = data.filter(row => !secondaryValues.has(normalizeString(row[primaryMatchColumn])));
+        const output = Papa.unparse(result);
+        return downloadFile(output, 'csv');
       } else {
-        const primaryData = primaryFileType === 'jsonl'
-          ? parseJsonl(primaryCsv)
-          : JSON.parse(primaryCsv);
-        const primaryObjects = Array.isArray(primaryData) ? primaryData : [primaryData];
-        
-        updatedData = primaryObjects.map(obj => {
-          const newObj = { ...obj };
-          const currentValue = getValueByPath(obj, primaryTargetColumn);
-          
-          if (!currentValue || String(currentValue).trim() === '') {
-            const matchValue = normalizeString(getValueByPath(obj, primaryMatchColumn));
-            const backfillValue = lookupMap.get(matchValue);
-            
-            if (backfillValue) {
-              // Set nested value
-              let current = newObj;
-              const parts = primaryTargetColumn.split('.');
-              const lastPart = parts.pop()!;
-              
-              for (const part of parts) {
-                current = current[part] = current[part] || {};
-              }
-              
-              current[lastPart] = backfillValue;
-            }
-          }
-          return newObj;
-        });
+        const data = primaryFileType === 'jsonl' ? parseJsonl(primaryFile) : JSON.parse(primaryFile);
+        const objects = Array.isArray(data) ? data : [data];
+        result = objects.filter(obj => !secondaryValues.has(normalizeString(getValueByPath(obj, primaryMatchColumn))));
+        const output = JSON.stringify(result, null, 2);
+        return downloadFile(output, 'json');
       }
-
-      // Generate output file
-      const output = primaryFileType === 'csv' 
-        ? Papa.unparse(updatedData)
-        : JSON.stringify(updatedData, null, 2);
-      
-      const blob = new Blob([output], { 
-        type: primaryFileType === 'csv' ? 'text/csv' : 'application/json' 
-      });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const extension = primaryFileType === 'csv' ? 'csv' : 'json';
-      a.download = `backfilled_${timestamp}.${extension}`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-
-      toast.success('Processing complete! File downloaded.');
     } catch (error) {
-      toast.error(
-        `Error processing files: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      toast.error(`Error processing files: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  };
+
+  const downloadFile = (content: string, type: 'csv' | 'json') => {
+    const blob = new Blob([content], { type: type === 'csv' ? 'text/csv' : 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    a.download = `deduplicated_${timestamp}.${type}`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    toast.success('Processing complete! File downloaded.');
   };
 
   return (
     <div className='flex flex-col mb-12'>
       <div className='mb-10'>
         <Header>
-          <Header.Title>Deduplicate CSV</Header.Title>
+          <Header.Title>Deduplicate Files</Header.Title>
           <Header.Description>
-            Remove rows from a CSV if they match values in another CSV
+            Remove entries from a file if they match values in another file
           </Header.Description>
         </Header>
       </div>
 
       <div className='flex flex-col gap-14'>
-        {/* Primary CSV Section */}
+        {/* Primary File Section */}
         <div>
-          <h3 className='text-lg font-semibold mb-4'>
-            Primary CSV (To Be Deduplicated)
-          </h3>
+          <h3 className='text-lg font-semibold mb-4'>Primary File (To Be Deduplicated)</h3>
           <div className='flex items-center gap-4'>
             <Button variant='secondary' asChild={true}>
               <label className='cursor-pointer'>
                 <input
                   type='file'
-                  accept='.csv'
+                  accept='.csv,.json,.jsonl'
                   onChange={e => {
                     const file = e.target.files?.[0];
-                    if (file) {
-                      handleFileUpload(file, true);
-                    }
+                    if (file) handleFileUpload(file, true);
                   }}
                   className='hidden'
                 />
@@ -192,11 +176,11 @@ export function DeduplicateCsv() {
               </label>
             </Button>
           </div>
-          {primaryHeaders.length > 0 && (
+          {(primaryHeaders.length > 0 || primarySchema.length > 0) && (
             <div className='mt-6'>
-              <h4 className='font-medium mb-2'>Match Column</h4>
+              <h4 className='font-medium mb-2'>Match Field</h4>
               <FieldSelector
-                fields={primaryHeaders}
+                fields={primaryFileType === 'csv' ? primaryHeaders : primarySchema}
                 selectedField={primaryMatchColumn}
                 onFieldSelect={setPrimaryMatchColumn}
               />
@@ -206,22 +190,18 @@ export function DeduplicateCsv() {
 
         <Separator />
 
-        {/* Secondary CSV Section */}
+        {/* Secondary File Section */}
         <div>
-          <h3 className='text-lg font-semibold mb-4'>
-            Secondary CSV (Reference for Duplicates)
-          </h3>
+          <h3 className='text-lg font-semibold mb-4'>Secondary File (Reference for Duplicates)</h3>
           <div className='flex items-center gap-4'>
             <Button variant='secondary' asChild={true}>
               <label className='cursor-pointer'>
                 <input
                   type='file'
-                  accept='.csv'
+                  accept='.csv,.json,.jsonl'
                   onChange={e => {
                     const file = e.target.files?.[0];
-                    if (file) {
-                      handleFileUpload(file, false);
-                    }
+                    if (file) handleFileUpload(file, false);
                   }}
                   className='hidden'
                 />
@@ -229,11 +209,11 @@ export function DeduplicateCsv() {
               </label>
             </Button>
           </div>
-          {secondaryHeaders.length > 0 && (
+          {(secondaryHeaders.length > 0 || secondarySchema.length > 0) && (
             <div className='mt-6'>
-              <h4 className='font-medium mb-2'>Match Column</h4>
+              <h4 className='font-medium mb-2'>Match Field</h4>
               <FieldSelector
-                fields={secondaryHeaders}
+                fields={secondaryFileType === 'csv' ? secondaryHeaders : secondarySchema}
                 selectedField={secondaryMatchColumn}
                 onFieldSelect={setSecondaryMatchColumn}
               />
@@ -243,9 +223,7 @@ export function DeduplicateCsv() {
 
         <Button
           onClick={processDeduplicate}
-          disabled={
-            !(primaryCsv && secondaryCsv && primaryMatchColumn && secondaryMatchColumn)
-          }
+          disabled={!(primaryFile && secondaryFile && primaryMatchColumn && secondaryMatchColumn)}
           className='max-w-min'
         >
           Process Deduplication
