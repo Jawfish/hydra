@@ -1,48 +1,45 @@
-import { useState } from 'react';
+import { Progress } from '@/components/ui/progress';
 import Anthropic from '@anthropic-ai/sdk';
 import Papa from 'papaparse';
-import { Progress } from "@/components/ui/progress";
+import { useState } from 'react';
 
 const ALL_LANGUAGES = [
-  "English",
-  "German",
-  "Spanish",
-  "French",
-  "Italian",
-  "Portuguese",
-  "Japanese",
-  "Korean"
+  'English',
+  'German',
+  'Spanish',
+  'French',
+  'Italian',
+  'Portuguese',
+  'Japanese',
+  'Korean'
 ] as const;
 
 const DEFAULT_ENABLED_LANGUAGES = [
-  "German",
-  "Spanish",
-  "French",
-  "Italian",
-  "Portuguese",
-  "Japanese",
-  "Korean"
+  'German',
+  'Spanish',
+  'French',
+  'Italian',
+  'Portuguese',
+  'Japanese',
+  'Korean'
 ] as const;
 
+import { FieldSelector } from '@/components/FieldSelector';
+import { FileUpload } from '@/components/FileUpload';
+import { Header } from '@/components/Header';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { FileUpload } from '@/components/FileUpload';
-import { Header } from '@/components/Header';
-import { FieldSelector } from '@/components/FieldSelector';
-import { Button } from '@/components/ui/button';
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useFileStore } from '@/store/store';
 import { toast } from 'sonner';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-
 
 export function Translate() {
   const { fileType, csvHeaders, fileContent } = useFileStore();
@@ -54,14 +51,15 @@ export function Translate() {
     new Set(DEFAULT_ENABLED_LANGUAGES)
   );
   const [languageColumnName, setLanguageColumnName] = useState<string>('Language');
-  const [translationColumnName, setTranslationColumnName] = useState<string>('Translated Text');
+  const [translationColumnName, setTranslationColumnName] =
+    useState<string>('Translated Text');
 
   const handleColumnSelect = (column: string) => {
     setSelectedColumn(column);
   };
 
-  const processCSV = async () => {
-    if (!selectedColumn || !apiKey) {
+  const processCsv = async () => {
+    if (!(selectedColumn && apiKey)) {
       toast.error('Please select a column and provide your Anthropic API key');
       return;
     }
@@ -81,12 +79,15 @@ export function Translate() {
       const parsedData = Papa.parse(fileContent, { header: true });
       const existingColumns = Object.keys(parsedData.data[0] || {});
 
-      if (existingColumns.includes(languageColumnName) || existingColumns.includes(translationColumnName)) {
+      if (
+        existingColumns.includes(languageColumnName) ||
+        existingColumns.includes(translationColumnName)
+      ) {
         toast.error('Output column names conflict with existing columns in the CSV');
         return;
       }
 
-      if (!languageColumnName.trim() || !translationColumnName.trim()) {
+      if (!(languageColumnName.trim() && translationColumnName.trim())) {
         toast.error('Output column names cannot be empty');
         return;
       }
@@ -104,33 +105,33 @@ export function Translate() {
       let completedOperations = 0;
 
       // Process rows in chunks to avoid overwhelming the browser
-      const CHUNK_SIZE = 5; // Process 5 rows at a time
+      const chunkSize = 5; // Process 5 rows at a time
 
-      for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
-        const chunk = rows.slice(i, i + CHUNK_SIZE);
+      for (let i = 0; i < rows.length; i += chunkSize) {
+        const chunk = rows.slice(i, i + chunkSize);
         const chunkPromises = chunk.flatMap(row =>
-          Array.from(selectedLanguages).map(async (language) => {
+          Array.from(selectedLanguages).map(async language => {
             try {
               const response = await anthropic.messages.create({
                 max_tokens: 1024,
-                messages: [{
-                  role: 'user',
-                  content: row[selectedColumn]
-                }],
-                model: "claude-3-5-sonnet-latest",
+                messages: [
+                  {
+                    role: 'user',
+                    content: row[selectedColumn]
+                  }
+                ],
+                model: 'claude-3-5-sonnet-latest',
                 system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
               });
 
-              const translatedText = response.content[0].type === 'text'
-                ? response.content[0].text
-                : '';
+              const translatedText =
+                response.content[0].type === 'text' ? response.content[0].text : '';
 
               const translatedRow = { ...row };
               translatedRow[languageColumnName] = language;
               translatedRow[translationColumnName] = translatedText;
               return translatedRow;
-            } catch (error) {
-              console.error(`Error processing translation to ${language}:`, error);
+            } catch (_error) {
               const errorRow = { ...row };
               errorRow[languageColumnName] = language;
               errorRow[translationColumnName] = 'Error processing translation';
@@ -158,7 +159,9 @@ export function Translate() {
 
       toast.success('Processing complete! File downloaded.');
     } catch (error) {
-      toast.error('Error processing file: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      toast.error(
+        `Error processing file: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     } finally {
       setIsProcessing(false);
       setProgress(0);
@@ -168,12 +171,10 @@ export function Translate() {
   return (
     <div className='flex flex-col mb-12'>
       <div className='mb-10'>
-      <Header>
-        <Header.Title>CSV Translator</Header.Title>
-        <Header.Description>
-          Translate CSV data
-        </Header.Description>
-      </Header>
+        <Header>
+          <Header.Title>CSV Translator</Header.Title>
+          <Header.Description>Translate CSV data</Header.Description>
+        </Header>
       </div>
       <FileUpload />
 
@@ -184,15 +185,13 @@ export function Translate() {
             <div>
               <h3 className='text-lg font-semibold mb-4'>Anthropic API Key</h3>
               <Input
-                type="password"
-                placeholder="Enter your Anthropic API key"
+                type='password'
+                placeholder='Enter your Anthropic API key'
                 value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                className="max-w-md"
+                onChange={e => setApiKey(e.target.value)}
+                className='max-w-md'
               />
             </div>
-
-
 
             <div>
               <h3 className='text-lg font-semibold mb-4'>Select Column to Process</h3>
@@ -207,25 +206,31 @@ export function Translate() {
               <h3 className='text-lg font-semibold mb-4'>Output Column Names</h3>
               <div className='flex flex-col gap-4 max-w-md'>
                 <div>
-                  <label htmlFor="languageColumn" className="block text-sm font-medium mb-2">
+                  <label
+                    htmlFor='languageColumn'
+                    className='block text-sm font-medium mb-2'
+                  >
                     Language Column Name
                   </label>
                   <Input
-                    id="languageColumn"
-                    placeholder="Language"
+                    id='languageColumn'
+                    placeholder='Language'
                     value={languageColumnName}
-                    onChange={(e) => setLanguageColumnName(e.target.value)}
+                    onChange={e => setLanguageColumnName(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label htmlFor="translationColumn" className="block text-sm font-medium mb-2">
+                  <label
+                    htmlFor='translationColumn'
+                    className='block text-sm font-medium mb-2'
+                  >
                     Translation Column Name
                   </label>
                   <Input
-                    id="translationColumn"
-                    placeholder="Translated Text"
+                    id='translationColumn'
+                    placeholder='Translated Text'
                     value={translationColumnName}
-                    onChange={(e) => setTranslationColumnName(e.target.value)}
+                    onChange={e => setTranslationColumnName(e.target.value)}
                   />
                 </div>
               </div>
@@ -234,22 +239,22 @@ export function Translate() {
             <div>
               <h3 className='text-lg font-semibold mb-4'>Languages to Translate To</h3>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="w-[200px] justify-between">
+                <DropdownMenuTrigger asChild={true}>
+                  <Button variant='outline'>
                     Select Languages
-                    <span className="text-xs text-muted-foreground">
+                    <span className='text-xs text-muted-foreground'>
                       ({selectedLanguages.size} selected)
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-[200px]">
+                <DropdownMenuContent className='w-[200px]'>
                   <DropdownMenuLabel>Available Languages</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {ALL_LANGUAGES.map((language) => (
+                  {ALL_LANGUAGES.map(language => (
                     <DropdownMenuCheckboxItem
                       key={language}
                       checked={selectedLanguages.has(language)}
-                      onCheckedChange={(checked) => {
+                      onCheckedChange={checked => {
                         const newSelected = new Set(selectedLanguages);
                         if (checked) {
                           newSelected.add(language);
@@ -268,15 +273,15 @@ export function Translate() {
 
             <div className='flex flex-col gap-4'>
               {isProcessing && (
-                <div className="flex flex-col gap-2">
+                <div className='flex flex-col gap-2'>
                   <Progress value={progress} />
-                  <p className="text-sm text-muted-foreground text-center">
+                  <p className='text-sm text-muted-foreground text-center'>
                     {progress}% complete
                   </p>
                 </div>
               )}
               <Button
-                onClick={processCSV}
+                onClick={processCsv}
                 disabled={isProcessing || !selectedColumn || !apiKey}
               >
                 {isProcessing ? 'Translating...' : 'Translate CSV'}

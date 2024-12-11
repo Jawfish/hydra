@@ -2,8 +2,8 @@ import { AppSidebar } from '@/components/AppSidebar';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
-import { Translate } from '@/views/Translate';
 import { MapValues } from '@/views/MapValues';
+import { Translate } from '@/views/Translate';
 import { UuidExtractor } from '@/views/UuidExtractor';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
