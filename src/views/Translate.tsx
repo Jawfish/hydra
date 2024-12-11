@@ -115,7 +115,7 @@ export function Translate() {
             try {
               const response = await anthropic.messages.create({
                 // biome-ignore lint/style/useNamingConvention: This is an external API schema
-                max_tokens: 1024,
+                max_tokens: 4096,
                 messages: [
                   {
                     role: 'user',
