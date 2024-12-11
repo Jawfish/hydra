@@ -1,4 +1,4 @@
-import { Bot, FileJson, FileText, IdCard, Map as MapIcon } from 'lucide-react';
+import { Bot, FileJson, FileText, FileX, IdCard, Map as MapIcon } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -38,6 +38,11 @@ const items = [
     title: 'Backfill CSV',
     url: '/backfill',
     icon: FileText
+  },
+  {
+    title: 'Deduplicate CSV',
+    url: '/deduplicate',
+    icon: FileX
   }
 ];
 

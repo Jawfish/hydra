@@ -3,6 +3,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import { BackfillCsv } from '@/views/BackfillCsv';
+import { DeduplicateCsv } from '@/views/DeduplicateCsv';
 import { JsonlToCsv } from '@/views/JsonlToCsv';
 import { MapValues } from '@/views/MapValues';
 import { Translate } from '@/views/Translate';
@@ -22,6 +23,7 @@ function App() {
               <Route path='/translate' element={<Translate />} />
               <Route path='/convert' element={<JsonlToCsv />} />
               <Route path='/backfill' element={<BackfillCsv />} />
+              <Route path='/deduplicate' element={<DeduplicateCsv />} />
               <Route path='/' element={<Navigate to='/extract' replace={true} />} />
             </Routes>
           </div>
