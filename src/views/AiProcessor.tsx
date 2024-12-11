@@ -51,20 +51,21 @@ export function AiProcessor() {
     try {
       setIsProcessing(true);
       const anthropic = new Anthropic({
-        apiKey: apiKey
+        apiKey: apiKey,
+        dangerouslyAllowBrowser: true
       });
 
       const parsedData = Papa.parse(fileContent, { header: true });
       const rows = parsedData.data as Record<string, string>[];
       const processedRows = [];
-      
+
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         try {
           const response = await anthropic.messages.create({
             max_tokens: 1024,
-            messages: [{ 
-              role: 'user', 
+            messages: [{
+              role: 'user',
               content: `Process this text: ${row[selectedColumn]}`
             }],
             model: selectedModel
@@ -73,7 +74,7 @@ export function AiProcessor() {
           const processedRow = { ...row };
           processedRow[newColumnName] = response.content[0].text;
           processedRows.push(processedRow);
-          
+
           setProgress(Math.round(((i + 1) / rows.length) * 100));
         } catch (error) {
           console.error(`Error processing row ${i}:`, error);
@@ -161,8 +162,8 @@ export function AiProcessor() {
             </div>
 
             <div className='flex flex-col gap-4'>
-              <Button 
-                onClick={processCSV} 
+              <Button
+                onClick={processCSV}
                 disabled={isProcessing || !selectedColumn || !newColumnName || !apiKey}
               >
                 {isProcessing ? `Processing... ${progress}%` : 'Process CSV'}
