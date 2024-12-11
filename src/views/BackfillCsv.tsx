@@ -1,37 +1,39 @@
 import { FieldSelector } from '@/components/FieldSelector';
-import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import Papa from 'papaparse';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 export function BackfillCsv() {
+  // State for primary CSV
   const [primaryCsv, setPrimaryCsv] = useState<string>('');
-  const [secondaryCsv, setSecondaryCsv] = useState<string>('');
   const [primaryHeaders, setPrimaryHeaders] = useState<string[]>([]);
-  const [secondaryHeaders, setSecondaryHeaders] = useState<string[]>([]);
-  
-  // Selected columns for matching
   const [primaryMatchColumn, setPrimaryMatchColumn] = useState<string>('');
-  const [secondaryMatchColumn, setSecondaryMatchColumn] = useState<string>('');
-  
-  // Columns to backfill
   const [primaryTargetColumn, setPrimaryTargetColumn] = useState<string>('');
+  
+  // State for secondary CSV
+  const [secondaryCsv, setSecondaryCsv] = useState<string>('');
+  const [secondaryHeaders, setSecondaryHeaders] = useState<string[]>([]);
+  const [secondaryMatchColumn, setSecondaryMatchColumn] = useState<string>('');
   const [secondarySourceColumn, setSecondarySourceColumn] = useState<string>('');
 
-  const handlePrimaryCsvUpload = (content: string) => {
-    setPrimaryCsv(content);
-    const result = Papa.parse(content, { header: true });
-    setPrimaryHeaders(Object.keys(result.data[0] || {}));
-  };
-
-  const handleSecondaryCsvUpload = (content: string) => {
-    setSecondaryCsv(content);
-    const result = Papa.parse(content, { header: true });
-    setSecondaryHeaders(Object.keys(result.data[0] || {}));
+  const handleFileUpload = (file: File, isPrimary: boolean) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      if (isPrimary) {
+        setPrimaryCsv(content);
+        const result = Papa.parse(content, { header: true });
+        setPrimaryHeaders(Object.keys(result.data[0] || {}));
+      } else {
+        setSecondaryCsv(content);
+        const result = Papa.parse(content, { header: true });
+        setSecondaryHeaders(Object.keys(result.data[0] || {}));
+      }
+    };
+    reader.readAsText(file);
   };
 
   const processBackfill = () => {
@@ -102,10 +104,22 @@ export function BackfillCsv() {
         {/* Primary CSV Section */}
         <div>
           <h3 className='text-lg font-semibold mb-4'>Primary CSV (To Be Updated)</h3>
-          <FileUpload 
-            onFileContent={handlePrimaryCsvUpload}
-            accept='.csv'
-          />
+          <div className='flex items-center gap-4'>
+            <input
+              type="file"
+              accept=".csv"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFileUpload(file, true);
+              }}
+              className="block w-full text-sm text-slate-500
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-full file:border-0
+                file:text-sm file:font-semibold
+                file:bg-violet-50 file:text-violet-700
+                hover:file:bg-violet-100"
+            />
+          </div>
           {primaryHeaders.length > 0 && (
             <div className='mt-6 flex flex-col gap-6'>
               <div>
@@ -133,10 +147,22 @@ export function BackfillCsv() {
         {/* Secondary CSV Section */}
         <div>
           <h3 className='text-lg font-semibold mb-4'>Secondary CSV (Source of Data)</h3>
-          <FileUpload 
-            onFileContent={handleSecondaryCsvUpload}
-            accept='.csv'
-          />
+          <div className='flex items-center gap-4'>
+            <input
+              type="file"
+              accept=".csv"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFileUpload(file, false);
+              }}
+              className="block w-full text-sm text-slate-500
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-full file:border-0
+                file:text-sm file:font-semibold
+                file:bg-violet-50 file:text-violet-700
+                hover:file:bg-violet-100"
+            />
+          </div>
           {secondaryHeaders.length > 0 && (
             <div className='mt-6 flex flex-col gap-6'>
               <div>
