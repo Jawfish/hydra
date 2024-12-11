@@ -170,7 +170,7 @@ export function AiProcessor() {
       <Header>
         <Header.Title>CSV Translator</Header.Title>
         <Header.Description>
-          Translate CSV data into {LANGUAGES.length} languages using Claude AI
+          Translate CSV data into {ALL_LANGUAGES.length - 1} languages using Claude AI
         </Header.Description>
       </Header>
 
