@@ -90,41 +90,43 @@ export function DeduplicateCsv() {
   };
 
   return (
-    <div className="flex flex-col mb-12">
-      <div className="mb-10">
+    <div className='flex flex-col mb-12'>
+      <div className='mb-10'>
         <Header>
           <Header.Title>Deduplicate CSV</Header.Title>
           <Header.Description>
-            Remove rows from CSV A if they match values in CSV B
+            Remove rows from a CSV if they match values in another CSV
           </Header.Description>
         </Header>
       </div>
 
-      <div className="flex flex-col gap-14">
+      <div className='flex flex-col gap-14'>
         {/* Primary CSV Section */}
         <div>
-          <h3 className="text-lg font-semibold mb-4">Primary CSV (To Be Deduplicated)</h3>
-          <div className="flex items-center gap-4">
-            <Button variant="outline" asChild>
-              <label className="cursor-pointer">
+          <h3 className='text-lg font-semibold mb-4'>
+            Primary CSV (To Be Deduplicated)
+          </h3>
+          <div className='flex items-center gap-4'>
+            <Button variant='outline' asChild={true}>
+              <label className='cursor-pointer'>
                 <input
-                  type="file"
-                  accept=".csv"
+                  type='file'
+                  accept='.csv'
                   onChange={e => {
                     const file = e.target.files?.[0];
                     if (file) {
                       handleFileUpload(file, true);
                     }
                   }}
-                  className="hidden"
+                  className='hidden'
                 />
                 Choose File
               </label>
             </Button>
           </div>
           {primaryHeaders.length > 0 && (
-            <div className="mt-6">
-              <h4 className="font-medium mb-2">Match Column</h4>
+            <div className='mt-6'>
+              <h4 className='font-medium mb-2'>Match Column</h4>
               <FieldSelector
                 fields={primaryHeaders}
                 selectedField={primaryMatchColumn}
@@ -138,30 +140,30 @@ export function DeduplicateCsv() {
 
         {/* Secondary CSV Section */}
         <div>
-          <h3 className="text-lg font-semibold mb-4">
+          <h3 className='text-lg font-semibold mb-4'>
             Secondary CSV (Reference for Duplicates)
           </h3>
-          <div className="flex items-center gap-4">
-            <Button variant="outline" asChild>
-              <label className="cursor-pointer">
+          <div className='flex items-center gap-4'>
+            <Button variant='outline' asChild={true}>
+              <label className='cursor-pointer'>
                 <input
-                  type="file"
-                  accept=".csv"
+                  type='file'
+                  accept='.csv'
                   onChange={e => {
                     const file = e.target.files?.[0];
                     if (file) {
                       handleFileUpload(file, false);
                     }
                   }}
-                  className="hidden"
+                  className='hidden'
                 />
                 Choose File
               </label>
             </Button>
           </div>
           {secondaryHeaders.length > 0 && (
-            <div className="mt-6">
-              <h4 className="font-medium mb-2">Match Column</h4>
+            <div className='mt-6'>
+              <h4 className='font-medium mb-2'>Match Column</h4>
               <FieldSelector
                 fields={secondaryHeaders}
                 selectedField={secondaryMatchColumn}
@@ -174,12 +176,9 @@ export function DeduplicateCsv() {
         <Button
           onClick={processDeduplicate}
           disabled={
-            !primaryCsv ||
-            !secondaryCsv ||
-            !primaryMatchColumn ||
-            !secondaryMatchColumn
+            !(primaryCsv && secondaryCsv && primaryMatchColumn && secondaryMatchColumn)
           }
-          className="max-w-min"
+          className='max-w-min'
         >
           Process Deduplication
         </Button>
