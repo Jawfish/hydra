@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import { Backfill } from '@/views/Backfill';
-import { DeduplicateCsv } from '@/views/DeduplicateCsv';
+import { DeduplicateCsv } from '@/views/Deduplicate';
 import { JsonlToCsv } from '@/views/JsonlToCsv';
 import { MapValues } from '@/views/MapValues';
 import { Translate } from '@/views/Translate';
