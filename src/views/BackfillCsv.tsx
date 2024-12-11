@@ -94,7 +94,7 @@ export function BackfillCsv() {
 
   const processBackfill = () => {
     if (!(primaryCsv && secondaryCsv)) {
-      toast.error('Please upload both CSV files');
+      toast.error('Please upload both files');
       return;
     }
 
@@ -106,7 +106,7 @@ export function BackfillCsv() {
         secondarySourceColumn
       )
     ) {
-      toast.error('Please select all required columns');
+      toast.error('Please select all required fields');
       return;
     }
 
@@ -165,9 +165,9 @@ export function BackfillCsv() {
     <div className='flex flex-col mb-12'>
       <div className='mb-10'>
         <Header>
-          <Header.Title>Backfill CSV</Header.Title>
+          <Header.Title>Backfill</Header.Title>
           <Header.Description>
-            Backfill empty values in a CSV using data from another CSV
+            Backfill empty values in a file using data from another file
           </Header.Description>
         </Header>
       </div>
@@ -175,7 +175,7 @@ export function BackfillCsv() {
       <div className='flex flex-col gap-14'>
         {/* Primary CSV Section */}
         <div>
-          <h3 className='text-lg font-semibold mb-4'>Primary CSV (To Be Updated)</h3>
+          <h3 className='text-lg font-semibold mb-4'>Primary File (To Be Updated)</h3>
           <div className='flex items-center gap-4'>
             <Button variant='secondary' asChild={true}>
               <label className='cursor-pointer'>
@@ -197,7 +197,7 @@ export function BackfillCsv() {
           {(primaryHeaders.length > 0 || primarySchema.length > 0) && (
             <div className='mt-6 flex flex-col gap-6'>
               <div>
-                <h4 className='font-medium mb-2'>Match Column</h4>
+                <h4 className='font-medium mb-2'>Match Field</h4>
                 <FieldSelector
                   fields={primaryFileType === 'csv' ? primaryHeaders : primarySchema}
                   selectedField={primaryMatchColumn}
@@ -205,7 +205,7 @@ export function BackfillCsv() {
                 />
               </div>
               <div>
-                <h4 className='font-medium mb-2'>Column to Backfill</h4>
+                <h4 className='font-medium mb-2'>Field to Backfill</h4>
                 <FieldSelector
                   fields={primaryFileType === 'csv' ? primaryHeaders : primarySchema}
                   selectedField={primaryTargetColumn}
@@ -220,7 +220,7 @@ export function BackfillCsv() {
 
         {/* Secondary CSV Section */}
         <div>
-          <h3 className='text-lg font-semibold mb-4'>Secondary CSV (Source of Data)</h3>
+          <h3 className='text-lg font-semibold mb-4'>Secondary File (Source of Data)</h3>
           <div className='flex items-center gap-4'>
             <Button variant='secondary' asChild={true}>
               <label className='cursor-pointer'>
@@ -242,7 +242,7 @@ export function BackfillCsv() {
           {(secondaryHeaders.length > 0 || secondarySchema.length > 0) && (
             <div className='mt-6 flex flex-col gap-6'>
               <div>
-                <h4 className='font-medium mb-2'>Match Column</h4>
+                <h4 className='font-medium mb-2'>Match Field</h4>
                 <FieldSelector
                   fields={secondaryFileType === 'csv' ? secondaryHeaders : secondarySchema}
                   selectedField={secondaryMatchColumn}
@@ -250,7 +250,7 @@ export function BackfillCsv() {
                 />
               </div>
               <div>
-                <h4 className='font-medium mb-2'>Source Column</h4>
+                <h4 className='font-medium mb-2'>Source Field</h4>
                 <FieldSelector
                   fields={secondaryFileType === 'csv' ? secondaryHeaders : secondarySchema}
                   selectedField={secondarySourceColumn}

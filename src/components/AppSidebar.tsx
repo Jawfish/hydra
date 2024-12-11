@@ -35,7 +35,7 @@ const items = [
     icon: FileJson
   },
   {
-    title: 'Backfill CSV',
+    title: 'Backfill',
     url: '/backfill',
     icon: FileText
   },
