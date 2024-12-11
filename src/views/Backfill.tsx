@@ -1,7 +1,6 @@
 import { FieldSelector } from '@/components/FieldSelector';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { parseJsonl } from '@/lib/jsonl';
 import { normalizeString } from '@/lib/utils';
@@ -19,16 +18,6 @@ export function Backfill() {
   >(null);
   const [primaryMatchColumn, setPrimaryMatchColumn] = useState<string>('');
   const [primaryTargetColumn, setPrimaryTargetColumn] = useState<string>('');
-  const [showResults, setShowResults] = useState(false);
-  const [backfillStats, setBackfillStats] = useState<{
-    totalCount: number;
-    backfilledCount: number;
-    unchangedCount: number;
-  }>({
-    totalCount: 0,
-    backfilledCount: 0,
-    unchangedCount: 0,
-  });
 
   // State for secondary file
   const [secondaryCsv, setSecondaryCsv] = useState<string>('');
@@ -115,7 +104,7 @@ export function Backfill() {
     return path.split('.').reduce((acc, part) => acc?.[part], obj);
   };
 
-  const downloadFile = (content: string, type: 'csv' | 'json' | 'jsonl') => {
+  const downloadFile = (content: string, type: 'csv' | 'json' | 'jsonl', stats: { backfilledCount: number, totalCount: number }) => {
     const mimeTypes = {
       csv: 'text/csv',
       json: 'application/json',
@@ -130,6 +119,12 @@ export function Backfill() {
     a.download = `backfilled_${timestamp}.${type}`;
     a.click();
     window.URL.revokeObjectURL(url);
+    
+    toast.success(
+      `Processing complete! ${stats.backfilledCount} ${
+        stats.backfilledCount === 1 ? 'value was' : 'values were'
+      } backfilled out of ${stats.totalCount} records. File downloaded.`
+    );
   };
 
   const processBackfill = () => {
@@ -191,7 +186,7 @@ export function Backfill() {
         });
 
         const csv = Papa.unparse(updatedData);
-        downloadFile(csv, 'csv');
+        downloadFile(csv, 'csv', { backfilledCount: stats.backfilledCount, totalCount: stats.totalCount });
       } else {
         const primaryData = primaryFileType === 'jsonl' ? parseJsonl(primaryCsv) : JSON.parse(primaryCsv);
         const objects = Array.isArray(primaryData) ? primaryData : [primaryData];
@@ -227,16 +222,13 @@ export function Backfill() {
         // Generate new file in original format
         if (primaryFileType === 'jsonl') {
           const jsonl = updatedData.map(obj => JSON.stringify(obj)).join('\n');
-          downloadFile(jsonl, 'jsonl');
+          downloadFile(jsonl, 'jsonl', { backfilledCount: stats.backfilledCount, totalCount: stats.totalCount });
         } else {
           const json = JSON.stringify(Array.isArray(primaryData) ? updatedData : updatedData[0], null, 2);
-          downloadFile(json, 'json');
+          downloadFile(json, 'json', { backfilledCount: stats.backfilledCount, totalCount: stats.totalCount });
         }
       }
 
-      setBackfillStats(stats);
-      setShowResults(true);
-      toast.success('Processing complete! File downloaded.');
     } catch (error) {
       toast.error(
         `Error processing files: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -367,19 +359,6 @@ export function Backfill() {
           Process Backfill
         </Button>
       </div>
-
-      <Dialog open={showResults} onOpenChange={setShowResults}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Backfill Results</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <p>Total records: {backfillStats.totalCount}</p>
-            <p>Records backfilled: {backfillStats.backfilledCount}</p>
-            <p>Records unchanged: {backfillStats.unchangedCount}</p>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
