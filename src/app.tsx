@@ -1,4 +1,5 @@
 import { AppSidebar } from '@/components/AppSidebar';
+import { RouteChangeHandler } from '@/components/RouteChangeHandler';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
@@ -14,6 +15,7 @@ function App() {
   return (
     <Router>
       <ThemeProvider defaultTheme='system' storageKey='vite-ui-theme'>
+        <RouteChangeHandler />
         <SidebarProvider>
           <AppSidebar />
           <div className='p-8 xl:mx-auto w-full max-w-4xl'>
