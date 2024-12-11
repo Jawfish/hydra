@@ -136,30 +136,37 @@ export function Deduplicate() {
 
       // Process primary file
       let result;
+      let originalCount = 0;
+      let finalCount = 0;
+
       if (primaryFileType === 'csv') {
         const data = Papa.parse(primaryFile, { header: true }).data as Record<
           string,
           string
         >[];
+        originalCount = data.length;
         result = data.filter(
           row => !secondaryValues.has(normalizeString(row[primaryMatchColumn]))
         );
+        finalCount = result.length;
         const output = Papa.unparse(result);
-        return downloadFile(output, 'csv');
+        return downloadFile(output, 'csv', originalCount - finalCount);
       } else {
         const data =
           primaryFileType === 'jsonl'
             ? parseJsonl(primaryFile)
             : JSON.parse(primaryFile);
         const objects = Array.isArray(data) ? data : [data];
+        originalCount = objects.length;
         result = objects.filter(
           obj =>
             !secondaryValues.has(
               normalizeString(getValueByPath(obj, primaryMatchColumn))
             )
         );
+        finalCount = result.length;
         const output = JSON.stringify(result, null, 2);
-        return downloadFile(output, 'json');
+        return downloadFile(output, 'json', originalCount - finalCount);
       }
     } catch (error) {
       toast.error(
@@ -168,7 +175,7 @@ export function Deduplicate() {
     }
   };
 
-  const downloadFile = (content: string, type: 'csv' | 'json') => {
+  const downloadFile = (content: string, type: 'csv' | 'json', removedCount: number) => {
     const blob = new Blob([content], {
       type: type === 'csv' ? 'text/csv' : 'application/json'
     });
@@ -179,7 +186,11 @@ export function Deduplicate() {
     a.download = `deduplicated_${timestamp}.${type}`;
     a.click();
     window.URL.revokeObjectURL(url);
-    toast.success('Processing complete! File downloaded.');
+    toast.success(
+      `Processing complete! ${removedCount} ${
+        removedCount === 1 ? 'item was' : 'items were'
+      } removed. File downloaded.`
+    );
   };
 
   return (
