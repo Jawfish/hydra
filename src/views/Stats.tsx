@@ -37,15 +37,25 @@ export function Stats() {
     if (!stats || !field || !identifierField) return;
 
     const details: FieldAnalysisDetail[] = [];
-    const data = stats.fileType === 'csv' 
-      ? (Papa.parse(stats.fileContent, { header: true }).data as any[])
-      : parseJsonl(stats.fileContent);
+    let data;
+    
+    if (stats.fileType === 'csv') {
+      data = Papa.parse(stats.fileContent, { header: true }).data as any[];
+    } else if (stats.fileType === 'jsonl') {
+      data = parseJsonl(stats.fileContent);
+    } else { // JSON
+      data = JSON.parse(stats.fileContent);
+      // Ensure data is an array
+      if (!Array.isArray(data)) {
+        data = [data];
+      }
+    }
 
     data.forEach(row => {
       const fieldValue = typeof row === 'object' ? getValueByPath(row, field) : row[field];
       const identifier = typeof row === 'object' ? getValueByPath(row, identifierField) : row[identifierField];
       
-      const stringValue = String(fieldValue).trim();
+      const stringValue = String(fieldValue ?? '').trim();
       const isEmpty = stringValue === '' || fieldValue === null || fieldValue === undefined;
 
       details.push({
