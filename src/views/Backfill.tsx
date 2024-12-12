@@ -104,7 +104,11 @@ export function Backfill() {
     return path.split('.').reduce((acc, part) => acc?.[part], obj);
   };
 
-  const downloadFile = (content: string, type: 'csv' | 'json' | 'jsonl', stats: { backfilledCount: number, totalCount: number }) => {
+  const downloadFile = (
+    content: string,
+    type: 'csv' | 'json' | 'jsonl',
+    stats: { backfilledCount: number; totalCount: number }
+  ) => {
     const mimeTypes = {
       csv: 'text/csv',
       json: 'application/json',
@@ -119,7 +123,7 @@ export function Backfill() {
     a.download = `backfilled_${timestamp}.${type}`;
     a.click();
     window.URL.revokeObjectURL(url);
-    
+
     toast.success(
       `Processing complete! ${stats.backfilledCount} ${
         stats.backfilledCount === 1 ? 'value was' : 'values were'
@@ -133,7 +137,14 @@ export function Backfill() {
       return;
     }
 
-    if (!(primaryMatchColumn && secondaryMatchColumn && primaryTargetColumn && secondarySourceColumn)) {
+    if (
+      !(
+        primaryMatchColumn &&
+        secondaryMatchColumn &&
+        primaryTargetColumn &&
+        secondarySourceColumn
+      )
+    ) {
       toast.error('Please select all required fields');
       return;
     }
@@ -142,12 +153,21 @@ export function Backfill() {
       // Create lookup map from secondary file
       const lookupMap = new Map();
       if (secondaryFileType === 'csv') {
-        const data = Papa.parse(secondaryCsv, { header: true }).data as Record<string, string>[];
+        const data = Papa.parse(secondaryCsv, { header: true }).data as Record<
+          string,
+          string
+        >[];
         data.forEach(row => {
-          lookupMap.set(normalizeString(row[secondaryMatchColumn]), row[secondarySourceColumn]);
+          lookupMap.set(
+            normalizeString(row[secondaryMatchColumn]),
+            row[secondarySourceColumn]
+          );
         });
       } else {
-        const data = secondaryFileType === 'jsonl' ? parseJsonl(secondaryCsv) : JSON.parse(secondaryCsv);
+        const data =
+          secondaryFileType === 'jsonl'
+            ? parseJsonl(secondaryCsv)
+            : JSON.parse(secondaryCsv);
         const objects = Array.isArray(data) ? data : [data];
         objects.forEach(obj => {
           lookupMap.set(
@@ -157,7 +177,7 @@ export function Backfill() {
         });
       }
 
-      let stats = {
+      const stats = {
         totalCount: 0,
         backfilledCount: 0,
         unchangedCount: 0
@@ -165,9 +185,12 @@ export function Backfill() {
 
       // Process primary file
       if (primaryFileType === 'csv') {
-        const primaryData = Papa.parse(primaryCsv, { header: true }).data as Record<string, string>[];
+        const primaryData = Papa.parse(primaryCsv, { header: true }).data as Record<
+          string,
+          string
+        >[];
         stats.totalCount = primaryData.length;
-        
+
         const updatedData = primaryData.map(row => {
           const newRow = { ...row };
           if (!row[primaryTargetColumn] || row[primaryTargetColumn].trim() === '') {
@@ -186,12 +209,16 @@ export function Backfill() {
         });
 
         const csv = Papa.unparse(updatedData);
-        downloadFile(csv, 'csv', { backfilledCount: stats.backfilledCount, totalCount: stats.totalCount });
+        downloadFile(csv, 'csv', {
+          backfilledCount: stats.backfilledCount,
+          totalCount: stats.totalCount
+        });
       } else {
-        const primaryData = primaryFileType === 'jsonl' ? parseJsonl(primaryCsv) : JSON.parse(primaryCsv);
+        const primaryData =
+          primaryFileType === 'jsonl' ? parseJsonl(primaryCsv) : JSON.parse(primaryCsv);
         const objects = Array.isArray(primaryData) ? primaryData : [primaryData];
         stats.totalCount = objects.length;
-        
+
         const updatedData = objects.map(obj => {
           const newObj = { ...obj };
           const currentValue = getValueByPath(obj, primaryTargetColumn);
@@ -222,13 +249,22 @@ export function Backfill() {
         // Generate new file in original format
         if (primaryFileType === 'jsonl') {
           const jsonl = updatedData.map(obj => JSON.stringify(obj)).join('\n');
-          downloadFile(jsonl, 'jsonl', { backfilledCount: stats.backfilledCount, totalCount: stats.totalCount });
+          downloadFile(jsonl, 'jsonl', {
+            backfilledCount: stats.backfilledCount,
+            totalCount: stats.totalCount
+          });
         } else {
-          const json = JSON.stringify(Array.isArray(primaryData) ? updatedData : updatedData[0], null, 2);
-          downloadFile(json, 'json', { backfilledCount: stats.backfilledCount, totalCount: stats.totalCount });
+          const json = JSON.stringify(
+            Array.isArray(primaryData) ? updatedData : updatedData[0],
+            null,
+            2
+          );
+          downloadFile(json, 'json', {
+            backfilledCount: stats.backfilledCount,
+            totalCount: stats.totalCount
+          });
         }
       }
-
     } catch (error) {
       toast.error(
         `Error processing files: ${error instanceof Error ? error.message : 'Unknown error'}`

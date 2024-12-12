@@ -151,23 +151,18 @@ export function Deduplicate() {
         finalCount = result.length;
         const output = Papa.unparse(result);
         return downloadFile(output, 'csv', originalCount - finalCount);
-      } else {
-        const data =
-          primaryFileType === 'jsonl'
-            ? parseJsonl(primaryFile)
-            : JSON.parse(primaryFile);
-        const objects = Array.isArray(data) ? data : [data];
-        originalCount = objects.length;
-        result = objects.filter(
-          obj =>
-            !secondaryValues.has(
-              normalizeString(getValueByPath(obj, primaryMatchColumn))
-            )
-        );
-        finalCount = result.length;
-        const output = JSON.stringify(result, null, 2);
-        return downloadFile(output, 'json', originalCount - finalCount);
       }
+      const data =
+        primaryFileType === 'jsonl' ? parseJsonl(primaryFile) : JSON.parse(primaryFile);
+      const objects = Array.isArray(data) ? data : [data];
+      originalCount = objects.length;
+      result = objects.filter(
+        obj =>
+          !secondaryValues.has(normalizeString(getValueByPath(obj, primaryMatchColumn)))
+      );
+      finalCount = result.length;
+      const output = JSON.stringify(result, null, 2);
+      return downloadFile(output, 'json', originalCount - finalCount);
     } catch (error) {
       toast.error(
         `Error processing files: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -175,7 +170,11 @@ export function Deduplicate() {
     }
   };
 
-  const downloadFile = (content: string, type: 'csv' | 'json', removedCount: number) => {
+  const downloadFile = (
+    content: string,
+    type: 'csv' | 'json',
+    removedCount: number
+  ) => {
     const blob = new Blob([content], {
       type: type === 'csv' ? 'text/csv' : 'application/json'
     });
@@ -218,7 +217,9 @@ export function Deduplicate() {
                   accept='.csv,.json,.jsonl'
                   onChange={e => {
                     const file = e.target.files?.[0];
-                    if (file) handleFileUpload(file, true);
+                    if (file) {
+                      handleFileUpload(file, true);
+                    }
                   }}
                   className='hidden'
                 />
@@ -253,7 +254,9 @@ export function Deduplicate() {
                   accept='.csv,.json,.jsonl'
                   onChange={e => {
                     const file = e.target.files?.[0];
-                    if (file) handleFileUpload(file, false);
+                    if (file) {
+                      handleFileUpload(file, false);
+                    }
                   }}
                   className='hidden'
                 />

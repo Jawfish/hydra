@@ -34,16 +34,19 @@ export function Stats() {
   const [fieldAnalysis, setFieldAnalysis] = useState<FieldAnalysisDetail[]>([]);
 
   const analyzeFieldDetails = (field: string, identifierField: string) => {
-    if (!stats || !field || !identifierField) return;
+    if (!(stats && field && identifierField)) {
+      return;
+    }
 
     const details: FieldAnalysisDetail[] = [];
     let data;
-    
+
     if (stats.fileType === 'csv') {
       data = Papa.parse(stats.fileContent, { header: true }).data as any[];
     } else if (stats.fileType === 'jsonl') {
       data = parseJsonl(stats.fileContent);
-    } else { // JSON
+    } else {
+      // JSON
       data = JSON.parse(stats.fileContent);
       // Ensure data is an array
       if (!Array.isArray(data)) {
@@ -52,11 +55,16 @@ export function Stats() {
     }
 
     data.forEach(row => {
-      const fieldValue = typeof row === 'object' ? getValueByPath(row, field) : row[field];
-      const identifier = typeof row === 'object' ? getValueByPath(row, identifierField) : row[identifierField];
-      
+      const fieldValue =
+        typeof row === 'object' ? getValueByPath(row, field) : row[field];
+      const identifier =
+        typeof row === 'object'
+          ? getValueByPath(row, identifierField)
+          : row[identifierField];
+
       const stringValue = String(fieldValue ?? '').trim();
-      const isEmpty = stringValue === '' || fieldValue === null || fieldValue === undefined;
+      const isEmpty =
+        stringValue === '' || fieldValue === null || fieldValue === undefined;
 
       details.push({
         identifier: String(identifier),
@@ -97,7 +105,7 @@ export function Stats() {
     data.forEach(row => {
       const value = typeof row === 'object' ? getValueByPath(row, field) : row[field];
       const stringValue = String(value).trim();
-      
+
       if (stringValue === '' || value === null || value === undefined) {
         emptyCount++;
       } else {
@@ -123,7 +131,7 @@ export function Stats() {
         if (file.name.endsWith('.csv')) {
           const result = Papa.parse(content, { header: true });
           const headers = Object.keys(result.data[0] || {});
-          const fields = headers.map(header => 
+          const fields = headers.map(header =>
             analyzeField(result.data as any[], header)
           );
 
@@ -138,9 +146,7 @@ export function Stats() {
         } else if (file.name.endsWith('.jsonl')) {
           const objects = parseJsonl(content);
           const schema = extractJsonSchema(objects[0]);
-          const fields = schema.map(field => 
-            analyzeField(objects, field)
-          );
+          const fields = schema.map(field => analyzeField(objects, field));
 
           setStats({
             fileName: file.name,
@@ -154,9 +160,7 @@ export function Stats() {
           const data = JSON.parse(content);
           const objects = Array.isArray(data) ? data : [data];
           const schema = extractJsonSchema(objects[0]);
-          const fields = schema.map(field => 
-            analyzeField(objects, field)
-          );
+          const fields = schema.map(field => analyzeField(objects, field));
 
           setStats({
             fileName: file.name,
@@ -167,7 +171,7 @@ export function Stats() {
             fileContent: content
           });
         }
-        
+
         toast.success('File analysis complete!');
       } catch (error) {
         toast.error(
@@ -198,7 +202,9 @@ export function Stats() {
                 accept='.csv,.json,.jsonl'
                 onChange={e => {
                   const file = e.target.files?.[0];
-                  if (file) handleFileUpload(file);
+                  if (file) {
+                    handleFileUpload(file);
+                  }
                 }}
                 className='hidden'
               />
@@ -216,7 +222,7 @@ export function Stats() {
                 <p>Type: {stats.fileType.toUpperCase()}</p>
                 <p>Total Rows: {stats.rowCount}</p>
               </div>
-              
+
               {(stats.headers || stats.schema) && (
                 <div className='rounded-lg border p-4'>
                   <h3 className='font-medium mb-2'>
@@ -225,7 +231,9 @@ export function Stats() {
                   <ScrollArea className='h-[100px]'>
                     <div className='space-y-1'>
                       {(stats.headers || stats.schema)?.map(field => (
-                        <p key={field} className='text-sm'>{field}</p>
+                        <p key={field} className='text-sm'>
+                          {field}
+                        </p>
                       ))}
                     </div>
                   </ScrollArea>
@@ -263,31 +271,35 @@ export function Stats() {
                 <div className='flex gap-4 mb-4'>
                   <div className='flex flex-col gap-2'>
                     <label className='text-sm font-medium'>Identifier Field</label>
-                    <select 
+                    <select
                       className='rounded-md border p-2'
                       value={selectedIdentifier}
-                      onChange={(e) => setSelectedIdentifier(e.target.value)}
+                      onChange={e => setSelectedIdentifier(e.target.value)}
                     >
-                      <option value="">Select identifier field...</option>
+                      <option value=''>Select identifier field...</option>
                       {(stats.headers || stats.schema)?.map(field => (
-                        <option key={field} value={field}>{field}</option>
+                        <option key={field} value={field}>
+                          {field}
+                        </option>
                       ))}
                     </select>
                   </div>
-                  
+
                   <div className='flex flex-col gap-2'>
                     <label className='text-sm font-medium'>Analyze Field</label>
-                    <select 
+                    <select
                       className='rounded-md border p-2'
                       value={selectedAnalysisField}
-                      onChange={(e) => {
+                      onChange={e => {
                         setSelectedAnalysisField(e.target.value);
                         analyzeFieldDetails(e.target.value, selectedIdentifier);
                       }}
                     >
-                      <option value="">Select field to analyze...</option>
+                      <option value=''>Select field to analyze...</option>
                       {(stats.headers || stats.schema)?.map(field => (
-                        <option key={field} value={field}>{field}</option>
+                        <option key={field} value={field}>
+                          {field}
+                        </option>
                       ))}
                     </select>
                   </div>
