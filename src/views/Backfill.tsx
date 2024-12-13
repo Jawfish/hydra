@@ -122,6 +122,19 @@ export function Backfill() {
       return;
     }
 
+    console.time('backfill');
+    
+    // Precompute normalized reference values for faster matching
+    console.time('reference-map');
+    const normalizedReferenceMap = new Map(
+      referenceFileContent.map(refRow => [
+        normalizeString(getValueByPath(refRow, referenceMatchField) as string),
+        refRow
+      ])
+    );
+    console.timeEnd('reference-map');
+
+    console.time('process-rows');
     const backfilledContent = workingFileContent.map(workingRow => {
       const matchValue = getValueByPath(workingRow, workingMatchField);
       const normalizedMatchValue = normalizeString(matchValue as string);
@@ -139,12 +152,8 @@ export function Backfill() {
 
       // Only backfill if the current value is empty
       if (isEmptyValue) {
-        // Find matching reference row using normalized comparison
-        const matchingReferenceRow = referenceFileContent.find(
-          refRow =>
-            normalizeString(getValueByPath(refRow, referenceMatchField) as string) ===
-            normalizedMatchValue
-        );
+        // Use Map lookup instead of .find()
+        const matchingReferenceRow = normalizedReferenceMap.get(normalizedMatchValue);
 
         if (matchingReferenceRow) {
           const fillValue = getValueByPath(matchingReferenceRow, referenceFillField);
@@ -157,8 +166,10 @@ export function Backfill() {
 
       return workingRow;
     });
+    console.timeEnd('process-rows');
 
     // Create a download link
+    console.time('create-csv');
     const backfilledOutput = jsonToCsv(backfilledContent);
     const blob = new Blob([backfilledOutput], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -167,21 +178,19 @@ export function Backfill() {
     a.download = `backfilled_${workingFileName}`;
     a.click();
     window.URL.revokeObjectURL(url);
+    console.timeEnd('create-csv');
 
-    // Count how many rows were actually backfilled
-    const backfilledRowCount = backfilledContent.filter(
-      row =>
-        getValueByPath(row, workingFillField) !==
-        getValueByPath(
-          workingFileContent.find(
-            orig =>
-              normalizeString(getValueByPath(orig, workingMatchField) as string) ===
-              normalizeString(getValueByPath(row, workingMatchField) as string)
-          ) || {},
-          workingFillField
-        )
-    ).length;
+    // Count backfilled rows using the Map for consistent comparison
+    console.time('count-backfilled');
+    const backfilledRowCount = backfilledContent.filter(row => {
+      const origValue = getValueByPath(row, workingFillField);
+      const matchValue = normalizeString(getValueByPath(row, workingMatchField) as string);
+      const referenceRow = normalizedReferenceMap.get(matchValue);
+      return referenceRow && origValue !== getValueByPath(referenceRow, referenceFillField);
+    }).length;
+    console.timeEnd('count-backfilled');
 
+    console.timeEnd('backfill');
     toast.success(`Backfilled ${backfilledRowCount} rows`);
   };
 
