@@ -162,12 +162,13 @@ export function Translate() {
 
       const fileType = (fileName?.split('.').pop() as FileType) || 'csv';
       const outputContent = serializeJson(processedRows, fileType);
-      const blob = new Blob([outputContent], { 
-        type: fileType === 'json' 
-          ? 'application/json' 
-          : fileType === 'jsonl' 
-            ? 'application/jsonl' 
-            : 'text/csv' 
+      const blob = new Blob([outputContent], {
+        type:
+          fileType === 'json'
+            ? 'application/json'
+            : fileType === 'jsonl'
+              ? 'application/jsonl'
+              : 'text/csv'
       });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
