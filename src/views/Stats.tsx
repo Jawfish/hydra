@@ -165,12 +165,12 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
       {fieldAnalysis.length > 0 ? (
         <div>
           <h4 className='text-sm font-medium mb-2'>
-            Records with empty values in {selectedAnalysisField}
+            Empty values in {selectedAnalysisField}
           </h4>
           <ScrollArea className='h-[200px]'>
             <div className='space-y-2'>
               {fieldAnalysis.map(detail => (
-                <div key={Math.random()} className='text-sm'>
+                <div key={detail.identifier} className='text-sm'>
                   {selectedIdentifier}: {detail.identifier}
                 </div>
               ))}

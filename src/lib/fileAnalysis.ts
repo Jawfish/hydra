@@ -59,12 +59,16 @@ export const analyzeFieldDetails = (
     const fieldValue = getValueByPath(row, field);
     const identifier = getValueByPath(row, identifierField);
 
-    const stringValue = String(fieldValue ?? '').trim();
-    const isEmpty = stringValue === '' || fieldValue === null || fieldValue === undefined;
+    // More strict empty check
+    const isEmpty = fieldValue === undefined || 
+                   fieldValue === null || 
+                   (typeof fieldValue === 'string' && fieldValue.trim() === '') ||
+                   (Array.isArray(fieldValue) && fieldValue.length === 0) ||
+                   (typeof fieldValue === 'object' && fieldValue !== null && Object.keys(fieldValue).length === 0);
 
     details.push({
       identifier: String(identifier),
-      value: isEmpty ? '' : stringValue,
+      value: String(fieldValue ?? ''),
       isEmpty
     });
   }
@@ -72,9 +76,9 @@ export const analyzeFieldDetails = (
   const emptyDetails = details.filter(d => d.isEmpty);
   console.log('analyzeFieldDetails: Analysis complete', {
     totalAnalyzed: details.length,
-    emptyCount: details.filter(d => d.isEmpty).length,
-    nonEmptyCount: details.filter(d => !d.isEmpty).length
+    emptyCount: emptyDetails.length,
+    nonEmptyCount: details.length - emptyDetails.length
   });
 
-  return details;
+  return emptyDetails; // Only return actually empty entries
 };
