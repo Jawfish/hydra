@@ -34,11 +34,26 @@ export function Stats() {
     }
   }, [fileContentParsed]);
 
+  useEffect(() => {
+    console.log('Current file state:', {
+      fileName,
+      fileContentParsed: fileContentParsed,
+      fileContentParsedLength: fileContentParsed.length
+    });
+  }, [fileName, fileContentParsed]);
+
   const handleFileUpload = (name: string, content: string, fileType: string) => {
     try {
       console.log('Uploading file:', { name, fileType });
       console.log('Raw content sample:', content.slice(0, 200));
-      setFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
+      console.log('Content length:', content.length);
+      
+      try {
+        setFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
+      } catch (parseError) {
+        console.error('File content parsing error:', parseError);
+        toast.error(`Parsing error: ${parseError instanceof Error ? parseError.message : 'Unknown parsing error'}`);
+      }
     } catch (error) {
       console.error('File upload error:', error);
       toast.error(
