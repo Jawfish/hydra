@@ -11,22 +11,20 @@ import {
 } from '@/components/ui/select';
 import { getAllPaths, serializeJson, normalizeString } from '@/lib/parse';
 import { getValueByPath } from '@/lib/parse';
-import { useReferenceFileStore, useWorkingFileStore } from '@/store/store';
+import {
+  type FileType,
+  useReferenceFileStore,
+  useWorkingFileStore
+} from '@/store/store';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 export function Deduplicate() {
-  const {
-    fileName: workingFileName,
-    fileContentParsed: workingFileContent,
-    setFileContent: setWorkingFileContent
-  } = useWorkingFileStore();
+  const { fileName: workingFileName, fileContentParsed: workingFileContent } =
+    useWorkingFileStore();
 
-  const {
-    fileName: referenceFileName,
-    fileContentParsed: referenceFileContent,
-    setFileContent: setReferenceFileContent
-  } = useReferenceFileStore();
+  const { fileName: referenceFileName, fileContentParsed: referenceFileContent } =
+    useReferenceFileStore();
 
   const [workingFileSchema, setWorkingFileSchema] = useState<string[]>([]);
   const [referenceFileSchema, setReferenceFileSchema] = useState<string[]>([]);
@@ -89,10 +87,13 @@ export function Deduplicate() {
       console.time('download');
       const fileType = (workingFileName?.split('.').pop() as FileType) || 'csv';
       const output = serializeJson(result, fileType);
-      const blob = new Blob([output], { 
-        type: fileType === 'json' ? 'application/json' 
-             : fileType === 'jsonl' ? 'application/jsonl' 
-             : 'text/csv' 
+      const blob = new Blob([output], {
+        type:
+          fileType === 'json'
+            ? 'application/json'
+            : fileType === 'jsonl'
+              ? 'application/jsonl'
+              : 'text/csv'
       });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');

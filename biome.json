@@ -51,8 +51,18 @@
       "suspicious": {
         "all": true,
         "noConsole": {
+          "level": "warn",
           "options": {
-            "allow": ["assert", "error", "info", "warn", "debug"]
+            "allow": [
+              "assert",
+              "error",
+              "info",
+              "warn",
+              "debug",
+              "time",
+              "timeEnd",
+              "trace"
+            ]
           }
         },
         "noReactSpecificProps": "off"

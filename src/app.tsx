@@ -14,12 +14,11 @@ function App() {
       <ThemeProvider defaultTheme='system' storageKey='vite-ui-theme'>
         <SidebarProvider>
           <AppSidebar />
-          <div className='p-8 xl:mx-auto w-full max-w-4xl'>
+          <div className='p-8 xl:mx-auto w-full max-w-4xl mb-10'>
             <Routes>
               {/* <Route path='/extract' element={<UuidExtractor />} /> */}
               {/* <Route path='/map' element={<MapValues />} /> */}
               {/* <Route path='/translate' element={<Translate />} /> */}
-              {/* <Route path='/convert' element={<Convert />} /> */}
               <Route path='/backfill' element={<Backfill />} />
               <Route path='/deduplicate' element={<Deduplicate />} />
               <Route path='/stats' element={<Stats />} />
@@ -35,7 +34,7 @@ function App() {
           {/* Global file downloader */}
           <WorkingFileDownloader />
         </SidebarProvider>
-        <Toaster />
+        <Toaster position='top-right' richColors={true} />
       </ThemeProvider>
     </Router>
   );

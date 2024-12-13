@@ -4,6 +4,7 @@ import type React from 'react';
 
 type FileUploadProps = {
   onFileUpload: (fileName: string, fileContent: string, fileType: string) => void;
+  fileName: string | null;
 };
 
 const getFileType = (file: File): FileType => {
@@ -26,7 +27,7 @@ const getFileType = (file: File): FileType => {
   }
 };
 
-export function FileUpload({ onFileUpload }: FileUploadProps) {
+export function FileUpload({ onFileUpload, fileName }: FileUploadProps) {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -37,23 +38,38 @@ export function FileUpload({ onFileUpload }: FileUploadProps) {
     }
   };
 
+  // Truncate the file name if it's too long, but preserve the extension
+  const truncateFileName = (name: string) => {
+    const parts = name.split('.');
+    const extension = parts[parts.length - 1];
+    const nameOnly = parts[0];
+    let truncatedName = nameOnly.slice(0, 20);
+
+    if (nameOnly.length > 20) {
+      truncatedName = `${truncatedName.slice(0, 17)}...`;
+    }
+
+    return `${truncatedName} (${extension})`;
+  };
+
   return (
-    <Button asChild={true} variant='secondary'>
-      <label className='cursor-pointer'>
-        Select File
-        <input
-          type='file'
-          accept='.csv,.jsonl,.json'
-          className='hidden'
-          onChange={handleFileUpload}
-        />
-      </label>
-    </Button>
+    <div className='flex gap-2 items-center'>
+      <Button asChild={true} variant='secondary'>
+        <label className='cursor-pointer'>
+          Select File
+          <input
+            type='file'
+            accept='.csv,.jsonl,.json'
+            className='hidden'
+            onChange={handleFileUpload}
+          />
+        </label>
+      </Button>
+      {fileName && (
+        <p className='text-sm text-muted-foreground'>
+          <strong className='font-medium'>{truncateFileName(fileName)}</strong>
+        </p>
+      )}
+    </div>
   );
 }
-
-// {/* {fileName && (
-//     <p className='text-sm text-muted-foreground'>
-//       Selected file: <strong className='font-medium'>{fileName}</strong>
-//     </p>
-//   )} */}

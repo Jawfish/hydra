@@ -17,7 +17,6 @@ import {
 import { getAllPaths } from '@/lib/parse';
 import { useWorkingFileStore } from '@/store/store';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
 
 interface FileStatisticsProps {
   fileName: string;
@@ -213,7 +212,6 @@ export const Stats: React.FC = () => {
       console.debug('Parsed content updated:', fileContentParsed);
       console.debug('Total rows:', fileContentParsed.length);
       console.debug('First few rows:', fileContentParsed.slice(0, 5));
-      toast.success(`File analysis complete! ${fileContentParsed.length} rows loaded.`);
     }
   }, [fileContentParsed]);
 

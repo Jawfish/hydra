@@ -1,4 +1,4 @@
-import { useWorkingFileStore } from '@/store/store';
+import { type FileType, useWorkingFileStore } from '@/store/store';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -13,17 +13,22 @@ import { toast } from 'sonner';
 
 export function WorkingFileDownloader() {
   const { fileName, fileContentParsed } = useWorkingFileStore();
-  const [selectedFormat, setSelectedFormat] = useState<'csv' | 'json' | 'jsonl'>('csv');
+  const [selectedFormat, setSelectedFormat] = useState<FileType>('csv');
 
   const handleDownload = () => {
-    if (!fileContentParsed.length) return;
+    if (fileContentParsed.length === 0) {
+      return;
+    }
 
     try {
       const output = serializeJson(fileContentParsed, selectedFormat);
-      const blob = new Blob([output], { 
-        type: selectedFormat === 'json' ? 'application/json' 
-             : selectedFormat === 'jsonl' ? 'application/jsonl' 
-             : 'text/csv' 
+      const blob = new Blob([output], {
+        type:
+          selectedFormat === 'json'
+            ? 'application/json'
+            : selectedFormat === 'jsonl'
+              ? 'application/jsonl'
+              : 'text/csv'
       });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -49,7 +54,10 @@ export function WorkingFileDownloader() {
     <div className='fixed bottom-0 left-0 right-0 bg-background border-t p-4 flex items-center justify-center space-x-4 shadow-lg z-50'>
       <div className='flex items-center space-x-2'>
         <span className='text-sm text-muted-foreground'>Convert to:</span>
-        <Select value={selectedFormat} onValueChange={setSelectedFormat}>
+        <Select
+          value={selectedFormat}
+          onValueChange={(value: string) => setSelectedFormat(value as FileType)}
+        >
           <SelectTrigger className='w-[100px]'>
             <SelectValue placeholder='Format' />
           </SelectTrigger>
@@ -60,9 +68,7 @@ export function WorkingFileDownloader() {
           </SelectContent>
         </Select>
       </div>
-      <Button onClick={handleDownload}>
-        Download Converted File
-      </Button>
+      <Button onClick={handleDownload}>Download Converted File</Button>
     </div>
   );
 }

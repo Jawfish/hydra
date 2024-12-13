@@ -6,9 +6,9 @@ const CRLF_REGEX = /\r\n/g;
 /**
  * Safely parses JSONL content and returns valid JSON objects
  * @param {string} content - Raw JSONL content
- * @returns {object[]} Array of parsed JSON objects
+ * @returns {Record<string, unknown>[]} Array of parsed JSON objects
  */
-export const jsonlToJson = (content: string): object[] => {
+export const jsonlToJson = (content: string): Record<string, unknown>[] => {
   return content
     .replace(BOM_REGEX, '') // Remove byte order mark
     .replace(CRLF_REGEX, '\n') // Normalize line endings
@@ -74,14 +74,17 @@ export const getValueByPath = (obj: Record<string, unknown>, path: string): unkn
 /**
  * Convert CSV content into an array of objects
  * @param {string} csv - CSV content to parse
- * @returns {object[]} - Array of objects representing the CSV data
+ * @returns {Record<string, unknown>[]} - Array of objects representing the CSV data
  */
-export const csvToJson = (csv: string): object[] => {
+export const csvToJson = (csv: string): Record<string, unknown>[] => {
   if (!csv.trim()) {
     return [];
   }
   // Include header row to return an array of objects keyed by header names
-  const result = Papa.parse<object>(csv, { header: true, dynamicTyping: true }).data;
+  const result = Papa.parse<Record<string, unknown>>(csv, {
+    header: true,
+    dynamicTyping: true
+  }).data;
 
   if (!result || result.length === 0) {
     return [];
@@ -121,7 +124,7 @@ export const flattenObject = (
 
 /**
  * Convert an array of objects into a CSV string, handling nested objects
- * @param {object[]} data - Array of objects to convert to CSV
+ * @param {Record<string, unknown>[]} data - Array of objects to convert to CSV
  * @returns {string} - CSV string
  */
 export const serializeJson = (
@@ -134,9 +137,10 @@ export const serializeJson = (
     case 'jsonl':
       return data.map(item => JSON.stringify(item)).join('\n');
     case 'csv':
-      // Only flatten for CSV
-      const flattenedData = data.map(item => flattenObject(item));
-      return Papa.unparse(flattenedData, { header: true });
+      return Papa.unparse(
+        data.map(item => flattenObject(item)),
+        { header: true }
+      );
     default:
       throw new Error(`Unsupported file type: ${originalFileType}`);
   }
@@ -170,3 +174,24 @@ export function normalizeString(s: string | null | undefined): string {
       .trim()
   );
 }
+
+/**
+ * Parse JSON content so that it can be used as an array of objects
+ * @param {string} content - Raw JSON content
+ * @returns {Record<string, unknown>[]} - Array of parsed JSON objects
+ */
+export const parseJson = (content: string): Record<string, unknown>[] => {
+  const parsedContent = JSON.parse(content);
+
+  if (typeof parsedContent === 'object' && !Array.isArray(parsedContent)) {
+    const numericKeys = Object.keys(parsedContent).filter(
+      key => !Number.isNaN(Number(key))
+    );
+    if (numericKeys.length > 0) {
+      return numericKeys.map(key => parsedContent[key]);
+    }
+    return [parsedContent];
+  }
+
+  return Array.isArray(parsedContent) ? parsedContent : [parsedContent];
+};

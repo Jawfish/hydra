@@ -6,6 +6,7 @@ import {
   getValueByPath,
   serializeJson,
   jsonlToJson,
+  parseJson,
   normalizeString
 } from '@/lib/parse';
 import type { FileType } from '@/store/store';
@@ -518,10 +519,7 @@ describe('JSON parsing', () => {
 
     const parsed = parseJson(jsonContent);
 
-    expect(parsed).toEqual([
-      { name: 'John' },
-      { name: 'Jane' }
-    ]);
+    expect(parsed).toEqual([{ name: 'John' }, { name: 'Jane' }]);
   });
 
   it('parses single object as array', () => {
@@ -537,25 +535,19 @@ describe('JSON parsing', () => {
 
     const parsed = parseJson(jsonContent);
 
-    expect(parsed).toEqual([
-      { name: 'John' },
-      { name: 'Jane' }
-    ]);
+    expect(parsed).toEqual([{ name: 'John' }, { name: 'Jane' }]);
   });
 
   it('handles mixed numeric and non-numeric keys', () => {
-    const jsonContent = '{
-      "0":{"name":"John"},
-      "1":{"name":"Jane"},
-      "metadata":{"total":2}
-    }';
+    const jsonContent = `{
+      "0": {"name": "John"},
+      "1": {"name": "Jane"},
+      "metadata": {"total": 2}
+    }`;
 
     const parsed = parseJson(jsonContent);
 
-    expect(parsed).toEqual([
-      { name: 'John' },
-      { name: 'Jane' }
-    ]);
+    expect(parsed).toEqual([{ name: 'John' }, { name: 'Jane' }]);
   });
 
   it('handles nested objects', () => {
@@ -597,21 +589,18 @@ describe('JSON parsing', () => {
   });
 
   it('handles nested objects with numeric keys', () => {
-    const nestedNumericJson = '{
-      "data": {
-        "0": {"name": "John"},
-        "1": {"name": "Jane"}
-      }
-    }';
+    const nestedNumericJson = '{"data":{"0":{"name":"John"},"1":{"name":"Jane"}}}';
 
     const parsed = parseJson(nestedNumericJson);
 
-    expect(parsed).toEqual([{
-      data: {
-        "0": { name: "John" },
-        "1": { name: "Jane" }
+    expect(parsed).toEqual([
+      {
+        data: {
+          '0': { name: 'John' },
+          '1': { name: 'Jane' }
+        }
       }
-    }]);
+    ]);
   });
 });
 

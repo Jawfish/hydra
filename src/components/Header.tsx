@@ -1,4 +1,5 @@
 import type React from 'react';
+import { Separator } from '@/components/ui/separator';
 
 interface HeaderProps {
   children: React.ReactNode;
@@ -13,7 +14,10 @@ interface DescriptionProps {
 }
 
 export const Header = ({ children }: HeaderProps) => (
-  <header className='flex flex-col gap-1 mb-10'>{children}</header>
+  <>
+    <header className='flex flex-col gap-1'>{children}</header>
+    <Separator className='my-10' />
+  </>
 );
 
 Header.Title = ({ children }: TitleProps) => (

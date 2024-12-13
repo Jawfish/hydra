@@ -11,23 +11,21 @@ import {
 } from '@/components/ui/select';
 import { getAllPaths, normalizeString } from '@/lib/parse';
 import { getValueByPath } from '@/lib/parse';
-import { jsonToCsv } from '@/lib/parse';
-import { useReferenceFileStore, useWorkingFileStore } from '@/store/store';
+import { serializeJson } from '@/lib/parse';
+import {
+  type FileType,
+  useReferenceFileStore,
+  useWorkingFileStore
+} from '@/store/store';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 export function Backfill() {
-  const {
-    fileName: workingFileName,
-    fileContentParsed: workingFileContent,
-    setFileContent: setWorkingFileContent
-  } = useWorkingFileStore();
+  const { fileName: workingFileName, fileContentParsed: workingFileContent } =
+    useWorkingFileStore();
 
-  const {
-    fileName: referenceFileName,
-    fileContentParsed: referenceFileContent,
-    setFileContent: setReferenceFileContent
-  } = useReferenceFileStore();
+  const { fileName: referenceFileName, fileContentParsed: referenceFileContent } =
+    useReferenceFileStore();
 
   const [workingFileSchema, setWorkingFileSchema] = useState<string[]>([]);
   const [referenceFileSchema, setReferenceFileSchema] = useState<string[]>([]);
@@ -133,8 +131,8 @@ export function Backfill() {
 
     // Create a download link
     console.time('create-csv');
-    const fileType = workingFileName?.split('.').pop() as FileType || 'csv';
-    const backfilledOutput = jsonToCsv(backfilledContent, fileType);
+    const fileType = (workingFileName?.split('.').pop() as FileType) || 'csv';
+    const backfilledOutput = serializeJson(backfilledContent, fileType);
     const blob = new Blob([backfilledOutput], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
