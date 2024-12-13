@@ -179,12 +179,26 @@ export function Stats() {
   }, [fileContentParsed]);
 
   useEffect(() => {
-    if (selectedAnalysisField && selectedIdentifier) {
+    console.log('Analyzing details:', {
+      selectedAnalysisField,
+      selectedIdentifier,
+      fileContentParsed: fileContentParsed.length
+    });
+
+    if (selectedAnalysisField && selectedIdentifier && fileContentParsed.length > 0) {
+      console.log('Calling analyzeFieldDetails with:', {
+        data: fileContentParsed[0], // Log first row to check structure
+        analysisField: selectedAnalysisField,
+        identifierField: selectedIdentifier
+      });
+
       const details = analyzeFieldDetails(
         fileContentParsed,
         selectedAnalysisField,
         selectedIdentifier
       );
+      
+      console.log('Analyzed field details:', details);
       setFieldAnalysis(details);
     }
   }, [selectedAnalysisField, selectedIdentifier, fileContentParsed]);
