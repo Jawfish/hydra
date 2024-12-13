@@ -2,6 +2,7 @@ import { AppSidebar } from '@/components/AppSidebar';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
+import { WorkingFileDownloader } from '@/components/WorkingFileDownloader';
 import { Stats } from '@/views/Stats';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { Backfill } from '@/views/Backfill';
@@ -30,6 +31,9 @@ function App() {
           <div className='hidden 2xl:block'>
             <AppSidebar />
           </div>
+
+          {/* Global file downloader */}
+          <WorkingFileDownloader />
         </SidebarProvider>
         <Toaster />
       </ThemeProvider>
