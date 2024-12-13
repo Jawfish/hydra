@@ -37,6 +37,23 @@ export function Backfill() {
   const [workingFillField, setWorkingFillField] = useState<string>('');
   const [referenceFillField, setReferenceFillField] = useState<string>('');
 
+  // Debug logging for file content changes
+  useEffect(() => {
+    console.log('Working File Content Changed:', {
+      fileName: workingFileName,
+      contentLength: workingFileContent.length,
+      firstRow: workingFileContent[0]
+    });
+  }, [workingFileContent, workingFileName]);
+
+  useEffect(() => {
+    console.log('Reference File Content Changed:', {
+      fileName: referenceFileName,
+      contentLength: referenceFileContent.length,
+      firstRow: referenceFileContent[0]
+    });
+  }, [referenceFileContent, referenceFileName]);
+
   // Generate schemas when files are loaded
   useEffect(() => {
     if (workingFileContent.length > 0) {
@@ -54,9 +71,11 @@ export function Backfill() {
 
   const handleWorkingFileUpload = (name: string, content: string, fileType: string) => {
     try {
+      console.log('Uploading Working File:', { name, fileType, contentLength: content.length });
       setWorkingFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
       toast.success(`Working file ${name} uploaded successfully`);
     } catch (error) {
+      console.error('Working File Upload Error:', error);
       toast.error(
         `Error uploading working file: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
@@ -69,9 +88,11 @@ export function Backfill() {
     fileType: string
   ) => {
     try {
+      console.log('Uploading Reference File:', { name, fileType, contentLength: content.length });
       setReferenceFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
       toast.success(`Reference file ${name} uploaded successfully`);
     } catch (error) {
+      console.error('Reference File Upload Error:', error);
       toast.error(
         `Error uploading reference file: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
@@ -253,6 +274,17 @@ export function Backfill() {
           </Button>
         </div>
       )}
+
+      {/* Debug Information */}
+      <div className='mt-4 p-4 bg-gray-100 rounded'>
+        <h4 className='font-bold'>Debug Information</h4>
+        <p>Working File: {workingFileName || 'Not uploaded'}</p>
+        <p>Working File Content Length: {workingFileContent.length}</p>
+        <p>Working File Schema Length: {workingFileSchema.length}</p>
+        <p>Reference File: {referenceFileName || 'Not uploaded'}</p>
+        <p>Reference File Content Length: {referenceFileContent.length}</p>
+        <p>Reference File Schema Length: {referenceFileSchema.length}</p>
+      </div>
     </div>
   );
 }
