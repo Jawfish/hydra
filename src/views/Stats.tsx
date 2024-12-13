@@ -49,6 +49,7 @@ export function Stats() {
       console.log('Content length:', content.length);
       
       try {
+        useWorkingFileStore.getState().setFileName(name);
         setFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
       } catch (parseError) {
         console.error('File content parsing error:', parseError);
