@@ -115,7 +115,7 @@ export function Translate() {
     anthropic: Anthropic
   ): Promise<string> => {
     return retry(
-      async bail => {
+      async () => {
         try {
           const response = await anthropic.messages.create({
             max_tokens: 4096,
@@ -131,11 +131,10 @@ export function Translate() {
 
           return response.content[0].type === 'text' ? response.content[0].text : '';
         } catch (error) {
-          if (error instanceof Error && error.message.includes('rate limit')) {
-            throw error;
-          }
-          bail(error);
-          return '';
+          // Log the error for debugging
+          console.warn('Translation attempt failed:', error);
+          // Rethrow to trigger retry
+          throw error;
         }
       },
       {
