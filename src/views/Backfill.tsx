@@ -1,7 +1,6 @@
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -9,25 +8,25 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { useWorkingFileStore, useReferenceFileStore } from '@/store/store';
+import { Separator } from '@/components/ui/separator';
 import { getAllPaths } from '@/lib/parse';
 import { getValueByPath } from '@/lib/parse';
-import { useState, useEffect } from 'react';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
 import { jsonToCsv } from '@/lib/parse';
+import { useReferenceFileStore, useWorkingFileStore } from '@/store/store';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export function Backfill() {
-  const { 
-    fileName: workingFileName, 
-    fileContentParsed: workingFileContent, 
-    setFileContent: setWorkingFileContent 
+  const {
+    fileName: workingFileName,
+    fileContentParsed: workingFileContent,
+    setFileContent: setWorkingFileContent
   } = useWorkingFileStore();
-  
-  const { 
-    fileName: referenceFileName, 
-    fileContentParsed: referenceFileContent, 
-    setFileContent: setReferenceFileContent 
+
+  const {
+    fileName: referenceFileName,
+    fileContentParsed: referenceFileContent,
+    setFileContent: setReferenceFileContent
   } = useReferenceFileStore();
 
   const [workingFileSchema, setWorkingFileSchema] = useState<string[]>([]);
@@ -58,38 +57,53 @@ export function Backfill() {
       setWorkingFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
       toast.success(`Working file ${name} uploaded successfully`);
     } catch (error) {
-      toast.error(`Error uploading working file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(
+        `Error uploading working file: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   };
 
-  const handleReferenceFileUpload = (name: string, content: string, fileType: string) => {
+  const handleReferenceFileUpload = (
+    name: string,
+    content: string,
+    fileType: string
+  ) => {
     try {
       setReferenceFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
       toast.success(`Reference file ${name} uploaded successfully`);
     } catch (error) {
-      toast.error(`Error uploading reference file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(
+        `Error uploading reference file: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   };
 
   const performBackfill = () => {
-    if (!workingMatchField || !referenceMatchField || !workingFillField || !referenceFillField) {
+    if (
+      !(
+        workingMatchField &&
+        referenceMatchField &&
+        workingFillField &&
+        referenceFillField
+      )
+    ) {
       toast.error('Please select all fields for backfilling');
       return;
     }
 
     const backfilledContent = workingFileContent.map(workingRow => {
       const matchValue = getValueByPath(workingRow, workingMatchField);
-      
+
       // Find matching reference row
-      const matchingReferenceRow = referenceFileContent.find(refRow => 
-        getValueByPath(refRow, referenceMatchField) === matchValue
+      const matchingReferenceRow = referenceFileContent.find(
+        refRow => getValueByPath(refRow, referenceMatchField) === matchValue
       );
 
       if (matchingReferenceRow) {
         const fillValue = getValueByPath(matchingReferenceRow, referenceFillField);
-        return { 
-          ...workingRow, 
-          [workingFillField]: fillValue 
+        return {
+          ...workingRow,
+          [workingFillField]: fillValue
         };
       }
 
@@ -129,9 +143,11 @@ export function Backfill() {
             <div className='mt-4'>
               <div className='flex gap-4 mb-4'>
                 <div className='flex flex-col gap-2 w-full'>
-                  <label className='text-sm font-medium'>Match Field</label>
-                  <Select 
-                    value={workingMatchField} 
+                  <label htmlFor='matchField' className='text-sm font-medium'>
+                    Match Field
+                  </label>
+                  <Select
+                    value={workingMatchField}
                     onValueChange={setWorkingMatchField}
                   >
                     <SelectTrigger>
@@ -139,23 +155,26 @@ export function Backfill() {
                     </SelectTrigger>
                     <SelectContent>
                       {workingFileSchema.map(field => (
-                        <SelectItem key={field} value={field}>{field}</SelectItem>
+                        <SelectItem key={field} value={field}>
+                          {field}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className='flex flex-col gap-2 w-full'>
-                  <label className='text-sm font-medium'>Fill Field</label>
-                  <Select 
-                    value={workingFillField} 
-                    onValueChange={setWorkingFillField}
-                  >
+                  <label htmlFor='fillField' className='text-sm font-medium'>
+                    Fill Field
+                  </label>
+                  <Select value={workingFillField} onValueChange={setWorkingFillField}>
                     <SelectTrigger>
                       <SelectValue placeholder='Select fill field...' />
                     </SelectTrigger>
                     <SelectContent>
                       {workingFileSchema.map(field => (
-                        <SelectItem key={field} value={field}>{field}</SelectItem>
+                        <SelectItem key={field} value={field}>
+                          {field}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -172,9 +191,11 @@ export function Backfill() {
             <div className='mt-4'>
               <div className='flex gap-4 mb-4'>
                 <div className='flex flex-col gap-2 w-full'>
-                  <label className='text-sm font-medium'>Match Field</label>
-                  <Select 
-                    value={referenceMatchField} 
+                  <label htmlFor='matchField' className='text-sm font-medium'>
+                    Match Field
+                  </label>
+                  <Select
+                    value={referenceMatchField}
                     onValueChange={setReferenceMatchField}
                   >
                     <SelectTrigger>
@@ -182,15 +203,19 @@ export function Backfill() {
                     </SelectTrigger>
                     <SelectContent>
                       {referenceFileSchema.map(field => (
-                        <SelectItem key={field} value={field}>{field}</SelectItem>
+                        <SelectItem key={field} value={field}>
+                          {field}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className='flex flex-col gap-2 w-full'>
-                  <label className='text-sm font-medium'>Fill Field</label>
-                  <Select 
-                    value={referenceFillField} 
+                  <label htmlFor='fillField' className='text-sm font-medium'>
+                    Fill Field
+                  </label>
+                  <Select
+                    value={referenceFillField}
                     onValueChange={setReferenceFillField}
                   >
                     <SelectTrigger>
@@ -198,7 +223,9 @@ export function Backfill() {
                     </SelectTrigger>
                     <SelectContent>
                       {referenceFileSchema.map(field => (
-                        <SelectItem key={field} value={field}>{field}</SelectItem>
+                        <SelectItem key={field} value={field}>
+                          {field}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -211,9 +238,16 @@ export function Backfill() {
 
       {workingFileName && referenceFileName && (
         <div className='mt-8 flex justify-center'>
-          <Button 
+          <Button
             onClick={performBackfill}
-            disabled={!workingMatchField || !referenceMatchField || !workingFillField || !referenceFillField}
+            disabled={
+              !(
+                workingMatchField &&
+                referenceMatchField &&
+                workingFillField &&
+                referenceFillField
+              )
+            }
           >
             Perform Backfill
           </Button>
