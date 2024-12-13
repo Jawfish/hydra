@@ -13,7 +13,7 @@ interface FieldAnalysisDetail {
 }
 
 export function Stats() {
-  const { fileName, fileContentRaw, fileContentParsed, setFileContent } = useWorkingFileStore();
+  const { fileName, fileContentParsed, setFileContent } = useWorkingFileStore();
   const [selectedIdentifier, setSelectedIdentifier] = useState<string>('');
   const [selectedAnalysisField, setSelectedAnalysisField] = useState<string>('');
   const [fieldAnalysis, setFieldAnalysis] = useState<FieldAnalysisDetail[]>([]);
@@ -31,12 +31,12 @@ export function Stats() {
     }
   };
 
-  const analyzeField = (data: any[], field: string) => {
+  const analyzeField = (data: Record<string, unknown>[], field: string) => {
     const uniqueValues = new Set();
     let nonEmptyCount = 0;
     let emptyCount = 0;
 
-    data.forEach(row => {
+    for (const row of data) {
       const value = typeof row === 'object' ? getValueByPath(row, field) : row[field];
       const stringValue = String(value).trim();
 
@@ -46,7 +46,7 @@ export function Stats() {
         nonEmptyCount++;
         uniqueValues.add(stringValue);
       }
-    });
+    }
 
     return {
       name: field,
@@ -61,7 +61,8 @@ export function Stats() {
       return;
     }
 
-    const details: FieldAnalysisDetail[] = fileContentParsed.map(row => {
+    const details: FieldAnalysisDetail[] = [];
+    for (const row of fileContentParsed) {
       const fieldValue = getValueByPath(row, field);
       const identifier = getValueByPath(row, identifierField);
 
@@ -69,12 +70,12 @@ export function Stats() {
       const isEmpty =
         stringValue === '' || fieldValue === null || fieldValue === undefined;
 
-      return {
+      details.push({
         identifier: String(identifier),
         value: isEmpty ? '' : stringValue,
         isEmpty
-      };
-    });
+      });
+    }
 
     setFieldAnalysis(details.filter(d => d.isEmpty));
   };
@@ -151,8 +152,11 @@ export function Stats() {
               <h3 className='font-medium mb-4'>Detailed Analysis</h3>
               <div className='flex gap-4 mb-4'>
                 <div className='flex flex-col gap-2'>
-                  <label className='text-sm font-medium'>Identifier Field</label>
+                  <label htmlFor='identifier-field' className='text-sm font-medium'>
+                    Identifier Field
+                  </label>
                   <select
+                    id='identifier-field'
                     className='rounded-md border p-2'
                     value={selectedIdentifier}
                     onChange={e => setSelectedIdentifier(e.target.value)}
@@ -167,8 +171,11 @@ export function Stats() {
                 </div>
 
                 <div className='flex flex-col gap-2'>
-                  <label className='text-sm font-medium'>Analyze Field</label>
+                  <label htmlFor='analyze-field' className='text-sm font-medium'>
+                    Analyze Field
+                  </label>
                   <select
+                    id='analyze-field'
                     className='rounded-md border p-2'
                     value={selectedAnalysisField}
                     onChange={e => {
@@ -193,8 +200,8 @@ export function Stats() {
                   </h4>
                   <ScrollArea className='h-[200px]'>
                     <div className='space-y-2'>
-                      {fieldAnalysis.map((detail, index) => (
-                        <div key={index} className='text-sm'>
+                      {fieldAnalysis.map(detail => (
+                        <div key={detail.identifier} className='text-sm'>
                           {selectedIdentifier}: {detail.identifier}
                         </div>
                       ))}

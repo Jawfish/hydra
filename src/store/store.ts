@@ -1,58 +1,64 @@
+import { csvToJson, jsonlToJson } from '@/lib/parse';
 import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
 
-interface FileState {
-  input: string;
-  extractedUuids: string[];
-  fileError: string | null;
+export type FileType = 'jsonl' | 'csv' | 'json' | 'unknown';
+
+type FileState = {
   fileName: string | null;
-  jsonlSchema: string[];
-  csvHeaders: string[];
-  selectedField: string;
-  fileContent: string;
-  fileType: 'csv' | 'jsonl' | null;
+  fileContentRaw: string;
+  fileContentParsed: Record<string, unknown>[];
+};
 
-  setInput: (input: string) => void;
-  setExtractedUuids: (uuids: string[]) => void;
-  setFileError: (error: string | null) => void;
+type FileActions = {
   setFileName: (name: string | null) => void;
-  setJsonlSchema: (schema: string[]) => void;
-  setCsvHeaders: (headers: string[]) => void;
-  setSelectedField: (field: string) => void;
-  setFileContent: (content: string) => void;
-  setFileType: (type: 'csv' | 'jsonl' | null) => void;
+  setFileContent: (content: string, fileType: FileType) => void;
   resetFileState: () => void;
-}
+};
 
-export const useFileStore = create<FileState>(set => ({
-  input: '',
-  extractedUuids: [],
-  fileError: null,
+type FileStore = FileState & FileActions;
+
+const initialState: FileState = {
   fileName: null,
-  jsonlSchema: [],
-  csvHeaders: [],
-  selectedField: '',
-  fileContent: '',
-  fileType: null,
+  fileContentRaw: '',
+  fileContentParsed: []
+};
 
-  setInput: input => set({ input }),
-  setExtractedUuids: extractedUuiDs => set({ extractedUuids: extractedUuiDs }),
-  setFileError: fileError => set({ fileError }),
-  setFileName: fileName => set({ fileName }),
-  setJsonlSchema: jsonlSchema => set({ jsonlSchema }),
-  setCsvHeaders: csvHeaders => set({ csvHeaders }),
-  setSelectedField: selectedField => set({ selectedField }),
-  setFileContent: fileContent => set({ fileContent }),
-  setFileType: fileType => set({ fileType }),
-  resetFileState: () =>
-    set({
-      input: '',
-      extractedUuids: [],
-      fileError: null,
-      fileName: null,
-      jsonlSchema: [],
-      csvHeaders: [],
-      selectedField: '',
-      fileContent: '',
-      fileType: null
-    })
-}));
+const createFileStore = () =>
+  create<FileStore>()(
+    immer(set => ({
+      ...initialState,
+      setFileName: name => {
+        set(state => {
+          console.debug(`Setting file name to ${name}`);
+          state.fileName = name;
+        });
+      },
+      setFileContent: (content, fileType) => {
+        set(state => {
+          console.debug(`Setting file content for ${fileType}`);
+          state.fileContentRaw = content;
+
+          switch (fileType) {
+            case 'jsonl':
+              state.fileContentParsed = jsonlToJson(content);
+              break;
+            case 'csv':
+              state.fileContentParsed = csvToJson(content);
+              break;
+            case 'json':
+              state.fileContentParsed = JSON.parse(content);
+              break;
+            default:
+              throw new Error(`Unsupported file type: ${fileType}`);
+          }
+        });
+      },
+      resetFileState: () => {
+        set(() => initialState);
+      }
+    }))
+  );
+
+export const useWorkingFileStore = createFileStore();
+export const useReferenceFileStore = createFileStore();
