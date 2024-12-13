@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { getAllPaths, jsonToCsv, normalizeString } from '@/lib/parse';
+import { getAllPaths, serializeJson, normalizeString } from '@/lib/parse';
 import { getValueByPath } from '@/lib/parse';
 import { useReferenceFileStore, useWorkingFileStore } from '@/store/store';
 import { useEffect, useState } from 'react';
@@ -87,8 +87,8 @@ export function Deduplicate() {
 
       // Create download
       console.time('download');
-      const fileType = workingFileName?.split('.').pop() as FileType || 'csv';
-      const output = jsonToCsv(result, fileType);
+      const fileType = (workingFileName?.split('.').pop() as FileType) || 'csv';
+      const output = serializeJson(result, fileType);
       const blob = new Blob([output], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
