@@ -1,6 +1,5 @@
 import { Progress } from '@/components/ui/progress';
 import Anthropic from '@anthropic-ai/sdk';
-import Papa from 'papaparse';
 import { useState } from 'react';
 
 const ALL_LANGUAGES = [
@@ -40,10 +39,12 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useWorkingFileStore } from '@/store/store';
 import { toast } from 'sonner';
+import { serializeJson } from '@/lib/parse';
 
 export function Translate() {
   const { fileName, fileContentRaw, fileContentParsed } = useWorkingFileStore();
-  const csvHeaders = fileContentParsed.length > 0 ? getAllPaths(fileContentParsed[0]) : [];
+  const csvHeaders =
+    fileContentParsed.length > 0 ? getAllPaths(fileContentParsed[0]) : [];
   const [selectedColumn, setSelectedColumn] = useState<string>('');
   const [apiKey, setApiKey] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -103,7 +104,9 @@ export function Translate() {
 
       const totalRows = rows.length;
       const totalOperations = totalRows * selectedLanguages.size;
-      console.debug(`Processing ${totalRows} rows into ${selectedLanguages.size} languages`);
+      console.debug(
+        `Processing ${totalRows} rows into ${selectedLanguages.size} languages`
+      );
       let completedOperations = 0;
 
       // Process rows in chunks to avoid overwhelming the browser
