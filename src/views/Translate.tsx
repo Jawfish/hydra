@@ -1,6 +1,7 @@
 import { Progress } from '@/components/ui/progress';
 import Anthropic from '@anthropic-ai/sdk';
 import { useState } from 'react';
+import retry from 'async-retry';
 import type { FileType } from '@/store/store';
 
 const ALL_LANGUAGES = [
@@ -124,21 +125,37 @@ export function Translate() {
         const chunkPromises = chunk.flatMap(row =>
           Array.from(selectedLanguages).map(async language => {
             try {
-              const response = await anthropic.messages.create({
-                // biome-ignore lint/style/useNamingConvention: This is an external API schema
-                max_tokens: 4096,
-                messages: [
-                  {
-                    role: 'user',
-                    content: row[selectedColumn]
-                  }
-                ],
-                model: 'claude-3-5-sonnet-latest',
-                system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
-              });
+              const translatedText = await retry(async (bail) => {
+                try {
+                  const response = await anthropic.messages.create({
+                    // biome-ignore lint/style/useNamingConvention: This is an external API schema
+                    max_tokens: 4096,
+                    messages: [
+                      {
+                        role: 'user',
+                        content: row[selectedColumn]
+                      }
+                    ],
+                    model: 'claude-3-5-sonnet-latest',
+                    system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
+                  });
 
-              const translatedText =
-                response.content[0].type === 'text' ? response.content[0].text : '';
+                  return response.content[0].type === 'text' ? response.content[0].text : '';
+                } catch (error) {
+                  // Only retry on certain conditions, bail on others
+                  if (error instanceof Error && error.message.includes('rate limit')) {
+                    throw error; // This will trigger a retry
+                  }
+                  bail(error); // Stop retrying for other types of errors
+                  return ''; // Typescript needs a return
+                }
+              }, {
+                retries: 3, // Number of retry attempts
+                factor: 2, // Exponential backoff factor
+                minTimeout: 1000, // Minimum timeout between retries
+                maxTimeout: 60000, // Maximum timeout between retries
+                randomize: true, // Add some randomness to prevent thundering herd
+              });
 
               const translatedRow = { ...row };
               translatedRow[languageColumnName] = language;
@@ -147,7 +164,7 @@ export function Translate() {
             } catch (_error) {
               const errorRow = { ...row };
               errorRow[languageColumnName] = language;
-              errorRow[translationColumnName] = 'Error processing translation';
+              errorRow[translationColumnName] = 'Translation failed after multiple attempts';
               return errorRow;
             } finally {
               completedOperations++;
