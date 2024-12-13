@@ -18,13 +18,22 @@ export function Stats() {
   const [selectedAnalysisField, setSelectedAnalysisField] = useState<string>('');
   const [fieldAnalysis, setFieldAnalysis] = useState<FieldAnalysisDetail[]>([]);
 
-  const schema = fileName ? getAllPaths(fileContentParsed[0] || {}) : [];
+  const schema = fileName ? (() => {
+    console.log('Generating schema from first row:', fileContentParsed[0]);
+    const paths = getAllPaths(fileContentParsed[0] || {});
+    console.log('Generated schema paths:', paths);
+    return paths;
+  })() : [];
 
   const handleFileUpload = (name: string, content: string, fileType: string) => {
     try {
+      console.log('Uploading file:', { name, fileType });
+      console.log('Raw content sample:', content.slice(0, 200));
       setFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
+      console.log('Parsed content sample:', fileContentParsed.slice(0, 2));
       toast.success('File analysis complete!');
     } catch (error) {
+      console.error('File upload error:', error);
       toast.error(
         `Error analyzing file: ${error instanceof Error ? error.message : 'Unknown error'}`
       );

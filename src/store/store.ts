@@ -38,19 +38,29 @@ const createFileStore = () =>
         set(state => {
           console.debug(`Setting file content for ${fileType}`);
           state.fileContentRaw = content;
-
-          switch (fileType) {
+          
+          console.debug('Parsing content...');
+          try {
+            switch (fileType) {
             case 'jsonl':
               state.fileContentParsed = jsonlToJson(content);
+              console.debug('JSONL parsed:', state.fileContentParsed.length, 'rows');
               break;
             case 'csv':
               state.fileContentParsed = csvToJson(content);
+              console.debug('CSV parsed:', state.fileContentParsed.length, 'rows');
               break;
             case 'json':
               state.fileContentParsed = JSON.parse(content);
+              console.debug('JSON parsed:', Array.isArray(state.fileContentParsed) ? state.fileContentParsed.length + ' rows' : 'object');
               break;
             default:
               throw new Error(`Unsupported file type: ${fileType}`);
+          }
+          console.debug('Parse complete');
+          } catch (error) {
+            console.error('Parse error:', error);
+            throw error;
           }
         });
       },
