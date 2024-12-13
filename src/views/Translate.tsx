@@ -43,7 +43,8 @@ import { toast } from 'sonner';
 import { getAllPaths, serializeJson } from '@/lib/parse';
 
 export function Translate() {
-  const { fileName, fileContentRaw, fileContentParsed, setFileName, setFileContent } = useWorkingFileStore();
+  const { fileName, fileContentRaw, fileContentParsed, setFileName, setFileContent } =
+    useWorkingFileStore();
 
   const handleFileUpload = (name: string, content: string, fileType: FileType) => {
     setFileName(name);
@@ -73,7 +74,7 @@ export function Translate() {
       return;
     }
 
-    if (!fileContentRaw || !fileContentParsed.length) {
+    if (!fileContentRaw || fileContentParsed.length === 0) {
       toast.error('Please upload a CSV file first');
       return;
     }
@@ -182,16 +183,11 @@ export function Translate() {
 
   return (
     <div className='flex flex-col mb-12'>
-      <div className='mb-10'>
-        <Header>
-          <Header.Title>File Translator</Header.Title>
-          <Header.Description>Translate file data</Header.Description>
-        </Header>
-      </div>
-      <FileUpload 
-        onFileUpload={handleFileUpload}
-        fileName={fileName}
-      />
+      <Header>
+        <Header.Title>File Translator</Header.Title>
+        <Header.Description>Translate file data</Header.Description>
+      </Header>
+      <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
 
       {fileContentParsed.length > 0 && (
         <>
