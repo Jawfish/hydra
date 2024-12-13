@@ -1,4 +1,4 @@
-import { getValueByPath } from './parse';
+import { getValueByPath } from './parse.ts';
 
 export interface FieldAnalysis {
   name: string;
@@ -13,7 +13,10 @@ export interface FieldAnalysisDetail {
   isEmpty: boolean;
 }
 
-export const analyzeField = (data: Record<string, unknown>[], field: string): FieldAnalysis => {
+export const analyzeField = (
+  data: Record<string, unknown>[],
+  field: string
+): FieldAnalysis => {
   const uniqueValues = new Set();
   let nonEmptyCount = 0;
   let emptyCount = 0;
@@ -44,11 +47,15 @@ export const analyzeFieldDetails = (
   identifierField: string
 ): FieldAnalysisDetail[] => {
   if (!(data && field && identifierField)) {
-    console.log('analyzeFieldDetails: Missing required parameters', { data: !!data, field, identifierField });
+    console.debug('analyzeFieldDetails: Missing required parameters', {
+      data: !!data,
+      field,
+      identifierField
+    });
     return [];
   }
 
-  console.log('analyzeFieldDetails: Starting analysis', {
+  console.debug('analyzeFieldDetails: Starting analysis', {
     totalRows: data.length,
     field,
     identifierField
@@ -60,11 +67,14 @@ export const analyzeFieldDetails = (
     const identifier = getValueByPath(row, identifierField);
 
     // More strict empty check
-    const isEmpty = fieldValue === undefined || 
-                   fieldValue === null || 
-                   (typeof fieldValue === 'string' && fieldValue.trim() === '') ||
-                   (Array.isArray(fieldValue) && fieldValue.length === 0) ||
-                   (typeof fieldValue === 'object' && fieldValue !== null && Object.keys(fieldValue).length === 0);
+    const isEmpty =
+      fieldValue === undefined ||
+      fieldValue === null ||
+      (typeof fieldValue === 'string' && fieldValue.trim() === '') ||
+      (Array.isArray(fieldValue) && fieldValue.length === 0) ||
+      (typeof fieldValue === 'object' &&
+        fieldValue !== null &&
+        Object.keys(fieldValue).length === 0);
 
     details.push({
       identifier: String(identifier),
@@ -74,7 +84,7 @@ export const analyzeFieldDetails = (
   }
 
   const emptyDetails = details.filter(d => d.isEmpty);
-  console.log('analyzeFieldDetails: Analysis complete', {
+  console.debug('analyzeFieldDetails: Analysis complete', {
     totalAnalyzed: details.length,
     emptyCount: emptyDetails.length,
     nonEmptyCount: details.length - emptyDetails.length

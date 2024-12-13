@@ -1,14 +1,14 @@
-import { describe, it, expect } from 'vitest';
 import {
   countCsvRows,
   csvToJson,
-  jsonToCsv,
+  flattenObject,
   getAllPaths,
   getValueByPath,
+  jsonToCsv,
   jsonlToJson,
-  flattenObject,
   normalizeString
 } from '@/lib/parse';
+import { describe, expect, it } from 'vitest';
 describe('CSV counting', () => {
   it('counts single row in csv file', () => {
     const singleRowCsv = 'name,age\nJohn,30';
