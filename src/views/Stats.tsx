@@ -277,7 +277,7 @@ export const Stats: React.FC = () => {
 
       <div className='flex flex-col gap-8'>
         <div>
-          <FileUpload onFileUpload={handleFileUpload} />
+          <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
         </div>
 
         {fileName && fileContentParsed.length > 0 && (
