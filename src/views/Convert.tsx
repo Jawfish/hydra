@@ -2,12 +2,12 @@ import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { parseJsonl } from '@/lib/jsonl';
+import { parseJsonl } from '@/lib/json';
 import { useFileStore } from '@/store/store';
 import Papa from 'papaparse';
 import { toast } from 'sonner';
 
-export function JsonlToCsv() {
+export function Convert() {
   const { fileType, fileContent } = useFileStore();
 
   const convertToCsv = () => {
@@ -63,25 +63,17 @@ export function JsonlToCsv() {
 
   return (
     <div className='flex flex-col mb-12'>
-      <div className='mb-10'>
-        <Header>
-          <Header.Title>JSONL to CSV Converter</Header.Title>
-          <Header.Description>
-            Convert JSONL files to CSV, flattening nested objects
-          </Header.Description>
-        </Header>
-      </div>
+      <Header>
+        <Header.Title>Convert</Header.Title>
+        <Header.Description>Convert JSON to or from CSV</Header.Description>
+      </Header>
 
       <FileUpload />
 
-      {fileType === 'jsonl' && (
-        <>
-          <Separator className='my-14 h-[1px]' />
-          <div className='flex flex-col gap-4 max-w-min'>
-            <Button onClick={convertToCsv}>Convert to CSV</Button>
-          </div>
-        </>
-      )}
+      <Separator className='my-14 h-[1px]' />
+      <div className='flex flex-col gap-4 max-w-min'>
+        <Button onClick={convertToCsv}>Convert</Button>
+      </div>
     </div>
   );
 }

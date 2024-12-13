@@ -50,6 +50,11 @@
       },
       "suspicious": {
         "all": true,
+        "noConsole": {
+          "options": {
+            "allow": ["assert", "error", "info", "warn", "debug"]
+          }
+        },
         "noReactSpecificProps": "off"
       }
     }
@@ -57,6 +62,7 @@
   "organizeImports": {
     "enabled": true
   },
+
   "vcs": {
     "clientKind": "git",
     "enabled": false,

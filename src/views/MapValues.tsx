@@ -4,7 +4,7 @@ import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { getValueByPath, parseJsonl } from '@/lib/jsonl';
+import { getValueByPath, parseJsonl } from '@/lib/json';
 import { useFileStore } from '@/store/store';
 import Papa from 'papaparse';
 import { useState } from 'react';

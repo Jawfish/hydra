@@ -1,13 +1,20 @@
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  type FieldAnalysisDetail,
+  analyzeField,
+  analyzeFieldDetails
+} from '@/lib/fileAnalysis';
 import { getAllPaths } from '@/lib/parse';
-import { analyzeField, analyzeFieldDetails, type FieldAnalysisDetail } from '@/lib/fileAnalysis';
 import { useWorkingFileStore } from '@/store/store';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-const FileStatistics = ({ fileName, rowCount }: { fileName: string; rowCount: number }) => (
+const FileStatistics = ({
+  fileName,
+  rowCount
+}: { fileName: string; rowCount: number }) => (
   <div className='rounded-lg border p-4'>
     <h3 className='font-medium mb-2'>File Information</h3>
     <p>Name: {fileName}</p>
@@ -30,7 +37,10 @@ const SchemaDisplay = ({ schema }: { schema: string[] }) => (
   </div>
 );
 
-const FieldAnalysisTable = ({ schema, data }: { schema: string[]; data: Record<string, unknown>[] }) => (
+const FieldAnalysisTable = ({
+  schema,
+  data
+}: { schema: string[]; data: Record<string, unknown>[] }) => (
   <div className='rounded-lg border p-4'>
     <h3 className='font-medium mb-4'>Field Analysis</h3>
     <div className='grid grid-cols-4 gap-4 text-sm font-medium mb-2'>
@@ -61,6 +71,8 @@ const FieldAnalysisTable = ({ schema, data }: { schema: string[]; data: Record<s
 
 const DetailedAnalysisSection = ({
   schema,
+  // biome-ignore lint/correctness/noUnusedVariables: might be useful later
+  // biome-ignore lint/correctness/noUnusedFunctionParameters: might be useful later
   data,
   selectedIdentifier,
   setSelectedIdentifier,
@@ -163,7 +175,11 @@ export function Stats() {
 
   useEffect(() => {
     if (selectedAnalysisField && selectedIdentifier) {
-      const details = analyzeFieldDetails(fileContentParsed, selectedAnalysisField, selectedIdentifier);
+      const details = analyzeFieldDetails(
+        fileContentParsed,
+        selectedAnalysisField,
+        selectedIdentifier
+      );
       setFieldAnalysis(details);
     }
   }, [selectedAnalysisField, selectedIdentifier, fileContentParsed]);

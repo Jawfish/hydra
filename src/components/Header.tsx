@@ -13,7 +13,7 @@ interface DescriptionProps {
 }
 
 export const Header = ({ children }: HeaderProps) => (
-  <header className='flex flex-col gap-1'>{children}</header>
+  <header className='flex flex-col gap-1 mb-10'>{children}</header>
 );
 
 Header.Title = ({ children }: TitleProps) => (

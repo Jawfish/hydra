@@ -5,7 +5,7 @@ import {
   jsonToCsv,
   getAllPaths,
   getValueByPath,
-  parseJsonl,
+  jsonlToJson,
   flattenObject,
   normalizeString
 } from '@/lib/parse';
@@ -90,7 +90,7 @@ describe('Converting CSV to an array of objects', () => {
     const jsonlContent = '{"name":"John","age":30}\n{"name":"Jane","age":25}';
     const csvContent = 'name,age\nJohn,30\nJane,25';
 
-    const jsonlParsed = parseJsonl(jsonlContent);
+    const jsonlParsed = jsonlToJson(jsonlContent);
     const csvParsed = csvToJson(csvContent);
 
     expect(csvParsed).toStrictEqual(jsonlParsed);
@@ -159,7 +159,7 @@ describe('JSONL parsing', () => {
   it('parses simple jsonl content into objects', () => {
     const jsonl = '{"name":"John"}\n{"name":"Jane"}';
 
-    const parsed = parseJsonl(jsonl);
+    const parsed = jsonlToJson(jsonl);
 
     expect(parsed).toEqual([{ name: 'John' }, { name: 'Jane' }]);
   });
@@ -167,7 +167,7 @@ describe('JSONL parsing', () => {
   it('removes byte order mark from beginning of content', () => {
     const jsonlWithBom = '\uFEFF{"name":"John"}\n{"name":"Jane"}';
 
-    const parsed = parseJsonl(jsonlWithBom);
+    const parsed = jsonlToJson(jsonlWithBom);
 
     expect(parsed).toEqual([{ name: 'John' }, { name: 'Jane' }]);
   });
@@ -175,7 +175,7 @@ describe('JSONL parsing', () => {
   it('normalizes windows line endings to unix style', () => {
     const jsonlWithCrlf = '{"name":"John"}\r\n{"name":"Jane"}';
 
-    const parsed = parseJsonl(jsonlWithCrlf);
+    const parsed = jsonlToJson(jsonlWithCrlf);
 
     expect(parsed).toEqual([{ name: 'John' }, { name: 'Jane' }]);
   });

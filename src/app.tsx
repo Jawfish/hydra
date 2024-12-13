@@ -1,32 +1,24 @@
 import { AppSidebar } from '@/components/AppSidebar';
-import { RouteChangeHandler } from '@/components/RouteChangeHandler';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
-import { Backfill } from '@/views/Backfill';
-import { Deduplicate } from '@/views/Deduplicate';
-import { JsonlToCsv } from '@/views/JsonlToCsv';
-import { MapValues } from '@/views/MapValues';
 import { Stats } from '@/views/Stats';
-import { Translate } from '@/views/Translate';
-import { UuidExtractor } from '@/views/UuidExtractor';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 function App() {
   return (
     <Router>
       <ThemeProvider defaultTheme='system' storageKey='vite-ui-theme'>
-        <RouteChangeHandler />
         <SidebarProvider>
           <AppSidebar />
           <div className='p-8 xl:mx-auto w-full max-w-4xl'>
             <Routes>
-              <Route path='/extract' element={<UuidExtractor />} />
-              <Route path='/map' element={<MapValues />} />
-              <Route path='/translate' element={<Translate />} />
-              <Route path='/convert' element={<JsonlToCsv />} />
-              <Route path='/backfill' element={<Backfill />} />
-              <Route path='/deduplicate' element={<Deduplicate />} />
+              {/* <Route path='/extract' element={<UuidExtractor />} /> */}
+              {/* <Route path='/map' element={<MapValues />} /> */}
+              {/* <Route path='/translate' element={<Translate />} /> */}
+              {/* <Route path='/convert' element={<Convert />} /> */}
+              {/* <Route path='/backfill' element={<Backfill />} /> */}
+              {/* <Route path='/deduplicate' element={<Deduplicate />} /> */}
               <Route path='/stats' element={<Stats />} />
               <Route path='/' element={<Navigate to='/extract' replace={true} />} />
             </Routes>

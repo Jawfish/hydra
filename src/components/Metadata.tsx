@@ -1,5 +1,5 @@
-import { countCsvRows } from '@/lib/csv';
-import { parseJsonl } from '@/lib/jsonl';
+import { countCsvRows } from '@/lib/parse';
+import { parseJsonl } from '@/lib/json';
 import { useFileStore } from '@/store/store';
 
 export function Metadata() {

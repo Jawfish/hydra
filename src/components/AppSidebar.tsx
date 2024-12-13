@@ -38,7 +38,7 @@ const items = [
     icon: Bot
   },
   {
-    title: 'JSONL to CSV',
+    title: 'Convert',
     url: '/convert',
     icon: FileJson
   },
