@@ -89,12 +89,16 @@ export function Deduplicate() {
       console.time('download');
       const fileType = (workingFileName?.split('.').pop() as FileType) || 'csv';
       const output = serializeJson(result, fileType);
-      const blob = new Blob([output], { type: 'text/csv' });
+      const blob = new Blob([output], { 
+        type: fileType === 'json' ? 'application/json' 
+             : fileType === 'jsonl' ? 'application/jsonl' 
+             : 'text/csv' 
+      });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      a.download = `deduplicated_${timestamp}.csv`;
+      a.download = `deduplicated_${timestamp}.${fileType}`;
       a.click();
       window.URL.revokeObjectURL(url);
       console.timeEnd('download');
