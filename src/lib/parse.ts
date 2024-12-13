@@ -4,10 +4,10 @@ const CRLF_REGEX = /\r\n/g;
 
 /**
  * Safely parses JSONL content and returns valid JSON objects
- * @param content - Raw JSONL content
- * @returns Array of parsed JSON objects
+ * @param {string} content - Raw JSONL content
+ * @returns {object[]} Array of parsed JSON objects
  */
-export const parseJsonl = (content: string): object[] => {
+export const jsonlToJson = (content: string): object[] => {
   return content
     .replace(BOM_REGEX, '') // Remove byte order mark
     .replace(CRLF_REGEX, '\n') // Normalize line endings
