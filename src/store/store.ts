@@ -51,8 +51,26 @@ const createFileStore = () =>
               console.debug('CSV parsed:', state.fileContentParsed.length, 'rows');
               break;
             case 'json':
-              state.fileContentParsed = JSON.parse(content);
-              console.debug('JSON parsed:', Array.isArray(state.fileContentParsed) ? state.fileContentParsed.length + ' rows' : 'object');
+              try {
+                console.debug('Raw JSON content length:', content.length);
+                console.debug('Raw JSON preview:', content.slice(0, 200));
+                
+                const parsedContent = JSON.parse(content);
+                console.debug('Parsed JSON type:', typeof parsedContent);
+                console.debug('Parsed JSON keys:', Object.keys(parsedContent));
+                
+                // Ensure it's an array
+                state.fileContentParsed = Array.isArray(parsedContent) 
+                  ? parsedContent 
+                  : [parsedContent];
+                
+                console.debug('JSON parsed:', state.fileContentParsed.length + ' rows');
+                console.debug('First row:', state.fileContentParsed[0]);
+              } catch (error) {
+                console.error('JSON Parse error:', error);
+                console.error('Problematic content:', content.slice(0, 500)); // Show first 500 chars
+                throw error;
+              }
               break;
             default:
               throw new Error(`Unsupported file type: ${fileType}`);
