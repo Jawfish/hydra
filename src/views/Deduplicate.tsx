@@ -87,7 +87,8 @@ export function Deduplicate() {
 
       // Create download
       console.time('download');
-      const output = jsonToCsv(result);
+      const fileType = workingFileName?.split('.').pop() as FileType || 'csv';
+      const output = jsonToCsv(result, fileType);
       const blob = new Blob([output], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');

@@ -133,7 +133,8 @@ export function Backfill() {
 
     // Create a download link
     console.time('create-csv');
-    const backfilledOutput = jsonToCsv(backfilledContent);
+    const fileType = workingFileName?.split('.').pop() as FileType || 'csv';
+    const backfilledOutput = jsonToCsv(backfilledContent, fileType);
     const blob = new Blob([backfilledOutput], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');

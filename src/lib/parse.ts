@@ -123,11 +123,22 @@ export const flattenObject = (
  * @param {object[]} data - Array of objects to convert to CSV
  * @returns {string} - CSV string
  */
-export const jsonToCsv = (data: Record<string, unknown>[]): string => {
+export const jsonToCsv = (
+  data: Record<string, unknown>[],
+  originalFileType: FileType = 'csv'
+): string => {
   // Flatten each object in the array
   const flattenedData = data.map(item => flattenObject(item));
 
-  return Papa.unparse(flattenedData, { header: true });
+  switch (originalFileType) {
+    case 'json':
+      return JSON.stringify(flattenedData, null, 2);
+    case 'jsonl':
+      return flattenedData.map(item => JSON.stringify(item)).join('\n');
+    case 'csv':
+    default:
+      return Papa.unparse(flattenedData, { header: true });
+  }
 };
 
 /**
