@@ -1,3 +1,4 @@
+import { useFileUpload } from '@/hooks/use-file-upload';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -241,28 +242,7 @@ export const Stats: React.FC = () => {
     }
   }, [selectedAnalysisField, selectedIdentifier, fileContentParsed]);
 
-  const handleFileUpload = (name: string, content: string, fileType: string) => {
-    try {
-      console.debug('Uploading file:', { name, fileType });
-      console.debug('Raw content sample:', content.slice(0, 200));
-      console.debug('Content length:', content.length);
-
-      try {
-        useWorkingFileStore.getState().setFileName(name);
-        setFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
-      } catch (parseError) {
-        console.error('File content parsing error:', parseError);
-        toast.error(
-          `Parsing error: ${parseError instanceof Error ? parseError.message : 'Unknown parsing error'}`
-        );
-      }
-    } catch (error) {
-      console.error('File upload error:', error);
-      toast.error(
-        `Error analyzing file: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
-    }
-  };
+  const handleFileUpload = useFileUpload('working');
 
   return (
     <div className='flex flex-col mb-12'>
