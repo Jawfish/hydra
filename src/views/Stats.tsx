@@ -2,6 +2,13 @@ import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   type FieldAnalysisDetail,
   analyzeField,
   analyzeFieldDetails
@@ -95,38 +102,36 @@ const DetailedAnalysisSection = ({
         <label htmlFor='identifier-field' className='text-sm font-medium'>
           Identifier Field
         </label>
-        <select
-          id='identifier-field'
-          className='rounded-md border p-2'
-          value={selectedIdentifier}
-          onChange={e => setSelectedIdentifier(e.target.value)}
-        >
-          <option value=''>Select identifier field...</option>
-          {schema.map(field => (
-            <option key={field} value={field}>
-              {field}
-            </option>
-          ))}
-        </select>
+        <Select value={selectedIdentifier} onValueChange={setSelectedIdentifier}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select identifier field..." />
+          </SelectTrigger>
+          <SelectContent>
+            {schema.map(field => (
+              <SelectItem key={field} value={field}>
+                {field}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className='flex flex-col gap-2'>
         <label htmlFor='analyze-field' className='text-sm font-medium'>
           Analyze Field
         </label>
-        <select
-          id='analyze-field'
-          className='rounded-md border p-2'
-          value={selectedAnalysisField}
-          onChange={e => setSelectedAnalysisField(e.target.value)}
-        >
-          <option value=''>Select field to analyze...</option>
-          {schema.map(field => (
-            <option key={field} value={field}>
-              {field}
-            </option>
-          ))}
-        </select>
+        <Select value={selectedAnalysisField} onValueChange={setSelectedAnalysisField}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select field to analyze..." />
+          </SelectTrigger>
+          <SelectContent>
+            {schema.map(field => (
+              <SelectItem key={field} value={field}>
+                {field}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
 
