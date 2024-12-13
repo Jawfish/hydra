@@ -171,13 +171,14 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
             Empty values in {selectedAnalysisField} ( {fieldAnalysis.length})
           </h4>
           <ScrollArea className='h-[200px]'>
-            <div className='space-y-2'>
-              {fieldAnalysis.map(detail => (
-                <div key={detail.identifier} className='text-sm'>
+            <ul className='space-y-2'>
+              {fieldAnalysis.map((detail, idx) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: static data
+                <li key={idx} className='text-sm'>
                   {selectedIdentifier}: {detail.identifier}
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           </ScrollArea>
         </div>
       ) : (
@@ -224,7 +225,7 @@ export const Stats: React.FC = () => {
 
     if (selectedAnalysisField && selectedIdentifier && fileContentParsed.length > 0) {
       console.debug('Calling analyzeFieldDetails with:', {
-        data: fileContentParsed[0], // Log first row to check structure
+        data: fileContentParsed[0],
         analysisField: selectedAnalysisField,
         identifierField: selectedIdentifier
       });
