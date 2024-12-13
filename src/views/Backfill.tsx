@@ -39,7 +39,7 @@ export function Backfill() {
 
   // Debug logging for file content changes
   useEffect(() => {
-    console.log('Working File Content Changed:', {
+    console.debug('Working File Content Changed:', {
       fileName: workingFileName,
       contentLength: workingFileContent.length,
       firstRow: workingFileContent[0]
@@ -47,7 +47,7 @@ export function Backfill() {
   }, [workingFileContent, workingFileName]);
 
   useEffect(() => {
-    console.log('Reference File Content Changed:', {
+    console.debug('Reference File Content Changed:', {
       fileName: referenceFileName,
       contentLength: referenceFileContent.length,
       firstRow: referenceFileContent[0]
@@ -71,7 +71,11 @@ export function Backfill() {
 
   const handleWorkingFileUpload = (name: string, content: string, fileType: string) => {
     try {
-      console.log('Uploading Working File:', { name, fileType, contentLength: content.length });
+      console.debug('Uploading Working File:', {
+        name,
+        fileType,
+        contentLength: content.length
+      });
       useWorkingFileStore.getState().setFileName(name);
       setWorkingFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
       toast.success(`Working file ${name} uploaded successfully`);
@@ -89,7 +93,11 @@ export function Backfill() {
     fileType: string
   ) => {
     try {
-      console.log('Uploading Reference File:', { name, fileType, contentLength: content.length });
+      console.debug('Uploading Reference File:', {
+        name,
+        fileType,
+        contentLength: content.length
+      });
       useReferenceFileStore.getState().setFileName(name);
       setReferenceFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
       toast.success(`Reference file ${name} uploaded successfully`);
@@ -119,14 +127,14 @@ export function Backfill() {
 
       // Check if the fill field is empty
       const currentFillValue = getValueByPath(workingRow, workingFillField);
-      const isEmptyValue = 
-        currentFillValue === undefined || 
-        currentFillValue === null || 
+      const isEmptyValue =
+        currentFillValue === undefined ||
+        currentFillValue === null ||
         (typeof currentFillValue === 'string' && currentFillValue.trim() === '') ||
         (Array.isArray(currentFillValue) && currentFillValue.length === 0) ||
-        (typeof currentFillValue === 'object' && 
-         currentFillValue !== null && 
-         Object.keys(currentFillValue).length === 0);
+        (typeof currentFillValue === 'object' &&
+          currentFillValue !== null &&
+          Object.keys(currentFillValue).length === 0);
 
       // Only backfill if the current value is empty
       if (isEmptyValue) {
@@ -159,12 +167,16 @@ export function Backfill() {
 
     // Count how many rows were actually backfilled
     const backfilledRowCount = backfilledContent.filter(
-      row => getValueByPath(row, workingFillField) !== 
-             getValueByPath(workingFileContent.find(
-               orig => getValueByPath(orig, workingMatchField) === 
-                       getValueByPath(row, workingMatchField)
-             ) || {}, 
-             workingFillField)
+      row =>
+        getValueByPath(row, workingFillField) !==
+        getValueByPath(
+          workingFileContent.find(
+            orig =>
+              getValueByPath(orig, workingMatchField) ===
+              getValueByPath(row, workingMatchField)
+          ) || {},
+          workingFillField
+        )
     ).length;
 
     toast.success(`Backfilled ${backfilledRowCount} rows`);
@@ -282,7 +294,7 @@ export function Backfill() {
       </div>
 
       {workingFileName && referenceFileName && (
-        <div className='mt-8 flex justify-center'>
+        <div className='mt-8'>
           <Button
             onClick={performBackfill}
             disabled={
@@ -298,17 +310,6 @@ export function Backfill() {
           </Button>
         </div>
       )}
-
-      {/* Debug Information */}
-      <div className='mt-4 p-4 bg-gray-100 rounded'>
-        <h4 className='font-bold'>Debug Information</h4>
-        <p>Working File: {workingFileName || 'Not uploaded'}</p>
-        <p>Working File Content Length: {workingFileContent.length}</p>
-        <p>Working File Schema Length: {workingFileSchema.length}</p>
-        <p>Reference File: {referenceFileName || 'Not uploaded'}</p>
-        <p>Reference File Content Length: {referenceFileContent.length}</p>
-        <p>Reference File Schema Length: {referenceFileSchema.length}</p>
-      </div>
     </div>
   );
 }
