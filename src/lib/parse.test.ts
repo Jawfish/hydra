@@ -512,6 +512,109 @@ describe('Object flattening', () => {
   });
 });
 
+describe('JSON parsing', () => {
+  it('parses standard JSON array', () => {
+    const jsonContent = '[{"name":"John"},{"name":"Jane"}]';
+
+    const parsed = parseJson(jsonContent);
+
+    expect(parsed).toEqual([
+      { name: 'John' },
+      { name: 'Jane' }
+    ]);
+  });
+
+  it('parses single object as array', () => {
+    const jsonContent = '{"name":"John"}';
+
+    const parsed = parseJson(jsonContent);
+
+    expect(parsed).toEqual([{ name: 'John' }]);
+  });
+
+  it('handles object with numeric keys', () => {
+    const jsonContent = '{"0":{"name":"John"},"1":{"name":"Jane"}}';
+
+    const parsed = parseJson(jsonContent);
+
+    expect(parsed).toEqual([
+      { name: 'John' },
+      { name: 'Jane' }
+    ]);
+  });
+
+  it('handles mixed numeric and non-numeric keys', () => {
+    const jsonContent = '{
+      "0":{"name":"John"},
+      "1":{"name":"Jane"},
+      "metadata":{"total":2}
+    }';
+
+    const parsed = parseJson(jsonContent);
+
+    expect(parsed).toEqual([
+      { name: 'John' },
+      { name: 'Jane' }
+    ]);
+  });
+
+  it('handles nested objects', () => {
+    const jsonContent = '{"users":[{"name":"John"},{"name":"Jane"}]}';
+
+    const parsed = parseJson(jsonContent);
+
+    expect(parsed).toEqual([{ users: [{ name: 'John' }, { name: 'Jane' }] }]);
+  });
+
+  it('throws error for invalid JSON', () => {
+    const invalidJson = '{invalid json}';
+
+    expect(() => parseJson(invalidJson)).toThrow();
+  });
+
+  it('handles empty array', () => {
+    const emptyArrayJson = '[]';
+
+    const parsed = parseJson(emptyArrayJson);
+
+    expect(parsed).toEqual([]);
+  });
+
+  it('handles empty object', () => {
+    const emptyObjectJson = '{}';
+
+    const parsed = parseJson(emptyObjectJson);
+
+    expect(parsed).toEqual([{}]);
+  });
+
+  it('preserves primitive values', () => {
+    const primitiveJson = '"hello"';
+
+    const parsed = parseJson(primitiveJson);
+
+    expect(parsed).toEqual(['hello']);
+  });
+
+  it('handles nested objects with numeric keys', () => {
+    const nestedNumericJson = '{
+      "data": {
+        "0": {"name": "John"},
+        "1": {"name": "Jane"}
+      }
+    }';
+
+    const parsed = parseJson(nestedNumericJson);
+
+    expect(parsed).toEqual([{
+      data: {
+        "0": { name: "John" },
+        "1": { name: "Jane" }
+      }
+    }]);
+  });
+});
+
 describe('String normalization', () => {
   it('converts string to lowercase', () => {
     const input = 'HELLO World';
