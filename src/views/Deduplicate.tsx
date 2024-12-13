@@ -1,7 +1,6 @@
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import {
   Select,
   SelectContent,
@@ -9,9 +8,9 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { getAllPaths, normalizeString, jsonToCsv } from '@/lib/parse';
+import { getAllPaths, jsonToCsv, normalizeString } from '@/lib/parse';
 import { getValueByPath } from '@/lib/parse';
-import { useWorkingFileStore, useReferenceFileStore } from '@/store/store';
+import { useReferenceFileStore, useWorkingFileStore } from '@/store/store';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -65,7 +64,11 @@ export function Deduplicate() {
     }
   };
 
-  const handleReferenceFileUpload = (name: string, content: string, fileType: string) => {
+  const handleReferenceFileUpload = (
+    name: string,
+    content: string,
+    fileType: string
+  ) => {
     try {
       console.debug('Uploading Reference File:', {
         name,
@@ -146,7 +149,7 @@ export function Deduplicate() {
   };
 
   return (
-    <div className="flex flex-col mb-12">
+    <div className='flex flex-col mb-12'>
       <Header>
         <Header.Title>Deduplicate Files</Header.Title>
         <Header.Description>
@@ -154,24 +157,27 @@ export function Deduplicate() {
         </Header.Description>
       </Header>
 
-      <div className="grid grid-cols-2 gap-8">
+      <div className='grid grid-cols-2 gap-8'>
         <div>
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold">Working File</h3>
-            <p className="text-muted-foreground text-sm">
+          <div className='mb-4'>
+            <h3 className='text-lg font-semibold'>Working File</h3>
+            <p className='text-muted-foreground text-sm'>
               The file to remove duplicates from
             </p>
           </div>
-          <FileUpload onFileUpload={handleWorkingFileUpload} />
+          <FileUpload
+            onFileUpload={handleWorkingFileUpload}
+            fileName={workingFileName}
+          />
           {workingFileName && (
-            <div className="mt-4">
-              <div className="flex flex-col gap-2">
-                <label htmlFor="matchField" className="text-sm font-medium">
+            <div className='mt-4'>
+              <div className='flex flex-col gap-2'>
+                <label htmlFor='matchField' className='text-sm font-medium'>
                   Field to match on
                 </label>
                 <Select value={workingMatchField} onValueChange={setWorkingMatchField}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select match field..." />
+                    <SelectValue placeholder='Select match field...' />
                   </SelectTrigger>
                   <SelectContent>
                     {workingFileSchema.map(field => (
@@ -187,17 +193,20 @@ export function Deduplicate() {
         </div>
 
         <div>
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold">Reference File</h3>
-            <p className="text-muted-foreground text-sm">
+          <div className='mb-4'>
+            <h3 className='text-lg font-semibold'>Reference File</h3>
+            <p className='text-muted-foreground text-sm'>
               The file to check for duplicates against
             </p>
           </div>
-          <FileUpload onFileUpload={handleReferenceFileUpload} />
+          <FileUpload
+            onFileUpload={handleReferenceFileUpload}
+            fileName={referenceFileName}
+          />
           {referenceFileName && (
-            <div className="mt-4">
-              <div className="flex flex-col gap-2">
-                <label htmlFor="matchField" className="text-sm font-medium">
+            <div className='mt-4'>
+              <div className='flex flex-col gap-2'>
+                <label htmlFor='matchField' className='text-sm font-medium'>
                   Field to match on
                 </label>
                 <Select
@@ -205,7 +214,7 @@ export function Deduplicate() {
                   onValueChange={setReferenceMatchField}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select match field..." />
+                    <SelectValue placeholder='Select match field...' />
                   </SelectTrigger>
                   <SelectContent>
                     {referenceFileSchema.map(field => (
@@ -222,7 +231,7 @@ export function Deduplicate() {
       </div>
 
       {workingFileName && referenceFileName && (
-        <div className="mt-8">
+        <div className='mt-8'>
           <Button
             onClick={processDeduplicate}
             disabled={!(workingMatchField && referenceMatchField)}

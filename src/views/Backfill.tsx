@@ -8,7 +8,6 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
 import { getAllPaths, normalizeString } from '@/lib/parse';
 import { getValueByPath } from '@/lib/parse';
 import { jsonToCsv } from '@/lib/parse';
@@ -123,7 +122,7 @@ export function Backfill() {
     }
 
     console.time('backfill');
-    
+
     // Precompute normalized reference values for faster matching
     console.time('reference-map');
     const normalizedReferenceMap = new Map(
@@ -184,9 +183,13 @@ export function Backfill() {
     console.time('count-backfilled');
     const backfilledRowCount = backfilledContent.filter(row => {
       const origValue = getValueByPath(row, workingFillField);
-      const matchValue = normalizeString(getValueByPath(row, workingMatchField) as string);
+      const matchValue = normalizeString(
+        getValueByPath(row, workingMatchField) as string
+      );
       const referenceRow = normalizedReferenceMap.get(matchValue);
-      return referenceRow && origValue !== getValueByPath(referenceRow, referenceFillField);
+      return (
+        referenceRow && origValue !== getValueByPath(referenceRow, referenceFillField)
+      );
     }).length;
     console.timeEnd('count-backfilled');
 
@@ -202,18 +205,25 @@ export function Backfill() {
           Backfill data from one file into another
         </Header.Description>
       </Header>
-      <Separator className='my-14 h-[1px]' />
 
       <div className='grid grid-cols-2 gap-8'>
         <div>
-          <h3 className='text-lg font-semibold mb-4'>Working File</h3>
-          <FileUpload onFileUpload={handleWorkingFileUpload} />
+          <div className='mb-4'>
+            <h3 className='text-lg font-semibold'>Working File</h3>
+            <p className='text-muted-foreground text-sm'>
+              The file to backfill data into
+            </p>
+          </div>
+          <FileUpload
+            onFileUpload={handleWorkingFileUpload}
+            fileName={workingFileName}
+          />
           {workingFileName && (
             <div className='mt-4'>
               <div className='flex gap-4 mb-4'>
                 <div className='flex flex-col gap-2 w-full'>
                   <label htmlFor='matchField' className='text-sm font-medium'>
-                    Match Field
+                    Field to match on
                   </label>
                   <Select
                     value={workingMatchField}
@@ -233,7 +243,7 @@ export function Backfill() {
                 </div>
                 <div className='flex flex-col gap-2 w-full'>
                   <label htmlFor='fillField' className='text-sm font-medium'>
-                    Fill Field
+                    Field to backfill data into
                   </label>
                   <Select value={workingFillField} onValueChange={setWorkingFillField}>
                     <SelectTrigger>
@@ -254,14 +264,22 @@ export function Backfill() {
         </div>
 
         <div>
-          <h3 className='text-lg font-semibold mb-4'>Reference File</h3>
-          <FileUpload onFileUpload={handleReferenceFileUpload} />
+          <div className='mb-4'>
+            <h3 className='text-lg font-semibold'>Reference File</h3>
+            <p className='text-muted-foreground text-sm'>
+              The file to retrieve data from
+            </p>
+          </div>
+          <FileUpload
+            onFileUpload={handleReferenceFileUpload}
+            fileName={referenceFileName}
+          />
           {referenceFileName && (
             <div className='mt-4'>
               <div className='flex gap-4 mb-4'>
                 <div className='flex flex-col gap-2 w-full'>
                   <label htmlFor='matchField' className='text-sm font-medium'>
-                    Match Field
+                    Field to match on
                   </label>
                   <Select
                     value={referenceMatchField}
@@ -281,14 +299,14 @@ export function Backfill() {
                 </div>
                 <div className='flex flex-col gap-2 w-full'>
                   <label htmlFor='fillField' className='text-sm font-medium'>
-                    Fill Field
+                    Field to retrieve data from
                   </label>
                   <Select
                     value={referenceFillField}
                     onValueChange={setReferenceFillField}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder='Select fill field...' />
+                      <SelectValue placeholder='Select data field...' />
                     </SelectTrigger>
                     <SelectContent>
                       {referenceFileSchema.map(field => (
