@@ -124,6 +124,7 @@ export function Backfill() {
 
     const backfilledContent = workingFileContent.map(workingRow => {
       const matchValue = getValueByPath(workingRow, workingMatchField);
+      const normalizedMatchValue = normalizeString(matchValue as string);
 
       // Check if the fill field is empty
       const currentFillValue = getValueByPath(workingRow, workingFillField);
@@ -138,9 +139,9 @@ export function Backfill() {
 
       // Only backfill if the current value is empty
       if (isEmptyValue) {
-        // Find matching reference row
+        // Find matching reference row using normalized comparison
         const matchingReferenceRow = referenceFileContent.find(
-          refRow => getValueByPath(refRow, referenceMatchField) === matchValue
+          refRow => normalizeString(getValueByPath(refRow, referenceMatchField) as string) === normalizedMatchValue
         );
 
         if (matchingReferenceRow) {
