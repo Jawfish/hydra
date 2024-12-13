@@ -1,3 +1,4 @@
+import { useFileUpload } from '@/hooks/use-file-upload';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -68,45 +69,8 @@ export function Backfill() {
     }
   }, [referenceFileContent]);
 
-  const handleWorkingFileUpload = (name: string, content: string, fileType: string) => {
-    try {
-      console.debug('Uploading Working File:', {
-        name,
-        fileType,
-        contentLength: content.length
-      });
-      useWorkingFileStore.getState().setFileName(name);
-      setWorkingFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
-      toast.success(`Working file ${name} uploaded successfully`);
-    } catch (error) {
-      console.error('Working File Upload Error:', error);
-      toast.error(
-        `Error uploading working file: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
-    }
-  };
-
-  const handleReferenceFileUpload = (
-    name: string,
-    content: string,
-    fileType: string
-  ) => {
-    try {
-      console.debug('Uploading Reference File:', {
-        name,
-        fileType,
-        contentLength: content.length
-      });
-      useReferenceFileStore.getState().setFileName(name);
-      setReferenceFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
-      toast.success(`Reference file ${name} uploaded successfully`);
-    } catch (error) {
-      console.error('Reference File Upload Error:', error);
-      toast.error(
-        `Error uploading reference file: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
-    }
-  };
+  const handleWorkingFileUpload = useFileUpload('working');
+  const handleReferenceFileUpload = useFileUpload('reference');
 
   const performBackfill = () => {
     if (
