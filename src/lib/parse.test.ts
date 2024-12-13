@@ -4,7 +4,7 @@ import {
   flattenObject,
   getAllPaths,
   getValueByPath,
-  jsonToCsv,
+  serializeJson,
   jsonlToJson,
   normalizeString
 } from '@/lib/parse';
@@ -108,7 +108,7 @@ describe('Converting JSON to CSV', () => {
       { name: 'Jane', age: 25 }
     ];
 
-    const csv = jsonToCsv(data);
+    const csv = serializeJson(data);
     const expectedCsv = 'name,age\nJohn,30\nJane,25';
 
     expect(normalizeLineBreaks(csv)).toBe(normalizeLineBreaks(expectedCsv));
@@ -122,7 +122,7 @@ describe('Converting JSON to CSV', () => {
       { name: 'Alice', age: true }
     ];
 
-    const csv = jsonToCsv(data);
+    const csv = serializeJson(data);
     const expectedCsv = 'name,age\nJohn,30\nJane,25\nBob,35.5\nAlice,true';
 
     expect(normalizeLineBreaks(csv)).toBe(normalizeLineBreaks(expectedCsv));
@@ -134,7 +134,7 @@ describe('Converting JSON to CSV', () => {
       { name: 'Jane', description: 'Product manager, tech' }
     ];
 
-    const csv = jsonToCsv(data);
+    const csv = serializeJson(data);
     const expectedCsv =
       'name,description\nJohn,"Software engineer, senior"\nJane,"Product manager, tech"';
 
@@ -147,7 +147,7 @@ describe('Converting JSON to CSV', () => {
       { name: 'Jane', age: 25, address: { city: 'San Francisco', state: 'CA' } }
     ];
 
-    const csv = jsonToCsv(data);
+    const csv = serializeJson(data);
     const expectedCsv =
       'name,age,address.city,address.state\nJohn,30,New York,NY\nJane,25,San Francisco,CA';
 
