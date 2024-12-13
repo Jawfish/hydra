@@ -1,6 +1,7 @@
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { 
   Select, 
   SelectContent, 
@@ -14,24 +15,42 @@ import { useWorkingFileStore, useReferenceFileStore } from '@/store/store';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+interface FieldSelectorProps {
+  fields: string[];
+  selectedField: string;
+  onFieldSelect: (field: string) => void;
+}
+
+function FieldSelector({ fields, selectedField, onFieldSelect }: FieldSelectorProps) {
+  return (
+    <Select value={selectedField} onValueChange={onFieldSelect}>
+      <SelectTrigger className="w-[300px]">
+        <SelectValue placeholder="Select a field..." />
+      </SelectTrigger>
+      <SelectContent>
+        {fields.map(field => (
+          <SelectItem key={field} value={field}>
+            {field}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
 export function Deduplicate() {
-  const {
-    fileName: workingFileName,
-    fileContentParsed: workingFileContent,
-    setFileContent: setWorkingFileContent
-  } = useWorkingFileStore();
+  const [primaryFile, setPrimaryFile] = useState<string>('');
+  const [secondaryFile, setSecondaryFile] = useState<string>('');
+  const [primaryFileType, setPrimaryFileType] = useState<string>('');
+  const [secondaryFileType, setSecondaryFileType] = useState<string>('');
+  const [primaryHeaders, setPrimaryHeaders] = useState<string[]>([]);
+  const [secondaryHeaders, setSecondaryHeaders] = useState<string[]>([]);
+  const [primarySchema, setPrimarySchema] = useState<string[]>([]);
+  const [secondarySchema, setSecondarySchema] = useState<string[]>([]);
+  const [primaryMatchColumn, setPrimaryMatchColumn] = useState<string>('');
+  const [secondaryMatchColumn, setSecondaryMatchColumn] = useState<string>('');
 
-  const {
-    fileName: referenceFileName,
-    fileContentParsed: referenceFileContent,
-    setFileContent: setReferenceFileContent
-  } = useReferenceFileStore();
-
-  const [workingFileSchema, setWorkingFileSchema] = useState<string[]>([]);
-  const [referenceFileSchema, setReferenceFileSchema] = useState<string[]>([]);
-
-  const [workingMatchColumn, setWorkingMatchColumn] = useState<string>('');
-  const [referenceMatchColumn, setReferenceMatchColumn] = useState<string>('');
+  const extractJsonSchema = (obj: Record<string, unknown>, prefix = ''): string[] => {
     let schema: string[] = [];
     for (const [key, value] of Object.entries(obj)) {
       const path = prefix ? `${prefix}.${key}` : key;
