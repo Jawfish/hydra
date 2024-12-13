@@ -78,8 +78,6 @@ const FieldAnalysisTable = ({
 
 const DetailedAnalysisSection = ({
   schema,
-  // biome-ignore lint/correctness/noUnusedVariables: might be useful later
-  // biome-ignore lint/correctness/noUnusedFunctionParameters: might be useful later
   data,
   selectedIdentifier,
   setSelectedIdentifier,
@@ -94,63 +92,77 @@ const DetailedAnalysisSection = ({
   selectedAnalysisField: string;
   setSelectedAnalysisField: (value: string) => void;
   fieldAnalysis: FieldAnalysisDetail[];
-}) => (
-  <div className='rounded-lg border p-4'>
-    <h3 className='font-medium mb-4'>Detailed Analysis</h3>
-    <div className='flex gap-4 mb-4'>
-      <div className='flex flex-col gap-2'>
-        <label htmlFor='identifier-field' className='text-sm font-medium'>
-          Identifier Field
-        </label>
-        <Select value={selectedIdentifier} onValueChange={setSelectedIdentifier}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select identifier field..." />
-          </SelectTrigger>
-          <SelectContent>
-            {schema.map(field => (
-              <SelectItem key={field} value={field}>
-                {field}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+}) => {
+  console.log('DetailedAnalysisSection props:', {
+    selectedIdentifier,
+    selectedAnalysisField,
+    fieldAnalysisLength: fieldAnalysis.length,
+    fieldAnalysisSample: fieldAnalysis.slice(0, 2)
+  });
+
+  return (
+    <div className='rounded-lg border p-4'>
+      <h3 className='font-medium mb-4'>Detailed Analysis</h3>
+      <div className='flex gap-4 mb-4'>
+        <div className='flex flex-col gap-2'>
+          <label htmlFor='identifier-field' className='text-sm font-medium'>
+            Identifier Field
+          </label>
+          <Select value={selectedIdentifier} onValueChange={setSelectedIdentifier}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select identifier field..." />
+            </SelectTrigger>
+            <SelectContent>
+              {schema.map(field => (
+                <SelectItem key={field} value={field}>
+                  {field}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className='flex flex-col gap-2'>
+          <label htmlFor='analyze-field' className='text-sm font-medium'>
+            Analyze Field
+          </label>
+          <Select value={selectedAnalysisField} onValueChange={setSelectedAnalysisField}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select field to analyze..." />
+            </SelectTrigger>
+            <SelectContent>
+              {schema.map(field => (
+                <SelectItem key={field} value={field}>
+                  {field}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      <div className='flex flex-col gap-2'>
-        <label htmlFor='analyze-field' className='text-sm font-medium'>
-          Analyze Field
-        </label>
-        <Select value={selectedAnalysisField} onValueChange={setSelectedAnalysisField}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select field to analyze..." />
-          </SelectTrigger>
-          <SelectContent>
-            {schema.map(field => (
-              <SelectItem key={field} value={field}>
-                {field}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
-
-    {fieldAnalysis.length > 0 && (
-      <div>
-        <h4 className='text-sm font-medium mb-2'>
-          Records with empty values in {selectedAnalysisField}
-        </h4>
-        <ScrollArea className='h-[200px]'>
-          <div className='space-y-2'>
-            {fieldAnalysis.map(detail => (
-              <div key={detail.identifier} className='text-sm'>
-                {selectedIdentifier}: {detail.identifier}
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
-    )}
+      {fieldAnalysis.length > 0 ? (
+        <div>
+          <h4 className='text-sm font-medium mb-2'>
+            Records with empty values in {selectedAnalysisField}
+          </h4>
+          <ScrollArea className='h-[200px]'>
+            <div className='space-y-2'>
+              {fieldAnalysis.map(detail => (
+                <div key={detail.identifier} className='text-sm'>
+                  {selectedIdentifier}: {detail.identifier}
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
+      ) : (
+        <div className='text-sm text-muted-foreground'>
+          {selectedIdentifier && selectedAnalysisField 
+            ? 'No empty values found for the selected field.'
+            : 'Please select both identifier and analysis fields to see results.'}
+        </div>
+      )}
   </div>
 );
 

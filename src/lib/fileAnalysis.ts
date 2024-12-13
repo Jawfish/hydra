@@ -44,8 +44,15 @@ export const analyzeFieldDetails = (
   identifierField: string
 ): FieldAnalysisDetail[] => {
   if (!(data && field && identifierField)) {
+    console.log('analyzeFieldDetails: Missing required parameters', { data: !!data, field, identifierField });
     return [];
   }
+
+  console.log('analyzeFieldDetails: Starting analysis', {
+    totalRows: data.length,
+    field,
+    identifierField
+  });
 
   const details: FieldAnalysisDetail[] = [];
   for (const row of data) {
@@ -62,5 +69,12 @@ export const analyzeFieldDetails = (
     });
   }
 
-  return details.filter(d => d.isEmpty);
+  const emptyDetails = details.filter(d => d.isEmpty);
+  console.log('analyzeFieldDetails: Analysis complete', {
+    totalAnalyzed: details.length,
+    emptyCount: emptyDetails.length,
+    sampleEmpty: emptyDetails.slice(0, 2)
+  });
+
+  return emptyDetails;
 };
