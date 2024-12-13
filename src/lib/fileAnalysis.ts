@@ -1,4 +1,4 @@
-import { getValueByPath } from './parse.ts';
+import { getValueByPath } from '@/lib/parse';
 
 export interface FieldAnalysis {
   name: string;
