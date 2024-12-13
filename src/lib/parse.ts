@@ -128,15 +128,14 @@ export const serializeJson = (
   data: Record<string, unknown>[],
   originalFileType: FileType = 'csv'
 ): string => {
-  // Flatten each object in the array
-  const flattenedData = data.map(item => flattenObject(item));
-
   switch (originalFileType) {
     case 'json':
-      return JSON.stringify(flattenedData, null, 2);
+      return JSON.stringify(data, null, 2);
     case 'jsonl':
-      return flattenedData.map(item => JSON.stringify(item)).join('\n');
+      return data.map(item => JSON.stringify(item)).join('\n');
     case 'csv':
+      // Only flatten for CSV
+      const flattenedData = data.map(item => flattenObject(item));
       return Papa.unparse(flattenedData, { header: true });
     default:
       throw new Error(`Unsupported file type: ${originalFileType}`);

@@ -212,14 +212,16 @@ describe('Serializing JSON', () => {
     expect(JSON.parse(jsonSerialized)).toEqual([
       {
         name: 'John',
-        'address.city': 'New York',
-        'address.state': 'NY'
+        address: {
+          city: 'New York',
+          state: 'NY'
+        }
       }
     ]);
 
-    // JSONL: Single line with flattened object
+    // JSONL: Single line with nested object
     expect(jsonlSerialized).toBe(
-      '{"name":"John","address.city":"New York","address.state":"NY"}'
+      '{"name":"John","address":{"city":"New York","state":"NY"}}'
     );
 
     // CSV: Flattened with dot notation
