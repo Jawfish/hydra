@@ -9,7 +9,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { getAllPaths } from '@/lib/parse';
+import { getAllPaths, normalizeString } from '@/lib/parse';
 import { getValueByPath } from '@/lib/parse';
 import { jsonToCsv } from '@/lib/parse';
 import { useReferenceFileStore, useWorkingFileStore } from '@/store/store';
@@ -141,7 +141,9 @@ export function Backfill() {
       if (isEmptyValue) {
         // Find matching reference row using normalized comparison
         const matchingReferenceRow = referenceFileContent.find(
-          refRow => normalizeString(getValueByPath(refRow, referenceMatchField) as string) === normalizedMatchValue
+          refRow =>
+            normalizeString(getValueByPath(refRow, referenceMatchField) as string) ===
+            normalizedMatchValue
         );
 
         if (matchingReferenceRow) {
@@ -168,12 +170,16 @@ export function Backfill() {
 
     // Count how many rows were actually backfilled
     const backfilledRowCount = backfilledContent.filter(
-      row => getValueByPath(row, workingFillField) !==
-           getValueByPath(workingFileContent.find(
-             orig => normalizeString(getValueByPath(orig, workingMatchField) as string) ===
-                     normalizeString(getValueByPath(row, workingMatchField) as string)
-           ) || {},
-           workingFillField)
+      row =>
+        getValueByPath(row, workingFillField) !==
+        getValueByPath(
+          workingFileContent.find(
+            orig =>
+              normalizeString(getValueByPath(orig, workingMatchField) as string) ===
+              normalizeString(getValueByPath(row, workingMatchField) as string)
+          ) || {},
+          workingFillField
+        )
     ).length;
 
     toast.success(`Backfilled ${backfilledRowCount} rows`);
