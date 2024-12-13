@@ -178,13 +178,13 @@ export function Translate() {
     <div className='flex flex-col mb-12'>
       <div className='mb-10'>
         <Header>
-          <Header.Title>CSV Translator</Header.Title>
-          <Header.Description>Translate CSV data</Header.Description>
+          <Header.Title>File Translator</Header.Title>
+          <Header.Description>Translate file data</Header.Description>
         </Header>
       </div>
       <FileUpload />
 
-      {fileType === 'csv' && (
+      {fileContentParsed.length > 0 && (
         <>
           <Separator className='my-14 h-[1px]' />
           <div className='flex flex-col gap-8'>
