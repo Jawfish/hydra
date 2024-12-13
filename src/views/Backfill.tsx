@@ -168,16 +168,12 @@ export function Backfill() {
 
     // Count how many rows were actually backfilled
     const backfilledRowCount = backfilledContent.filter(
-      row =>
-        getValueByPath(row, workingFillField) !==
-        getValueByPath(
-          workingFileContent.find(
-            orig =>
-              getValueByPath(orig, workingMatchField) ===
-              getValueByPath(row, workingMatchField)
-          ) || {},
-          workingFillField
-        )
+      row => getValueByPath(row, workingFillField) !==
+           getValueByPath(workingFileContent.find(
+             orig => normalizeString(getValueByPath(orig, workingMatchField) as string) ===
+                     normalizeString(getValueByPath(row, workingMatchField) as string)
+           ) || {},
+           workingFillField)
     ).length;
 
     toast.success(`Backfilled ${backfilledRowCount} rows`);
