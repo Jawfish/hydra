@@ -72,9 +72,9 @@ export const analyzeFieldDetails = (
   const emptyDetails = details.filter(d => d.isEmpty);
   console.log('analyzeFieldDetails: Analysis complete', {
     totalAnalyzed: details.length,
-    emptyCount: emptyDetails.length,
-    sampleEmpty: emptyDetails.slice(0, 2)
+    emptyCount: details.filter(d => d.isEmpty).length,
+    nonEmptyCount: details.filter(d => !d.isEmpty).length
   });
 
-  return emptyDetails;
+  return details;
 };
