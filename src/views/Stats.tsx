@@ -18,10 +18,54 @@ import { useWorkingFileStore } from '@/store/store';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-const FileStatistics = ({
+import { FileUpload } from '@/components/FileUpload';
+import { Header } from '@/components/Header';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  type FieldAnalysisDetail,
+  analyzeField,
+  analyzeFieldDetails
+} from '@/lib/fileAnalysis';
+import { getAllPaths } from '@/lib/parse';
+import { useWorkingFileStore } from '@/store/store';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+
+interface FileStatisticsProps {
+  fileName: string;
+  rowCount: number;
+}
+
+interface SchemaDisplayProps {
+  schema: string[];
+}
+
+interface FieldAnalysisTableProps {
+  schema: string[];
+  data: Record<string, unknown>[];
+}
+
+interface DetailedAnalysisSectionProps {
+  schema: string[];
+  data: Record<string, unknown>[];
+  selectedIdentifier: string;
+  setSelectedIdentifier: (value: string) => void;
+  selectedAnalysisField: string;
+  setSelectedAnalysisField: (value: string) => void;
+  fieldAnalysis: FieldAnalysisDetail[];
+}
+
+const FileStatistics: React.FC<FileStatisticsProps> = ({
   fileName,
   rowCount
-}: { fileName: string; rowCount: number }) => (
+}) => (
   <div className='rounded-lg border p-4'>
     <h3 className='font-medium mb-2'>File Information</h3>
     <p>Name: {fileName}</p>
@@ -29,7 +73,7 @@ const FileStatistics = ({
   </div>
 );
 
-const SchemaDisplay = ({ schema }: { schema: string[] }) => (
+const SchemaDisplay: React.FC<SchemaDisplayProps> = ({ schema }) => (
   <div className='rounded-lg border p-4'>
     <h3 className='font-medium mb-2'>Schema</h3>
     <ScrollArea className='h-[100px]'>
@@ -44,10 +88,10 @@ const SchemaDisplay = ({ schema }: { schema: string[] }) => (
   </div>
 );
 
-const FieldAnalysisTable = ({
+const FieldAnalysisTable: React.FC<FieldAnalysisTableProps> = ({
   schema,
   data
-}: { schema: string[]; data: Record<string, unknown>[] }) => (
+}) => (
   <div className='rounded-lg border p-4'>
     <h3 className='font-medium mb-4'>Field Analysis</h3>
     <div className='grid grid-cols-4 gap-4 text-sm font-medium mb-2'>
@@ -76,7 +120,7 @@ const FieldAnalysisTable = ({
   </div>
 );
 
-const DetailedAnalysisSection = ({
+const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
   schema,
   data,
   selectedIdentifier,
@@ -166,7 +210,7 @@ const DetailedAnalysisSection = ({
   </div>
 );
 
-export function Stats() {
+export const Stats: React.FC = () => {
   const { fileName, fileContentParsed, setFileContent } = useWorkingFileStore();
   const [selectedIdentifier, setSelectedIdentifier] = useState<string>('');
   const [selectedAnalysisField, setSelectedAnalysisField] = useState<string>('');
