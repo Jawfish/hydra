@@ -38,11 +38,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { useFileStore } from '@/store/store';
+import { useWorkingFileStore } from '@/store/store';
 import { toast } from 'sonner';
 
 export function Translate() {
-  const { fileType, csvHeaders, fileContent } = useFileStore();
+  const { fileName, fileContentRaw, fileContentParsed } = useWorkingFileStore();
+  const csvHeaders = fileContentParsed.length > 0 ? Object.keys(fileContentParsed[0]) : [];
   const [selectedColumn, setSelectedColumn] = useState<string>('');
   const [apiKey, setApiKey] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -65,7 +66,7 @@ export function Translate() {
       return;
     }
 
-    if (!fileContent || fileType !== 'csv') {
+    if (!fileContentRaw || !fileContentParsed.length) {
       toast.error('Please upload a CSV file first');
       return;
     }
@@ -77,8 +78,7 @@ export function Translate() {
         dangerouslyAllowBrowser: true
       });
 
-      const parsedData = Papa.parse(fileContent, { header: true });
-      const existingColumns = Object.keys(parsedData.data[0] || {});
+      const existingColumns = Object.keys(fileContentParsed[0] || {});
 
       if (
         existingColumns.includes(languageColumnName) ||
@@ -98,7 +98,7 @@ export function Translate() {
         return;
       }
 
-      const rows = parsedData.data as Record<string, string>[];
+      const rows = fileContentParsed as Record<string, string>[];
       const processedRows: Record<string, string>[] = [];
 
       // Calculate total operations
