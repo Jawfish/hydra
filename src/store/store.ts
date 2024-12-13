@@ -59,10 +59,22 @@ const createFileStore = () =>
                 console.debug('Parsed JSON type:', typeof parsedContent);
                 console.debug('Parsed JSON keys:', Object.keys(parsedContent));
                 
-                // Ensure it's an array
-                state.fileContentParsed = Array.isArray(parsedContent) 
-                  ? parsedContent 
-                  : [parsedContent];
+                // Check if it's an object with numeric keys that looks like an array
+                if (typeof parsedContent === 'object' && !Array.isArray(parsedContent)) {
+                  const numericKeys = Object.keys(parsedContent).filter(key => !isNaN(Number(key)));
+                  if (numericKeys.length > 0) {
+                    // Convert object to array
+                    state.fileContentParsed = numericKeys.map(key => parsedContent[key]);
+                  } else {
+                    // If not array-like, wrap in an array
+                    state.fileContentParsed = [parsedContent];
+                  }
+                } else {
+                  // Normal array case
+                  state.fileContentParsed = Array.isArray(parsedContent) 
+                    ? parsedContent 
+                    : [parsedContent];
+                }
                 
                 console.debug('JSON parsed:', state.fileContentParsed.length + ' rows');
                 console.debug('First row:', state.fileContentParsed[0]);
