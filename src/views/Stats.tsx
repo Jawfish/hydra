@@ -27,8 +27,10 @@ export function Stats() {
 
   useEffect(() => {
     if (fileContentParsed.length > 0) {
-      console.log('Parsed content updated:', fileContentParsed.slice(0, 2));
-      toast.success('File analysis complete!');
+      console.log('Parsed content updated:', fileContentParsed);
+      console.log('Total rows:', fileContentParsed.length);
+      console.log('First few rows:', fileContentParsed.slice(0, 5));
+      toast.success(`File analysis complete! ${fileContentParsed.length} rows loaded.`);
     }
   }, [fileContentParsed]);
 
