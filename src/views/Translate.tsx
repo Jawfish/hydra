@@ -39,7 +39,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useWorkingFileStore } from '@/store/store';
 import { toast } from 'sonner';
-import { serializeJson } from '@/lib/parse';
+import { getAllPaths, serializeJson } from '@/lib/parse';
 
 export function Translate() {
   const { fileName, fileContentRaw, fileContentParsed } = useWorkingFileStore();
