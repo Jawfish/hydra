@@ -96,6 +96,9 @@ const FieldAnalysisTable: React.FC<FieldAnalysisTableProps> = ({ schema, data })
 
 const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
   schema,
+
+  // biome-ignore lint/correctness/noUnusedVariables: might be useful in future
+  // biome-ignore lint/correctness/noUnusedFunctionParameters: same as above
   data,
   selectedIdentifier,
   setSelectedIdentifier,
@@ -111,7 +114,7 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
   setSelectedAnalysisField: (value: string) => void;
   fieldAnalysis: FieldAnalysisDetail[];
 }) => {
-  console.log('DetailedAnalysisSection props:', {
+  console.debug('DetailedAnalysisSection props:', {
     selectedIdentifier,
     selectedAnalysisField,
     fieldAnalysisLength: fieldAnalysis.length,
@@ -165,7 +168,7 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
       {fieldAnalysis.length > 0 ? (
         <div>
           <h4 className='text-sm font-medium mb-2'>
-            Empty values in {selectedAnalysisField}
+            Empty values in {selectedAnalysisField} ( {fieldAnalysis.length})
           </h4>
           <ScrollArea className='h-[200px]'>
             <div className='space-y-2'>
@@ -213,14 +216,14 @@ export const Stats: React.FC = () => {
   }, [fileContentParsed]);
 
   useEffect(() => {
-    console.log('Analyzing details:', {
+    console.debug('Analyzing details:', {
       selectedAnalysisField,
       selectedIdentifier,
       fileContentParsed: fileContentParsed.length
     });
 
     if (selectedAnalysisField && selectedIdentifier && fileContentParsed.length > 0) {
-      console.log('Calling analyzeFieldDetails with:', {
+      console.debug('Calling analyzeFieldDetails with:', {
         data: fileContentParsed[0], // Log first row to check structure
         analysisField: selectedAnalysisField,
         identifierField: selectedIdentifier
@@ -232,7 +235,7 @@ export const Stats: React.FC = () => {
         selectedIdentifier
       );
 
-      console.log('Analyzed field details:', details);
+      console.debug('Analyzed field details:', details);
       setFieldAnalysis(details);
     }
   }, [selectedAnalysisField, selectedIdentifier, fileContentParsed]);
