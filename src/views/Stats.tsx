@@ -1,7 +1,7 @@
 import { Header } from '@/components/Header';
 import { FileUpload } from '@/components/FileUpload';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useWorkingFileStore } from '@/store/store';
 import { getAllPaths, getValueByPath } from '@/lib/parse';
@@ -25,13 +25,18 @@ export function Stats() {
     return paths;
   })() : [];
 
+  useEffect(() => {
+    if (fileContentParsed.length > 0) {
+      console.log('Parsed content updated:', fileContentParsed.slice(0, 2));
+      toast.success('File analysis complete!');
+    }
+  }, [fileContentParsed]);
+
   const handleFileUpload = (name: string, content: string, fileType: string) => {
     try {
       console.log('Uploading file:', { name, fileType });
       console.log('Raw content sample:', content.slice(0, 200));
       setFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
-      console.log('Parsed content sample:', fileContentParsed.slice(0, 2));
-      toast.success('File analysis complete!');
     } catch (error) {
       console.error('File upload error:', error);
       toast.error(
