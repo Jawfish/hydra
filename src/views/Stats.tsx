@@ -1,7 +1,6 @@
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { parseJsonl } from '@/lib/jsonl';
 import Papa from 'papaparse';
 import { useState } from 'react';
 import { toast } from 'sonner';
