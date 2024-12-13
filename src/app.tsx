@@ -4,6 +4,8 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import { Stats } from '@/views/Stats';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Backfill } from '@/views/Backfill';
+import { Deduplicate } from '@/views/Deduplicate';
 
 function App() {
   return (
@@ -17,8 +19,8 @@ function App() {
               {/* <Route path='/map' element={<MapValues />} /> */}
               {/* <Route path='/translate' element={<Translate />} /> */}
               {/* <Route path='/convert' element={<Convert />} /> */}
-              {/* <Route path='/backfill' element={<Backfill />} /> */}
-              {/* <Route path='/deduplicate' element={<Deduplicate />} /> */}
+              <Route path='/backfill' element={<Backfill />} />
+              <Route path='/deduplicate' element={<Deduplicate />} />
               <Route path='/stats' element={<Stats />} />
               <Route path='/' element={<Navigate to='/extract' replace={true} />} />
             </Routes>
