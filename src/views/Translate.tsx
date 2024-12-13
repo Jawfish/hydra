@@ -1,6 +1,7 @@
 import { Progress } from '@/components/ui/progress';
 import Anthropic from '@anthropic-ai/sdk';
 import { useState } from 'react';
+import type { FileType } from '@/store/store';
 
 const ALL_LANGUAGES = [
   'English',
@@ -42,7 +43,12 @@ import { toast } from 'sonner';
 import { getAllPaths, serializeJson } from '@/lib/parse';
 
 export function Translate() {
-  const { fileName, fileContentRaw, fileContentParsed } = useWorkingFileStore();
+  const { fileName, fileContentRaw, fileContentParsed, setFileName, setFileContent } = useWorkingFileStore();
+
+  const handleFileUpload = (name: string, content: string, fileType: FileType) => {
+    setFileName(name);
+    setFileContent(content, fileType);
+  };
   const csvHeaders =
     fileContentParsed.length > 0 ? getAllPaths(fileContentParsed[0]) : [];
   const [selectedColumn, setSelectedColumn] = useState<string>('');
@@ -182,7 +188,10 @@ export function Translate() {
           <Header.Description>Translate file data</Header.Description>
         </Header>
       </div>
-      <FileUpload />
+      <FileUpload 
+        onFileUpload={handleFileUpload}
+        fileName={fileName}
+      />
 
       {fileContentParsed.length > 0 && (
         <>
