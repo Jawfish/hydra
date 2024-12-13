@@ -43,7 +43,7 @@ import { toast } from 'sonner';
 
 export function Translate() {
   const { fileName, fileContentRaw, fileContentParsed } = useWorkingFileStore();
-  const csvHeaders = fileContentParsed.length > 0 ? Object.keys(fileContentParsed[0]) : [];
+  const csvHeaders = fileContentParsed.length > 0 ? getAllPaths(fileContentParsed[0]) : [];
   const [selectedColumn, setSelectedColumn] = useState<string>('');
   const [apiKey, setApiKey] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -101,8 +101,9 @@ export function Translate() {
       const rows = fileContentParsed as Record<string, string>[];
       const processedRows: Record<string, string>[] = [];
 
-      // Calculate total operations
-      const totalOperations = rows.length * selectedLanguages.size;
+      const totalRows = rows.length;
+      const totalOperations = totalRows * selectedLanguages.size;
+      console.debug(`Processing ${totalRows} rows into ${selectedLanguages.size} languages`);
       let completedOperations = 0;
 
       // Process rows in chunks to avoid overwhelming the browser
@@ -149,8 +150,8 @@ export function Translate() {
         processedRows.push(...chunkResults);
       }
 
-      const csv = Papa.unparse(processedRows);
-      const blob = new Blob([csv], { type: 'text/csv' });
+      const outputContent = serializeJson(processedRows, 'csv');
+      const blob = new Blob([outputContent], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
