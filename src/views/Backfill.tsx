@@ -117,26 +117,38 @@ export function Backfill() {
     const backfilledContent = workingFileContent.map(workingRow => {
       const matchValue = getValueByPath(workingRow, workingMatchField);
 
-      // Find matching reference row
-      const matchingReferenceRow = referenceFileContent.find(
-        refRow => getValueByPath(refRow, referenceMatchField) === matchValue
-      );
+      // Check if the fill field is empty
+      const currentFillValue = getValueByPath(workingRow, workingFillField);
+      const isEmptyValue = 
+        currentFillValue === undefined || 
+        currentFillValue === null || 
+        (typeof currentFillValue === 'string' && currentFillValue.trim() === '') ||
+        (Array.isArray(currentFillValue) && currentFillValue.length === 0) ||
+        (typeof currentFillValue === 'object' && 
+         currentFillValue !== null && 
+         Object.keys(currentFillValue).length === 0);
 
-      if (matchingReferenceRow) {
-        const fillValue = getValueByPath(matchingReferenceRow, referenceFillField);
-        return {
-          ...workingRow,
-          [workingFillField]: fillValue
-        };
+      // Only backfill if the current value is empty
+      if (isEmptyValue) {
+        // Find matching reference row
+        const matchingReferenceRow = referenceFileContent.find(
+          refRow => getValueByPath(refRow, referenceMatchField) === matchValue
+        );
+
+        if (matchingReferenceRow) {
+          const fillValue = getValueByPath(matchingReferenceRow, referenceFillField);
+          return {
+            ...workingRow,
+            [workingFillField]: fillValue
+          };
+        }
       }
 
       return workingRow;
     });
 
-    // Optionally convert back to CSV if original was CSV
-    const backfilledOutput = jsonToCsv(backfilledContent);
-
     // Create a download link
+    const backfilledOutput = jsonToCsv(backfilledContent);
     const blob = new Blob([backfilledOutput], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -145,7 +157,17 @@ export function Backfill() {
     a.click();
     window.URL.revokeObjectURL(url);
 
-    toast.success(`Backfilled ${backfilledContent.length} rows`);
+    // Count how many rows were actually backfilled
+    const backfilledRowCount = backfilledContent.filter(
+      row => getValueByPath(row, workingFillField) !== 
+             getValueByPath(workingFileContent.find(
+               orig => getValueByPath(orig, workingMatchField) === 
+                       getValueByPath(row, workingMatchField)
+             ) || {}, 
+             workingFillField)
+    ).length;
+
+    toast.success(`Backfilled ${backfilledRowCount} rows`);
   };
 
   return (
