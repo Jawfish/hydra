@@ -1,4 +1,4 @@
-import { getValueByPath } from '@/lib/jsonl';
+import { getValueByPath } from '@/lib/parse';
 import Papa from 'papaparse';
 
 const UUID_REGEX =
@@ -30,16 +30,6 @@ const getCandidates = (processedText: string): string[] =>
   processedText.split(' ').filter(s => s.length > 0);
 
 /**
- * Normalizes a potential UUID string by handling hyphens
- * @param candidate - Potential UUID string
- * @returns Normalized string with correct hyphen placement
- */
-const normalizeUuid = (candidate: string): string => {
-  const trimmed = candidate.replace(/^-+|-+$/g, '');
-  return trimmed.replace(/-+/g, '-');
-};
-
-/**
  * Validates if a normalized string is a valid UUID
  * @param normalized - Normalized potential UUID string
  * @returns boolean indicating if the string is a valid UUID
@@ -53,7 +43,7 @@ const isValidUuid = (normalized: string): boolean =>
  * @returns Array of valid UUID strings
  */
 const filterValidUuiDs = (candidates: string[]): string[] =>
-  candidates.filter(candidate => isValidUuid(normalizeUuid(candidate)));
+  candidates.filter(candidate => isValidUuid(candidate));
 
 /**
  * Main function that extracts valid UUIDs from a text string
