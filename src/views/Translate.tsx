@@ -160,13 +160,20 @@ export function Translate() {
         processedRows.push(...chunkResults);
       }
 
-      const outputContent = serializeJson(processedRows, 'csv');
-      const blob = new Blob([outputContent], { type: 'text/csv' });
+      const fileType = (fileName?.split('.').pop() as FileType) || 'csv';
+      const outputContent = serializeJson(processedRows, fileType);
+      const blob = new Blob([outputContent], { 
+        type: fileType === 'json' 
+          ? 'application/json' 
+          : fileType === 'jsonl' 
+            ? 'application/jsonl' 
+            : 'text/csv' 
+      });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      a.download = `translated_${timestamp}.csv`;
+      a.download = `translated_${timestamp}.${fileType}`;
       a.click();
       window.URL.revokeObjectURL(url);
 
