@@ -43,57 +43,56 @@ const createFileStore = () =>
             state.fileContentRaw = content;
             
             console.debug('Parsing content...');
-          try {
             switch (fileType) {
-            case 'jsonl':
-              state.fileContentParsed = jsonlToJson(content);
-              console.debug('JSONL parsed:', state.fileContentParsed.length, 'rows');
-              break;
-            case 'csv':
-              state.fileContentParsed = csvToJson(content);
-              console.debug('CSV parsed:', state.fileContentParsed.length, 'rows');
-              break;
-            case 'json':
-              try {
-                console.debug('Raw JSON content length:', content.length);
-                console.debug('Raw JSON preview:', content.slice(0, 200));
-                
-                const parsedContent = JSON.parse(content);
-                console.debug('Parsed JSON type:', typeof parsedContent);
-                console.debug('Parsed JSON keys:', Object.keys(parsedContent));
-                
-                // Check if it's an object with numeric keys that looks like an array
-                if (typeof parsedContent === 'object' && !Array.isArray(parsedContent)) {
-                  const numericKeys = Object.keys(parsedContent).filter(key => !isNaN(Number(key)));
-                  if (numericKeys.length > 0) {
-                    // Convert object to array
-                    state.fileContentParsed = numericKeys.map(key => parsedContent[key]);
+              case 'jsonl':
+                state.fileContentParsed = jsonlToJson(content);
+                console.debug('JSONL parsed:', state.fileContentParsed.length, 'rows');
+                break;
+              case 'csv':
+                state.fileContentParsed = csvToJson(content);
+                console.debug('CSV parsed:', state.fileContentParsed.length, 'rows');
+                break;
+              case 'json':
+                try {
+                  console.debug('Raw JSON content length:', content.length);
+                  console.debug('Raw JSON preview:', content.slice(0, 200));
+                  
+                  const parsedContent = JSON.parse(content);
+                  console.debug('Parsed JSON type:', typeof parsedContent);
+                  console.debug('Parsed JSON keys:', Object.keys(parsedContent));
+                  
+                  // Check if it's an object with numeric keys that looks like an array
+                  if (typeof parsedContent === 'object' && !Array.isArray(parsedContent)) {
+                    const numericKeys = Object.keys(parsedContent).filter(key => !isNaN(Number(key)));
+                    if (numericKeys.length > 0) {
+                      // Convert object to array
+                      state.fileContentParsed = numericKeys.map(key => parsedContent[key]);
+                    } else {
+                      // If not array-like, wrap in an array
+                      state.fileContentParsed = [parsedContent];
+                    }
                   } else {
-                    // If not array-like, wrap in an array
-                    state.fileContentParsed = [parsedContent];
+                    // Normal array case
+                    state.fileContentParsed = Array.isArray(parsedContent) 
+                      ? parsedContent 
+                      : [parsedContent];
                   }
-                } else {
-                  // Normal array case
-                  state.fileContentParsed = Array.isArray(parsedContent) 
-                    ? parsedContent 
-                    : [parsedContent];
+                  
+                  console.debug('JSON parsed:', state.fileContentParsed.length + ' rows');
+                  console.debug('First row:', state.fileContentParsed[0]);
+                } catch (error) {
+                  console.error('JSON Parse error:', error);
+                  console.error('Problematic content:', content.slice(0, 500));
+                  throw error;
                 }
-                
-                console.debug('JSON parsed:', state.fileContentParsed.length + ' rows');
-                console.debug('First row:', state.fileContentParsed[0]);
-              } catch (error) {
-                console.error('JSON Parse error:', error);
-                console.error('Problematic content:', content.slice(0, 500)); // Show first 500 chars
-                throw error;
-              }
-              break;
-            default:
-              throw new Error(`Unsupported file type: ${fileType}`);
-          }
-          console.debug('Parse complete', {
-            parsedType: typeof state.fileContentParsed,
-            parsedLength: state.fileContentParsed.length
-          });
+                break;
+              default:
+                throw new Error(`Unsupported file type: ${fileType}`);
+            }
+            console.debug('Parse complete', {
+              parsedType: typeof state.fileContentParsed,
+              parsedLength: state.fileContentParsed.length
+            });
           } catch (error) {
             console.error('Comprehensive parse error:', {
               error,
