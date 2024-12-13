@@ -29,9 +29,11 @@ export const jsonlToJson = (content: string): object[] => {
  * @returns Array of paths (e.g., ["name", "address.street", "address.city"])
  */
 export const getAllPaths = (obj: object, prefix = ''): string[] => {
+  console.log('Getting paths for object:', obj);
   let paths: string[] = [];
 
   if (!obj || typeof obj !== 'object') {
+    console.log('Invalid object for path generation');
     return paths;
   }
 
@@ -48,6 +50,7 @@ export const getAllPaths = (obj: object, prefix = ''): string[] => {
     }
   }
 
+  console.log('Generated paths:', paths);
   return paths;
 };
 
