@@ -66,7 +66,6 @@ export const analyzeFieldDetails = (
     const fieldValue = getValueByPath(row, field);
     const identifier = getValueByPath(row, identifierField);
 
-    // More strict empty check
     const isEmpty =
       fieldValue === undefined ||
       fieldValue === null ||
@@ -90,5 +89,5 @@ export const analyzeFieldDetails = (
     nonEmptyCount: details.length - emptyDetails.length
   });
 
-  return emptyDetails; // Only return actually empty entries
+  return emptyDetails;
 };
