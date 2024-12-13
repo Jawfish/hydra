@@ -68,15 +68,156 @@ export function Translate() {
     setSelectedColumn(column);
   };
 
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity:
-  const processCsv = async () => {
+  const validateInputs = (
+    selectedColumn: string,
+    apiKey: string,
+    fileContentRaw: string | null,
+    fileContentParsed: unknown[],
+    languageColumnName: string,
+    translationColumnName: string
+  ): boolean => {
     if (!(selectedColumn && apiKey)) {
       toast.error('Please select a column and provide your Anthropic API key');
-      return;
+      return false;
     }
 
     if (!fileContentRaw || fileContentParsed.length === 0) {
       toast.error('Please upload a CSV file first');
+      return false;
+    }
+
+    const existingColumns = Object.keys(fileContentParsed[0] || {});
+
+    if (
+      existingColumns.includes(languageColumnName) ||
+      existingColumns.includes(translationColumnName)
+    ) {
+      toast.error('Output column names conflict with existing columns in the CSV');
+      return false;
+    }
+
+    if (!(languageColumnName.trim() && translationColumnName.trim())) {
+      toast.error('Output column names cannot be empty');
+      return false;
+    }
+
+    if (languageColumnName === translationColumnName) {
+      toast.error('Output column names must be different');
+      return false;
+    }
+
+    return true;
+  };
+
+  const translateText = async (
+    text: string,
+    language: string,
+    anthropic: Anthropic
+  ): Promise<string> => {
+    return retry(
+      async bail => {
+        try {
+          const response = await anthropic.messages.create({
+            max_tokens: 4096,
+            messages: [
+              {
+                role: 'user',
+                content: text
+              }
+            ],
+            model: 'claude-3-5-sonnet-latest',
+            system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
+          });
+
+          return response.content[0].type === 'text' ? response.content[0].text : '';
+        } catch (error) {
+          if (error instanceof Error && error.message.includes('rate limit')) {
+            throw error;
+          }
+          bail(error);
+          return '';
+        }
+      },
+      {
+        retries: 3,
+        factor: 2,
+        minTimeout: 1000,
+        maxTimeout: 60000,
+        randomize: true
+      }
+    );
+  };
+
+  const processRowChunk = async (
+    chunk: Record<string, string>[],
+    selectedLanguages: Set<string>,
+    selectedColumn: string,
+    languageColumnName: string,
+    translationColumnName: string,
+    anthropic: Anthropic,
+    onProgress: () => void
+  ): Promise<Record<string, string>[]> => {
+    const chunkPromises = chunk.flatMap(row =>
+      Array.from(selectedLanguages).map(async language => {
+        try {
+          const translatedText = await translateText(
+            row[selectedColumn],
+            language,
+            anthropic
+          );
+          const translatedRow = { ...row };
+          translatedRow[languageColumnName] = language;
+          translatedRow[translationColumnName] = translatedText;
+          return translatedRow;
+        } catch (_error) {
+          const errorRow = { ...row };
+          errorRow[languageColumnName] = language;
+          errorRow[translationColumnName] =
+            'Translation failed after multiple attempts';
+          return errorRow;
+        } finally {
+          onProgress();
+        }
+      })
+    );
+
+    return Promise.all(chunkPromises);
+  };
+
+  const downloadOutput = (
+    processedRows: Record<string, string>[],
+    fileName: string | null,
+    fileType: FileType
+  ) => {
+    const outputContent = serializeJson(processedRows, fileType);
+    const blob = new Blob([outputContent], {
+      type:
+        fileType === 'json'
+          ? 'application/json'
+          : fileType === 'jsonl'
+            ? 'application/jsonl'
+            : 'text/csv'
+    });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    a.download = `translated_${timestamp}.${fileType}`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const processCsv = async () => {
+    if (
+      !validateInputs(
+        selectedColumn,
+        apiKey,
+        fileContentRaw,
+        fileContentParsed,
+        languageColumnName,
+        translationColumnName
+      )
+    ) {
       return;
     }
 
@@ -86,26 +227,6 @@ export function Translate() {
         apiKey: apiKey,
         dangerouslyAllowBrowser: true
       });
-
-      const existingColumns = Object.keys(fileContentParsed[0] || {});
-
-      if (
-        existingColumns.includes(languageColumnName) ||
-        existingColumns.includes(translationColumnName)
-      ) {
-        toast.error('Output column names conflict with existing columns in the CSV');
-        return;
-      }
-
-      if (!(languageColumnName.trim() && translationColumnName.trim())) {
-        toast.error('Output column names cannot be empty');
-        return;
-      }
-
-      if (languageColumnName === translationColumnName) {
-        toast.error('Output column names must be different');
-        return;
-      }
 
       const rows = fileContentParsed as Record<string, string>[];
       const processedRows: Record<string, string>[] = [];
@@ -117,83 +238,26 @@ export function Translate() {
       );
       let completedOperations = 0;
 
-      // Process rows in chunks to avoid overwhelming the browser
-      const chunkSize = 5; // Process 5 rows at a time
-
+      const chunkSize = 5;
       for (let i = 0; i < rows.length; i += chunkSize) {
         const chunk = rows.slice(i, i + chunkSize);
-        const chunkPromises = chunk.flatMap(row =>
-          Array.from(selectedLanguages).map(async language => {
-            try {
-              const translatedText = await retry(async (bail) => {
-                try {
-                  const response = await anthropic.messages.create({
-                    // biome-ignore lint/style/useNamingConvention: This is an external API schema
-                    max_tokens: 4096,
-                    messages: [
-                      {
-                        role: 'user',
-                        content: row[selectedColumn]
-                      }
-                    ],
-                    model: 'claude-3-5-sonnet-latest',
-                    system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
-                  });
-
-                  return response.content[0].type === 'text' ? response.content[0].text : '';
-                } catch (error) {
-                  // Only retry on certain conditions, bail on others
-                  if (error instanceof Error && error.message.includes('rate limit')) {
-                    throw error; // This will trigger a retry
-                  }
-                  bail(error); // Stop retrying for other types of errors
-                  return ''; // Typescript needs a return
-                }
-              }, {
-                retries: 3, // Number of retry attempts
-                factor: 2, // Exponential backoff factor
-                minTimeout: 1000, // Minimum timeout between retries
-                maxTimeout: 60000, // Maximum timeout between retries
-                randomize: true, // Add some randomness to prevent thundering herd
-              });
-
-              const translatedRow = { ...row };
-              translatedRow[languageColumnName] = language;
-              translatedRow[translationColumnName] = translatedText;
-              return translatedRow;
-            } catch (_error) {
-              const errorRow = { ...row };
-              errorRow[languageColumnName] = language;
-              errorRow[translationColumnName] = 'Translation failed after multiple attempts';
-              return errorRow;
-            } finally {
-              completedOperations++;
-              setProgress(Math.round((completedOperations / totalOperations) * 100));
-            }
-          })
+        const chunkResults = await processRowChunk(
+          chunk,
+          selectedLanguages,
+          selectedColumn,
+          languageColumnName,
+          translationColumnName,
+          anthropic,
+          () => {
+            completedOperations++;
+            setProgress(Math.round((completedOperations / totalOperations) * 100));
+          }
         );
-
-        const chunkResults = await Promise.all(chunkPromises);
         processedRows.push(...chunkResults);
       }
 
       const fileType = (fileName?.split('.').pop() as FileType) || 'csv';
-      const outputContent = serializeJson(processedRows, fileType);
-      const blob = new Blob([outputContent], {
-        type:
-          fileType === 'json'
-            ? 'application/json'
-            : fileType === 'jsonl'
-              ? 'application/jsonl'
-              : 'text/csv'
-      });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      a.download = `translated_${timestamp}.${fileType}`;
-      a.click();
-      window.URL.revokeObjectURL(url);
+      downloadOutput(processedRows, fileName, fileType);
 
       toast.success('Processing complete! File downloaded.');
     } catch (error) {
@@ -321,7 +385,7 @@ export function Translate() {
                 disabled={isProcessing || !selectedColumn || !apiKey}
                 className='max-w-min'
               >
-                {isProcessing ? 'Translating...' : 'Translate CSV'}
+                {isProcessing ? 'Translating...' : 'Translate'}
               </Button>
             </div>
           </div>
