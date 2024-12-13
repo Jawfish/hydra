@@ -1,10 +1,10 @@
-import { Header } from '@/components/Header';
 import { FileUpload } from '@/components/FileUpload';
+import { Header } from '@/components/Header';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useState, useEffect } from 'react';
-import { toast } from 'sonner';
-import { useWorkingFileStore } from '@/store/store';
 import { getAllPaths, getValueByPath } from '@/lib/parse';
+import { useWorkingFileStore } from '@/store/store';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface FieldAnalysisDetail {
   identifier: string;
@@ -18,24 +18,26 @@ export function Stats() {
   const [selectedAnalysisField, setSelectedAnalysisField] = useState<string>('');
   const [fieldAnalysis, setFieldAnalysis] = useState<FieldAnalysisDetail[]>([]);
 
-  const schema = fileName ? (() => {
-    console.log('Generating schema from first row:', fileContentParsed[0]);
-    const paths = getAllPaths(fileContentParsed[0] || {});
-    console.log('Generated schema paths:', paths);
-    return paths;
-  })() : [];
+  const schema = fileName
+    ? (() => {
+        console.debug('Generating schema from first row:', fileContentParsed[0]);
+        const paths = getAllPaths(fileContentParsed[0] || {});
+        console.debug('Generated schema paths:', paths);
+        return paths;
+      })()
+    : [];
 
   useEffect(() => {
     if (fileContentParsed.length > 0) {
-      console.log('Parsed content updated:', fileContentParsed);
-      console.log('Total rows:', fileContentParsed.length);
-      console.log('First few rows:', fileContentParsed.slice(0, 5));
+      console.debug('Parsed content updated:', fileContentParsed);
+      console.debug('Total rows:', fileContentParsed.length);
+      console.debug('First few rows:', fileContentParsed.slice(0, 5));
       toast.success(`File analysis complete! ${fileContentParsed.length} rows loaded.`);
     }
   }, [fileContentParsed]);
 
   useEffect(() => {
-    console.log('Current file state:', {
+    console.debug('Current file state:', {
       fileName,
       fileContentParsed: fileContentParsed,
       fileContentParsedLength: fileContentParsed.length
@@ -44,16 +46,18 @@ export function Stats() {
 
   const handleFileUpload = (name: string, content: string, fileType: string) => {
     try {
-      console.log('Uploading file:', { name, fileType });
-      console.log('Raw content sample:', content.slice(0, 200));
-      console.log('Content length:', content.length);
-      
+      console.debug('Uploading file:', { name, fileType });
+      console.debug('Raw content sample:', content.slice(0, 200));
+      console.debug('Content length:', content.length);
+
       try {
         useWorkingFileStore.getState().setFileName(name);
         setFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
       } catch (parseError) {
         console.error('File content parsing error:', parseError);
-        toast.error(`Parsing error: ${parseError instanceof Error ? parseError.message : 'Unknown parsing error'}`);
+        toast.error(
+          `Parsing error: ${parseError instanceof Error ? parseError.message : 'Unknown parsing error'}`
+        );
       }
     } catch (error) {
       console.error('File upload error:', error);
