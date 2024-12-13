@@ -1,33 +1,37 @@
-import { FieldSelector } from '@/components/FieldSelector';
+import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { parseJsonl } from '@/lib/json';
-import { normalizeString } from '@/lib/parse';
-import Papa from 'papaparse';
-import { useState } from 'react';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { getAllPaths, normalizeString } from '@/lib/parse';
+import { getValueByPath } from '@/lib/parse';
+import { useWorkingFileStore, useReferenceFileStore } from '@/store/store';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 export function Deduplicate() {
-  // State for primary file
-  const [primaryFile, setPrimaryFile] = useState<string>('');
-  const [primaryHeaders, setPrimaryHeaders] = useState<string[]>([]);
-  const [primarySchema, setPrimarySchema] = useState<string[]>([]);
-  const [primaryFileType, setPrimaryFileType] = useState<
-    'csv' | 'json' | 'jsonl' | null
-  >(null);
-  const [primaryMatchColumn, setPrimaryMatchColumn] = useState<string>('');
+  const {
+    fileName: workingFileName,
+    fileContentParsed: workingFileContent,
+    setFileContent: setWorkingFileContent
+  } = useWorkingFileStore();
 
-  // State for secondary file
-  const [secondaryFile, setSecondaryFile] = useState<string>('');
-  const [secondaryHeaders, setSecondaryHeaders] = useState<string[]>([]);
-  const [secondarySchema, setSecondarySchema] = useState<string[]>([]);
-  const [secondaryFileType, setSecondaryFileType] = useState<
-    'csv' | 'json' | 'jsonl' | null
-  >(null);
-  const [secondaryMatchColumn, setSecondaryMatchColumn] = useState<string>('');
+  const {
+    fileName: referenceFileName,
+    fileContentParsed: referenceFileContent,
+    setFileContent: setReferenceFileContent
+  } = useReferenceFileStore();
 
-  const extractJsonSchema = (obj: Record<string, unknown>, prefix = ''): string[] => {
+  const [workingFileSchema, setWorkingFileSchema] = useState<string[]>([]);
+  const [referenceFileSchema, setReferenceFileSchema] = useState<string[]>([]);
+
+  const [workingMatchColumn, setWorkingMatchColumn] = useState<string>('');
+  const [referenceMatchColumn, setReferenceMatchColumn] = useState<string>('');
     let schema: string[] = [];
     for (const [key, value] of Object.entries(obj)) {
       const path = prefix ? `${prefix}.${key}` : key;
