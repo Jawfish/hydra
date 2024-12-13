@@ -8,6 +8,7 @@ import {
   jsonlToJson,
   normalizeString
 } from '@/lib/parse';
+import type { FileType } from '@/store/store';
 import { describe, expect, it } from 'vitest';
 describe('CSV counting', () => {
   it('counts single row in csv file', () => {
@@ -32,89 +33,6 @@ describe('CSV counting', () => {
     const rowCount = countCsvRows(csvWithEmptyLines);
 
     expect(rowCount).toBe(2);
-  });
-});
-
-describe('Serializing JSON with file type preservation', () => {
-  it('preserves JSON format when original type is JSON', () => {
-    const data = [
-      { name: 'John', age: 30 },
-      { name: 'Jane', age: 25 }
-    ];
-
-    const serialized = serializeJson(data, 'json');
-    
-    // Expect pretty-printed JSON
-    expect(serialized).toBe(JSON.stringify(data, null, 2));
-  });
-
-  it('preserves JSONL format when original type is JSONL', () => {
-    const data = [
-      { name: 'John', age: 30 },
-      { name: 'Jane', age: 25 }
-    ];
-
-    const serialized = serializeJson(data, 'jsonl');
-    
-    // Expect newline-separated JSON strings
-    expect(serialized).toBe(
-      '{"name":"John","age":30}\n{"name":"Jane","age":25}'
-    );
-  });
-
-  it('defaults to CSV when no type is specified', () => {
-    const data = [
-      { name: 'John', age: 30 },
-      { name: 'Jane', age: 25 }
-    ];
-
-    const serialized = serializeJson(data);
-    
-    // Expect CSV format
-    expect(normalizeLineBreaks(serialized)).toBe(
-      normalizeLineBreaks('name,age\nJohn,30\nJane,25')
-    );
-  });
-
-  it('handles nested objects in all formats', () => {
-    const data = [
-      { 
-        name: 'John', 
-        address: { 
-          city: 'New York', 
-          state: 'NY' 
-        } 
-      }
-    ];
-
-    const jsonSerialized = serializeJson(data, 'json');
-    const jsonlSerialized = serializeJson(data, 'jsonl');
-    const csvSerialized = serializeJson(data, 'csv');
-
-    // JSON: Pretty-printed with nested structure
-    expect(JSON.parse(jsonSerialized)).toEqual([{
-      name: 'John', 
-      'address.city': 'New York', 
-      'address.state': 'NY'
-    }]);
-
-    // JSONL: Single line with flattened object
-    expect(jsonlSerialized).toBe(
-      '{"name":"John","address.city":"New York","address.state":"NY"}'
-    );
-
-    // CSV: Flattened with dot notation
-    expect(normalizeLineBreaks(csvSerialized)).toBe(
-      normalizeLineBreaks('name,address.city,address.state\nJohn,New York,NY')
-    );
-  });
-
-  it('throws error for unsupported file types', () => {
-    const data = [{ name: 'John' }];
-
-    expect(() => serializeJson(data, 'unknown' as FileType)).toThrow(
-      'Unsupported file type: unknown'
-    );
   });
 });
 
@@ -180,7 +98,7 @@ describe('Converting CSV to an array of objects', () => {
   });
 });
 
-describe('Converting JSON to CSV', () => {
+describe('Serializing JSON', () => {
   // Normalize line breaks to '\n' for comparison
   const normalizeLineBreaks = (str: string) =>
     str.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
@@ -235,6 +153,87 @@ describe('Converting JSON to CSV', () => {
       'name,age,address.city,address.state\nJohn,30,New York,NY\nJane,25,San Francisco,CA';
 
     expect(normalizeLineBreaks(csv)).toBe(normalizeLineBreaks(expectedCsv));
+  });
+
+  it('preserves JSON format when original type is JSON', () => {
+    const data = [
+      { name: 'John', age: 30 },
+      { name: 'Jane', age: 25 }
+    ];
+
+    const serialized = serializeJson(data, 'json');
+
+    // Expect pretty-printed JSON
+    expect(serialized).toBe(JSON.stringify(data, null, 2));
+  });
+
+  it('preserves JSONL format when original type is JSONL', () => {
+    const data = [
+      { name: 'John', age: 30 },
+      { name: 'Jane', age: 25 }
+    ];
+
+    const serialized = serializeJson(data, 'jsonl');
+
+    // Expect newline-separated JSON strings
+    expect(serialized).toBe('{"name":"John","age":30}\n{"name":"Jane","age":25}');
+  });
+
+  it('defaults to CSV when no type is specified', () => {
+    const data = [
+      { name: 'John', age: 30 },
+      { name: 'Jane', age: 25 }
+    ];
+
+    const serialized = serializeJson(data);
+
+    // Expect CSV format
+    expect(normalizeLineBreaks(serialized)).toBe(
+      normalizeLineBreaks('name,age\nJohn,30\nJane,25')
+    );
+  });
+
+  it('handles nested objects in all formats', () => {
+    const data = [
+      {
+        name: 'John',
+        address: {
+          city: 'New York',
+          state: 'NY'
+        }
+      }
+    ];
+
+    const jsonSerialized = serializeJson(data, 'json');
+    const jsonlSerialized = serializeJson(data, 'jsonl');
+    const csvSerialized = serializeJson(data, 'csv');
+
+    // JSON: Pretty-printed with nested structure
+    expect(JSON.parse(jsonSerialized)).toEqual([
+      {
+        name: 'John',
+        'address.city': 'New York',
+        'address.state': 'NY'
+      }
+    ]);
+
+    // JSONL: Single line with flattened object
+    expect(jsonlSerialized).toBe(
+      '{"name":"John","address.city":"New York","address.state":"NY"}'
+    );
+
+    // CSV: Flattened with dot notation
+    expect(normalizeLineBreaks(csvSerialized)).toBe(
+      normalizeLineBreaks('name,address.city,address.state\nJohn,New York,NY')
+    );
+  });
+
+  it('throws error for unsupported file types', () => {
+    const data = [{ name: 'John' }];
+
+    expect(() => serializeJson(data, 'unknown' as FileType)).toThrow(
+      'Unsupported file type: unknown'
+    );
   });
 });
 

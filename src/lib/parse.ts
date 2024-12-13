@@ -1,3 +1,4 @@
+import type { FileType } from '@/store/store';
 import Papa from 'papaparse';
 const BOM_REGEX = /^\uFEFF/;
 const CRLF_REGEX = /\r\n/g;
@@ -123,7 +124,7 @@ export const flattenObject = (
  * @param {object[]} data - Array of objects to convert to CSV
  * @returns {string} - CSV string
  */
-export const jsonToCsv = (
+export const serializeJson = (
   data: Record<string, unknown>[],
   originalFileType: FileType = 'csv'
 ): string => {
@@ -136,8 +137,9 @@ export const jsonToCsv = (
     case 'jsonl':
       return flattenedData.map(item => JSON.stringify(item)).join('\n');
     case 'csv':
-    default:
       return Papa.unparse(flattenedData, { header: true });
+    default:
+      throw new Error(`Unsupported file type: ${originalFileType}`);
   }
 };
 
