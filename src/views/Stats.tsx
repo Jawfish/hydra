@@ -6,28 +6,8 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  type FieldAnalysisDetail,
-  analyzeField,
-  analyzeFieldDetails
-} from '@/lib/fileAnalysis';
-import { getAllPaths } from '@/lib/parse';
-import { useWorkingFileStore } from '@/store/store';
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
-
-import { FileUpload } from '@/components/FileUpload';
-import { Header } from '@/components/Header';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  SelectValue
+} from '@/components/ui/select';
 import {
   type FieldAnalysisDetail,
   analyzeField,
@@ -62,10 +42,7 @@ interface DetailedAnalysisSectionProps {
   fieldAnalysis: FieldAnalysisDetail[];
 }
 
-const FileStatistics: React.FC<FileStatisticsProps> = ({
-  fileName,
-  rowCount
-}) => (
+const FileStatistics: React.FC<FileStatisticsProps> = ({ fileName, rowCount }) => (
   <div className='rounded-lg border p-4'>
     <h3 className='font-medium mb-2'>File Information</h3>
     <p>Name: {fileName}</p>
@@ -88,10 +65,7 @@ const SchemaDisplay: React.FC<SchemaDisplayProps> = ({ schema }) => (
   </div>
 );
 
-const FieldAnalysisTable: React.FC<FieldAnalysisTableProps> = ({
-  schema,
-  data
-}) => (
+const FieldAnalysisTable: React.FC<FieldAnalysisTableProps> = ({ schema, data }) => (
   <div className='rounded-lg border p-4'>
     <h3 className='font-medium mb-4'>Field Analysis</h3>
     <div className='grid grid-cols-4 gap-4 text-sm font-medium mb-2'>
@@ -154,7 +128,7 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
           </label>
           <Select value={selectedIdentifier} onValueChange={setSelectedIdentifier}>
             <SelectTrigger>
-              <SelectValue placeholder="Select identifier field..." />
+              <SelectValue placeholder='Select identifier field...' />
             </SelectTrigger>
             <SelectContent>
               {schema.map(field => (
@@ -170,9 +144,12 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
           <label htmlFor='analyze-field' className='text-sm font-medium'>
             Analyze Field
           </label>
-          <Select value={selectedAnalysisField} onValueChange={setSelectedAnalysisField}>
+          <Select
+            value={selectedAnalysisField}
+            onValueChange={setSelectedAnalysisField}
+          >
             <SelectTrigger>
-              <SelectValue placeholder="Select field to analyze..." />
+              <SelectValue placeholder='Select field to analyze...' />
             </SelectTrigger>
             <SelectContent>
               {schema.map(field => (
@@ -193,7 +170,7 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
           <ScrollArea className='h-[200px]'>
             <div className='space-y-2'>
               {fieldAnalysis.map(detail => (
-                <div key={detail.identifier} className='text-sm'>
+                <div key={Math.random()} className='text-sm'>
                   {selectedIdentifier}: {detail.identifier}
                 </div>
               ))}
@@ -202,13 +179,14 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
         </div>
       ) : (
         <div className='text-sm text-muted-foreground'>
-          {selectedIdentifier && selectedAnalysisField 
+          {selectedIdentifier && selectedAnalysisField
             ? 'No empty values found for the selected field.'
             : 'Please select both identifier and analysis fields to see results.'}
         </div>
       )}
-  </div>
-);
+    </div>
+  );
+};
 
 export const Stats: React.FC = () => {
   const { fileName, fileContentParsed, setFileContent } = useWorkingFileStore();
@@ -253,7 +231,7 @@ export const Stats: React.FC = () => {
         selectedAnalysisField,
         selectedIdentifier
       );
-      
+
       console.log('Analyzed field details:', details);
       setFieldAnalysis(details);
     }
@@ -321,4 +299,4 @@ export const Stats: React.FC = () => {
       </div>
     </div>
   );
-}
+};
