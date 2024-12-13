@@ -72,6 +72,7 @@ export function Backfill() {
   const handleWorkingFileUpload = (name: string, content: string, fileType: string) => {
     try {
       console.log('Uploading Working File:', { name, fileType, contentLength: content.length });
+      useWorkingFileStore.getState().setFileName(name);
       setWorkingFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
       toast.success(`Working file ${name} uploaded successfully`);
     } catch (error) {
@@ -89,6 +90,7 @@ export function Backfill() {
   ) => {
     try {
       console.log('Uploading Reference File:', { name, fileType, contentLength: content.length });
+      useReferenceFileStore.getState().setFileName(name);
       setReferenceFileContent(content, fileType as 'json' | 'csv' | 'jsonl');
       toast.success(`Reference file ${name} uploaded successfully`);
     } catch (error) {

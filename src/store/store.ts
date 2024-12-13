@@ -40,6 +40,8 @@ const createFileStore = () =>
             console.debug(`Setting file content for ${fileType}`);
             console.debug('Raw content length:', content.length);
             
+            // Ensure filename is set
+            state.fileName = state.fileName || 'Unnamed File';
             state.fileContentRaw = content;
             
             console.debug('Parsing content...');
