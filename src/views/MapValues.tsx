@@ -9,11 +9,6 @@ import { Textarea } from '@/shadcn/components/ui/textarea';
 import { useWorkingFileStore } from '@/store/store';
 import { useState } from 'react';
 import { toast } from 'sonner';
-interface MappedValue {
-  [key: string]: {
-    [key: string]: unknown;
-  };
-}
 
 export function MapValues() {
   const { fileContentParsed, fileName } = useWorkingFileStore();
@@ -23,7 +18,7 @@ export function MapValues() {
 
   const [keyField, setKeyField] = useState<string>('');
   const [valueFields, setValueFields] = useState<string[]>([]);
-  const [mappedValues, setMappedValues] = useState<MappedValue[]>([]);
+  const [mappedValues, setMappedValues] = useState<Record<string, unknown>>({});
 
   const handleKeyFieldSelect = (field: string) => {
     setKeyField(field);
@@ -45,19 +40,24 @@ export function MapValues() {
     }
 
     try {
-      const mapped = fileContentParsed.map(obj => {
-        const key = getValueByPath(obj, keyField);
-        const values: { [key: string]: unknown } = {};
+      const mapped = fileContentParsed.reduce(
+        (acc, obj) => {
+          const key = getValueByPath(obj, keyField);
+          const values: { [key: string]: unknown } = {};
 
-        for (const field of valueFields) {
-          values[field] = getValueByPath(obj, field);
-        }
+          for (const field of valueFields) {
+            values[field] = getValueByPath(obj, field);
+          }
 
-        return { [key as string]: values };
-      });
+          acc[key as string] = values;
+          return acc;
+        },
+        {} as Record<string, unknown>
+      );
 
       setMappedValues(mapped);
-      toast.success(`Generated mapping for ${mapped.length} objects`);
+
+      toast.success(`Generated mapping for ${Object.keys(mapped).length} objects`);
     } catch (error) {
       toast.error(
         `Error generating mapping: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -86,7 +86,7 @@ export function MapValues() {
           <Header>
             <Header.Title>Map Values</Header.Title>
             <Header.Description>
-              Create a mapping of key-value pairs from a CSV or JSONL file
+              Create a mapping of key-value pairs from an uploaded file
             </Header.Description>
           </Header>
         </div>
@@ -141,7 +141,7 @@ export function MapValues() {
                   Copy to Clipboard
                 </Button>
               </div>
-              {mappedValues.length > 0 && (
+              {mappedValues && (
                 <Textarea
                   id='mappedValues'
                   rows={12}

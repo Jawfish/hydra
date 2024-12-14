@@ -16,7 +16,6 @@ export function UuidExtractor() {
   const [selectedField, setSelectedField] = useState('');
   const [extractedUuids, setExtractedUuids] = useState<string[]>([]);
 
-  // Dynamically generate fields based on parsed content
   const availableFields = useMemo(() => {
     if (fileContentParsed.length === 0) {
       return [];
@@ -41,9 +40,7 @@ export function UuidExtractor() {
     <div className='flex flex-col mb-12'>
       <Header>
         <Header.Title>Extract UUIDs</Header.Title>
-        <Header.Description>
-          Extract UUIDs from pasted text or uploaded CSV or JSONL files
-        </Header.Description>
+        <Header.Description>Extract UUIDs from an uploaded file</Header.Description>
       </Header>
       <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
       {fileContentParsed.length > 0 && (

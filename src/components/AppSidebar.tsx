@@ -20,13 +20,13 @@ const SidebarRouteItem: React.FC<{ route: Route }> = ({ route }) => {
   };
 
   return (
-    <SidebarMenuItem 
-      className={`ml-4 py-1 ${isActive ? 'bg-primary/10 font-semibold' : ''}`}
+    <SidebarMenuItem
+      className={`py-2 -my-1 ${isActive ? 'bg-primary/10 font-semibold' : ''}`}
     >
       <Link
         to={route.path}
         onClick={handleRouteClick}
-        className='flex items-center gap-2'
+        className='ml-2 flex items-center gap-2'
       >
         <route.icon className={`w-4 h-4 ${isActive ? 'text-primary' : ''}`} />
         <span>{route.title}</span>
@@ -38,7 +38,7 @@ const SidebarRouteItem: React.FC<{ route: Route }> = ({ route }) => {
 export function AppSidebar() {
   return (
     <Sidebar collapsible='icon'>
-      <SidebarContent className='mt-2'>
+      <SidebarContent>
         <SidebarMenu>
           {routes.map((route, index) => (
             <React.Fragment key={route.title}>
