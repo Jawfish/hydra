@@ -52,22 +52,10 @@ type FilterGroup = {
 
 const evaluateCondition = (
   value: unknown,
-  condition: FilterCondition,
-  referenceValues?: Set<string>
+  condition: FilterCondition
 ): boolean => {
-  // Add a null check for referenceValues
-  if (condition.useReference && !referenceValues) {
-    return false;
-  }
-
   const normalizedValue = normalizeString(String(value));
   const normalizedTestValue = normalizeString(condition.value);
-
-  // Handle reference comparison if enabled
-  if (condition.useReference && referenceValues) {
-    const isInReference = referenceValues.has(normalizedValue);
-    return condition.comparison.startsWith('not') ? !isInReference : isInReference;
-  }
 
   switch (condition.comparison) {
     case 'equals':
@@ -93,15 +81,11 @@ const evaluateCondition = (
 
 const evaluateFilterGroup = (
   row: Record<string, unknown>,
-  group: FilterGroup,
-  referenceValues?: Map<string, Set<string>>
+  group: FilterGroup
 ): boolean => {
   const evaluateConditionWithRef = (condition: FilterCondition) => {
     const value = getValueByPath(row, condition.field);
-    const refValues =
-      (condition.referenceField && referenceValues?.get(condition.referenceField)) ||
-      undefined;
-    return evaluateCondition(value, condition, refValues);
+    return evaluateCondition(value, condition);
   };
 
   return group.operator === 'AND'
@@ -113,11 +97,7 @@ export function Filter() {
   const { fileName: workingFileName, fileContentParsed: workingFileContent } =
     useWorkingFileStore();
 
-  const { fileName: referenceFileName, fileContentParsed: referenceFileContent } =
-    useReferenceFileStore();
-
   const [workingFileSchema, setWorkingFileSchema] = useState<string[]>([]);
-  const [referenceFileSchema, setReferenceFileSchema] = useState<string[]>([]);
   const [filterGroup, setFilterGroup] = useState<FilterGroup>({
     operator: 'AND',
     conditions: [{ field: '', comparison: 'equals', value: '' }]
@@ -138,7 +118,6 @@ export function Filter() {
   }, [referenceFileContent]);
 
   const handleWorkingFileUpload = useFileUpload('working');
-  const handleReferenceFileUpload = useFileUpload('reference');
 
   const addCondition = () => {
     setFilterGroup(prev => ({
@@ -226,18 +205,6 @@ export function Filter() {
         <FileUpload onFileUpload={handleWorkingFileUpload} fileName={workingFileName} />
       </div>
 
-      <div className='mb-8'>
-        <div className='mb-4'>
-          <h3 className='text-lg font-semibold'>Reference File (Optional)</h3>
-          <p className='text-muted-foreground text-sm'>
-            Use for advanced filtering across files
-          </p>
-        </div>
-        <FileUpload
-          onFileUpload={handleReferenceFileUpload}
-          fileName={referenceFileName}
-        />
-      </div>
 
       {workingFileName && (
         <div className='mb-8'>
@@ -291,36 +258,7 @@ export function Filter() {
                   </SelectContent>
                 </Select>
 
-                {referenceFileName && (
-                  <div className='flex items-center space-x-2'>
-                    <input
-                      type='checkbox'
-                      id={`useReference-${index}`}
-                      checked={condition.useReference}
-                      onChange={e =>
-                        updateCondition(index, {
-                          useReference: e.target.checked,
-                          referenceField: condition.referenceField || ''
-                        })
-                      }
-                      className='h-4 w-4'
-                    />
-                    <label htmlFor={`useReference-${index}`} className='text-sm'>
-                      Use Reference File
-                    </label>
-                  </div>
-                )}
-
-                {condition.useReference && referenceFileName ? (
-                  <FieldSelector
-                    fields={referenceFileSchema}
-                    selectedField={condition.referenceField || ''}
-                    onFieldSelect={value =>
-                      updateCondition(index, { referenceField: value })
-                    }
-                    placeholder='Select reference field'
-                  />
-                ) : (
+                {(
                   <Input
                     type='text'
                     placeholder='Value'
