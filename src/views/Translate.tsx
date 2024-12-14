@@ -139,7 +139,7 @@ export function Translate() {
             model: 'claude-3-5-sonnet-latest',
             system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
           });
-
+          console.debug('Translation response:', response);
           return response.content[0].type === 'text' ? response.content[0].text : '';
         } catch (error) {
           // Log the error for debugging
@@ -149,7 +149,7 @@ export function Translate() {
         }
       },
       {
-        retries: 3,
+        retries: 7,
         factor: 2,
         minTimeout: 1000,
         maxTimeout: 60000,
