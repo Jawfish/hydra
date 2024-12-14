@@ -33,7 +33,9 @@ type ComparisonType =
   | 'greaterThan'
   | 'lessThan'
   | 'notEquals'
-  | 'notContains';
+  | 'notContains'
+  | 'inFile'
+  | 'notInFile';
 
 type LogicalOperator = 'AND' | 'OR';
 
@@ -41,6 +43,7 @@ type FilterCondition = {
   field: string;
   comparison: ComparisonType;
   value: string;
+  referenceField?: string;
 };
 
 type FilterGroup = {
@@ -50,7 +53,8 @@ type FilterGroup = {
 
 const evaluateCondition = (
   value: unknown,
-  condition: FilterCondition
+  condition: FilterCondition,
+  referenceFileContent?: Record<string, unknown>[]
 ): boolean => {
   const normalizedValue = normalizeString(String(value));
   const normalizedTestValue = normalizeString(condition.value);
@@ -72,6 +76,20 @@ const evaluateCondition = (
       return Number(value) > Number(condition.value);
     case 'lessThan':
       return Number(value) < Number(condition.value);
+    case 'inFile':
+      return referenceFileContent 
+        ? referenceFileContent.some(refRow => 
+            normalizeString(String(getValueByPath(refRow, condition.referenceField || ''))) === 
+            normalizeString(String(value))
+          )
+        : false;
+    case 'notInFile':
+      return referenceFileContent 
+        ? !referenceFileContent.some(refRow => 
+            normalizeString(String(getValueByPath(refRow, condition.referenceField || ''))) === 
+            normalizeString(String(value))
+          )
+        : true;
     default:
       return false;
   }
@@ -79,11 +97,12 @@ const evaluateCondition = (
 
 const evaluateFilterGroup = (
   row: Record<string, unknown>,
-  group: FilterGroup
+  group: FilterGroup,
+  referenceFileContent?: Record<string, unknown>[]
 ): boolean => {
   const evaluateConditionWithRef = (condition: FilterCondition) => {
     const value = getValueByPath(row, condition.field);
-    return evaluateCondition(value, condition);
+    return evaluateCondition(value, condition, referenceFileContent);
   };
 
   return group.operator === 'AND'
@@ -246,10 +265,19 @@ export function Filter() {
                     <SelectItem value='endsWith'>Ends with</SelectItem>
                     <SelectItem value='greaterThan'>Greater than</SelectItem>
                     <SelectItem value='lessThan'>Less than</SelectItem>
+                    <SelectItem value='inFile'>In File</SelectItem>
+                    <SelectItem value='notInFile'>Not in File</SelectItem>
                   </SelectContent>
                 </Select>
 
-                {(
+                {['inFile', 'notInFile'].includes(condition.comparison) ? (
+                  <FieldSelector
+                    fields={referenceFileSchema}
+                    selectedField={condition.referenceField || ''}
+                    onFieldSelect={value => updateCondition(index, { referenceField: value })}
+                    placeholder='Select reference field'
+                  />
+                ) : (
                   <Input
                     type='text'
                     placeholder='Value'
