@@ -35,7 +35,8 @@ type ComparisonType =
   | 'notEquals'
   | 'notContains'
   | 'inFile'
-  | 'notInFile';
+  | 'notInFile'
+  | 'isEmpty';
 
 type LogicalOperator = 'AND' | 'OR';
 
@@ -75,6 +76,12 @@ const evaluateCondition = (value: unknown, condition: FilterCondition): boolean 
       return Number(value) > Number(condition.value);
     case 'lessThan':
       return Number(value) < Number(condition.value);
+    case 'isEmpty':
+      return value === null || 
+             value === undefined || 
+             value === '' || 
+             (Array.isArray(value) && value.length === 0) ||
+             (typeof value === 'object' && value !== null && Object.keys(value).length === 0);
     case 'inFile':
       return condition.referenceFileContent
         ? condition.referenceFileContent.some(
@@ -267,6 +274,7 @@ export function Filter() {
                       <SelectItem value='endsWith'>Ends with</SelectItem>
                       <SelectItem value='greaterThan'>Greater than</SelectItem>
                       <SelectItem value='lessThan'>Less than</SelectItem>
+                      <SelectItem value='isEmpty'>Is Empty</SelectItem>
                       <SelectItem value='inFile'>In File</SelectItem>
                       <SelectItem value='notInFile'>Not in File</SelectItem>
                     </SelectContent>
