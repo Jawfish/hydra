@@ -1,5 +1,5 @@
+import { Button } from '@/shadcn/components/ui/button';
 import type React from 'react';
-import { cn } from '@/shadcn/lib/utils';
 
 interface ActionSectionProps {
   children: React.ReactNode;
@@ -8,34 +8,29 @@ interface ActionSectionProps {
 
 interface ActionSectionButtonProps {
   children: React.ReactNode;
+  variant?: 'default' | 'outline';
   onClick?: () => void;
   disabled?: boolean;
-  className?: string;
 }
 
-export const ActionSection = ({ children, className }: ActionSectionProps) => (
-  <div className={cn('flex flex-col gap-6 bg-muted p-6 -m-6 mt-6 rounded-md', className)}>
+export const ActionSection = ({ children }: ActionSectionProps) => (
+  <div className='flex flex-col gap-6 bg-muted p-6 -m-6 mt-6 rounded-md'>
     {children}
   </div>
 );
 
-ActionSection.Button = ({ 
-  children, 
-  onClick, 
-  disabled = false, 
-  className 
+ActionSection.Button = ({
+  children,
+  onClick,
+  variant = 'default',
+  disabled = false
 }: ActionSectionButtonProps) => (
-  <button
+  <Button
     onClick={onClick}
     disabled={disabled}
-    className={cn(
-      'w-min rounded-md bg-primary text-primary-foreground hover:bg-primary/90 ' +
-      'px-4 py-2 text-sm font-medium transition-colors ' +
-      'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ' +
-      'disabled:pointer-events-none disabled:opacity-50',
-      className
-    )}
+    variant={variant}
+    className='w-min min-w-fit'
   >
     {children}
-  </button>
+  </Button>
 );
