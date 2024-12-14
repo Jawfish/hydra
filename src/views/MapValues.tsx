@@ -15,7 +15,7 @@ interface MappedValue {
 }
 
 export function MapValues() {
-  const { fileContentParsed } = useWorkingFileStore();
+  const { fileContentParsed, fileName } = useWorkingFileStore();
   const availableFields = fileContentParsed[0] ? getAllPaths(fileContentParsed[0]) : [];
 
   const [keyField, setKeyField] = useState<string>('');
@@ -87,9 +87,14 @@ export function MapValues() {
             </Header.Description>
           </Header>
         </div>
-        <FileUpload />
+        <FileUpload 
+          onFileUpload={(fileName, fileContent, fileType) => {
+            useWorkingFileStore.getState().setFileContent(fileContent, fileType);
+          }}
+          fileName={fileName}
+        />
       </div>
-      {fileType && (
+      {fileContentParsed.length > 0 && (
         <>
           <Separator className='my-14 h-[1px]' />
           <div className='flex flex-col gap-14'>
