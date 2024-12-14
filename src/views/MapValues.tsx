@@ -4,9 +4,8 @@ import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { getValueByPath, parseJsonl } from '@/lib/json';
-import { useFileStore } from '@/store/store';
-import Papa from 'papaparse';
+import { getAllPaths, getValueByPath } from '@/lib/parse';
+import { useWorkingFileStore } from '@/store/store';
 import { useState } from 'react';
 import { toast } from 'sonner';
 interface MappedValue {
@@ -16,7 +15,8 @@ interface MappedValue {
 }
 
 export function MapValues() {
-  const { fileType, jsonlSchema, csvHeaders, fileContent } = useFileStore();
+  const { fileContentParsed } = useWorkingFileStore();
+  const availableFields = fileContentParsed[0] ? getAllPaths(fileContentParsed[0]) : [];
 
   const [keyField, setKeyField] = useState<string>('');
   const [valueFields, setValueFields] = useState<string[]>([]);
@@ -42,45 +42,19 @@ export function MapValues() {
     }
 
     try {
-      if (fileType === 'jsonl') {
-        const objects = parseJsonl(fileContent);
-        const mapped = objects.map(obj => {
-          const key = getValueByPath(obj, keyField);
-          const values: { [key: string]: unknown } = {};
+      const mapped = fileContentParsed.map(obj => {
+        const key = getValueByPath(obj, keyField);
+        const values: { [key: string]: unknown } = {};
 
-          for (const field of valueFields) {
-            values[field] = getValueByPath(obj, field);
-          }
+        for (const field of valueFields) {
+          values[field] = getValueByPath(obj, field);
+        }
 
-          return { [key as string]: values };
-        });
+        return { [key as string]: values };
+      });
 
-        setMappedValues(mapped);
-        toast.success(`Generated mapping for ${mapped.length} objects`);
-      } else if (fileType === 'csv') {
-        const csvData: string[][] = Papa.parse<string[]>(fileContent, {
-          skipEmptyLines: true
-        }).data;
-        const headers = csvData[0];
-        const rows = csvData.slice(1);
-
-        const keyIndex = headers.indexOf(keyField);
-        const valueIndices = valueFields.map(field => headers.indexOf(field));
-
-        const mapped = rows.map(row => {
-          const key = row[keyIndex];
-          const values: { [key: string]: unknown } = {};
-
-          for (const index of valueIndices) {
-            values[headers[index]] = row[index];
-          }
-
-          return { [key as string]: values };
-        });
-
-        setMappedValues(mapped);
-        toast.success(`Generated mapping for ${mapped.length} rows`);
-      }
+      setMappedValues(mapped);
+      toast.success(`Generated mapping for ${mapped.length} objects`);
     } catch (error) {
       toast.error(
         `Error generating mapping: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -127,7 +101,7 @@ export function MapValues() {
                 </p>
               </div>
               <FieldSelector
-                fields={fileType === 'jsonl' ? jsonlSchema : csvHeaders}
+                fields={availableFields}
                 selectedField={keyField}
                 onFieldSelect={handleKeyFieldSelect}
               />
@@ -141,7 +115,7 @@ export function MapValues() {
                 </p>
               </div>
               <div className='flex flex-wrap gap-2'>
-                {(fileType === 'jsonl' ? jsonlSchema : csvHeaders).map(field => (
+                {availableFields.map(field => (
                   <Button
                     key={field}
                     variant={valueFields.includes(field) ? 'default' : 'outline'}
