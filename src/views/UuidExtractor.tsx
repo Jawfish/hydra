@@ -1,3 +1,7 @@
+import React, { useState, useMemo } from 'react';
+import { useWorkingFileStore } from '@/store/store';
+import { getAllPaths, getValueByPath } from '@/lib/parse';
+import { extractUuids } from '@/lib/uuid';
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
@@ -5,21 +9,15 @@ import { Metadata } from '@/components/Metadata';
 import { UuidDisplay } from '@/components/UuidDisplay';
 import { UuidInput } from '@/components/UuidInput';
 import { Separator } from '@/components/ui/separator';
-import { getAllPaths, getValueByPath } from '@/lib/parse';
-import { extractUuids } from '@/lib/uuid';
-import { useWorkingFileStore } from '@/store/store';
-import { useMemo, useState } from 'react';
+import { useFileUpload } from '@/hooks/use-file-upload';
 
 export function UuidExtractor() {
   const {
-    setFileName,
-    setFileContent,
-    resetFileState,
     fileName,
-    fileType,
+    fileContentRaw,
     fileContentParsed,
-    fileContentRaw: input,
-    setFileContentRaw: setInput
+    setFileContent,
+    resetFileState
   } = useWorkingFileStore();
 
   const [selectedField, setSelectedField] = useState('');
@@ -31,28 +29,24 @@ export function UuidExtractor() {
     return getAllPaths(fileContentParsed[0] || {});
   }, [fileContentParsed]);
 
+  const handleFileUpload = useFileUpload('working');
+
   const handleFieldSelection = (field: string) => {
     setSelectedField(field);
     
-    // Use consistent extraction method across file types
-    const uuids = fileContentParsed
-      .map(row => {
-        const value = getValueByPath(row, field);
-        return value ? extractUuids(value.toString()) : [];
-      })
-      .flat();
+    const uuids = fileContentParsed.flatMap(row => {
+      const value = getValueByPath(row, field);
+      return value ? extractUuids(value.toString()) : [];
+    });
 
     setExtractedUuids(uuids);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value;
-    setInput(newText);
+    setFileContent(newText, 'unknown');
     setExtractedUuids(extractUuids(newText));
-
-    if (fileType) {
-      resetFileState();
-    }
+    resetFileState();
   };
 
   return (
@@ -63,19 +57,22 @@ export function UuidExtractor() {
           Extract UUIDs from pasted text or uploaded CSV or JSONL files
         </Header.Description>
       </Header>
-      <UuidInput input={input} onChange={handleInputChange} className='mb-4 mt-10' />
-      <FileUpload />
-      {fileType && (
+      <UuidInput input={fileContentRaw} onChange={handleInputChange} className='mb-4 mt-10' />
+      <FileUpload 
+        onFileUpload={handleFileUpload}
+        fileName={fileName}
+      />
+      {fileContentParsed.length > 0 && (
         <>
           <Separator className='my-14 h-[1px]' />
           <h3 className='font-semibold mb-4'>
-            Select {fileType === 'jsonl' ? 'field' : 'column'} to extract UUIDs from
+            Select field to extract UUIDs from
           </h3>
           <FieldSelector
             fields={availableFields}
             selectedField={selectedField}
             onFieldSelect={handleFieldSelection}
-            placeholder={`Select ${fileType} field`}
+            placeholder='Select field'
           />
         </>
       )}
@@ -87,7 +84,7 @@ export function UuidExtractor() {
           <UuidDisplay />
         </>
       )}
-      {((fileType && selectedField) || input) && extractedUuids.length === 0 && (
+      {(fileContentParsed.length > 0 && selectedField) && extractedUuids.length === 0 && (
         <>
           <Separator className='my-14 h-[1px]' />
           <div className='text-muted-foreground'>
