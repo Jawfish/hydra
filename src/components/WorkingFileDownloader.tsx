@@ -51,9 +51,9 @@ export function WorkingFileDownloader() {
   }
 
   return (
-    <div className='fixed bottom-0 left-0 right-0 bg-background border-t p-4 flex items-center justify-center space-x-4 shadow-lg z-50'>
+    <div className='fixed right-0 bottom-0 left-0 z-50 flex items-center justify-center space-x-4 border-t bg-background p-4 shadow-lg'>
       <div className='flex items-center space-x-2'>
-        <span className='text-sm text-muted-foreground'>Convert to:</span>
+        <span className='text-muted-foreground text-sm'>Convert to:</span>
         <Select
           value={selectedFormat}
           onValueChange={(value: string) => setSelectedFormat(value as FileType)}

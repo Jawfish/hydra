@@ -44,6 +44,12 @@
           }
         }
       },
+      "nursery": {
+        "useSortedClasses": {
+          "level": "error",
+          "options": {}
+        }
+      },
       "suspicious": {
         "all": true,
         "noConsole": {

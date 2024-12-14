@@ -137,7 +137,7 @@ export function Deduplicate() {
   };
 
   return (
-    <div className='flex flex-col mb-12'>
+    <div className='mb-12 flex flex-col'>
       <Header>
         <Header.Title>Deduplicate Files</Header.Title>
         <Header.Description>
@@ -148,7 +148,7 @@ export function Deduplicate() {
       <div className='grid grid-cols-2 gap-8'>
         <div>
           <div className='mb-4'>
-            <h3 className='text-lg font-semibold'>Working File</h3>
+            <h3 className='font-semibold text-lg'>Working File</h3>
             <p className='text-muted-foreground text-sm'>
               The file to remove duplicates from
             </p>
@@ -160,7 +160,7 @@ export function Deduplicate() {
           {workingFileName && (
             <div className='mt-4'>
               <div className='flex flex-col gap-2'>
-                <label htmlFor='matchField' className='text-sm font-medium'>
+                <label htmlFor='matchField' className='font-medium text-sm'>
                   Field to match on
                 </label>
                 <Select value={workingMatchField} onValueChange={setWorkingMatchField}>
@@ -182,7 +182,7 @@ export function Deduplicate() {
 
         <div>
           <div className='mb-4'>
-            <h3 className='text-lg font-semibold'>Reference File</h3>
+            <h3 className='font-semibold text-lg'>Reference File</h3>
             <p className='text-muted-foreground text-sm'>
               The file to check for duplicates against
             </p>
@@ -194,7 +194,7 @@ export function Deduplicate() {
           {referenceFileName && (
             <div className='mt-4'>
               <div className='flex flex-col gap-2'>
-                <label htmlFor='matchField' className='text-sm font-medium'>
+                <label htmlFor='matchField' className='font-medium text-sm'>
                   Field to match on
                 </label>
                 <Select

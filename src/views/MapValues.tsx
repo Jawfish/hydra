@@ -81,7 +81,7 @@ export function MapValues() {
   };
 
   return (
-    <div className='flex flex-col mb-12'>
+    <div className='mb-12 flex flex-col'>
       <Header>
         <Header.Title>Map Values</Header.Title>
         <Header.Description>
@@ -90,7 +90,7 @@ export function MapValues() {
       </Header>
 
       <div className='mb-4'>
-        <h3 className='text-lg font-semibold'>Working File</h3>
+        <h3 className='font-semibold text-lg'>Working File</h3>
         <p className='text-muted-foreground text-sm'>
           The file to generate a mapping from
         </p>
@@ -102,8 +102,8 @@ export function MapValues() {
           <div className='flex flex-col gap-14'>
             <div>
               <div className='mb-5'>
-                <h3 className='text-lg font-semibold'>Key Field</h3>
-                <p className='text-sm text-muted-foreground'>
+                <h3 className='font-semibold text-lg'>Key Field</h3>
+                <p className='text-muted-foreground text-sm'>
                   Select a field to use as the key in the mapping
                 </p>
               </div>
@@ -116,8 +116,8 @@ export function MapValues() {
             <Separator />
             <div>
               <div className='mb-5'>
-                <h3 className='text-lg font-semibold'>Value Fields</h3>
-                <p className='text-sm text-muted-foreground'>
+                <h3 className='font-semibold text-lg'>Value Fields</h3>
+                <p className='text-muted-foreground text-sm'>
                   Select one or more fields to use as values in the mapping
                 </p>
               </div>
@@ -153,7 +153,7 @@ export function MapValues() {
                   rows={12}
                   value={JSON.stringify(mappedValues, null, 2)}
                   readOnly={true}
-                  className='font-mono rounded-md resize-none'
+                  className='resize-none rounded-md font-mono'
                 />
               )}
             </ActionSection>

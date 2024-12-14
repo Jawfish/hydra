@@ -12,7 +12,7 @@ export function Metadata() {
   return (
     <>
       {fileName && (
-        <p className='text-sm text-muted-foreground mt-2'>
+        <p className='mt-2 text-muted-foreground text-sm'>
           {fileName.endsWith('.csv')
             ? `CSV file contains ${count} data rows`
             : `File contains ${count} objects`}

@@ -39,7 +39,7 @@ interface DetailedAnalysisSectionProps {
 
 const FileStatistics: React.FC<FileStatisticsProps> = ({ fileName, rowCount }) => (
   <div className='rounded-lg border p-4'>
-    <h3 className='font-medium mb-2'>File Information</h3>
+    <h3 className='mb-2 font-medium'>File Information</h3>
     <p>Name: {fileName}</p>
     <p>Total Rows: {rowCount}</p>
   </div>
@@ -47,7 +47,7 @@ const FileStatistics: React.FC<FileStatisticsProps> = ({ fileName, rowCount }) =
 
 const SchemaDisplay: React.FC<SchemaDisplayProps> = ({ schema }) => (
   <div className='rounded-lg border p-4'>
-    <h3 className='font-medium mb-2'>Schema</h3>
+    <h3 className='mb-2 font-medium'>Schema</h3>
     <ScrollArea className='h-[100px]'>
       <div className='space-y-1'>
         {schema.map(field => (
@@ -62,8 +62,8 @@ const SchemaDisplay: React.FC<SchemaDisplayProps> = ({ schema }) => (
 
 const FieldAnalysisTable: React.FC<FieldAnalysisTableProps> = ({ schema, data }) => (
   <div className='rounded-lg border p-4'>
-    <h3 className='font-medium mb-4'>Field Analysis</h3>
-    <div className='grid grid-cols-4 gap-4 text-sm font-medium mb-2'>
+    <h3 className='mb-4 font-medium'>Field Analysis</h3>
+    <div className='mb-2 grid grid-cols-4 gap-4 font-medium text-sm'>
       <div>Field</div>
       <div>Non-Empty</div>
       <div>Empty</div>
@@ -118,11 +118,11 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
 
   return (
     <div className='rounded-lg border p-4'>
-      <h3 className='font-medium mb-4'>Inspect Empty Fields</h3>
-      <div className='flex gap-4 mb-4'>
+      <h3 className='mb-4 font-medium'>Inspect Empty Fields</h3>
+      <div className='mb-4 flex gap-4'>
         <div className='flex flex-col gap-2'>
           <div className='flex items-center gap-2'>
-            <label htmlFor='identifier-field' className='text-sm font-medium'>
+            <label htmlFor='identifier-field' className='font-medium text-sm'>
               Identifier Field
             </label>
             <HelpTooltip message='The field to use for identifying the objects containing empty values' />
@@ -137,7 +137,7 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
 
         <div className='flex flex-col gap-2'>
           <div className='flex items-center gap-2'>
-            <label htmlFor='analyze-field' className='text-sm font-medium'>
+            <label htmlFor='analyze-field' className='font-medium text-sm'>
               Analyze Field
             </label>
             <HelpTooltip message='The field to check for empty values' />
@@ -153,7 +153,7 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
 
       {fieldAnalysis.length > 0 && (
         <div>
-          <h4 className='text-sm font-medium mb-2'>
+          <h4 className='mb-2 font-medium text-sm'>
             {fieldAnalysis.length} empty '{selectedAnalysisField}' listed by '
             {selectedIdentifier}':
           </h4>
@@ -224,7 +224,7 @@ export const Stats: React.FC = () => {
   const handleFileUpload = useFileUpload('working');
 
   return (
-    <div className='flex flex-col mb-12'>
+    <div className='mb-12 flex flex-col'>
       <Header>
         <Header.Title>File Statistics</Header.Title>
         <Header.Description>
@@ -233,7 +233,7 @@ export const Stats: React.FC = () => {
       </Header>
 
       <div className='mb-4'>
-        <h3 className='text-lg font-semibold'>Working File</h3>
+        <h3 className='font-semibold text-lg'>Working File</h3>
         <p className='text-muted-foreground text-sm'>The file to analyze</p>
       </div>
       <div className='mb-6'>

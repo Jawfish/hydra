@@ -21,7 +21,7 @@ export const Header = ({ children }: HeaderProps) => (
 );
 
 Header.Title = ({ children }: TitleProps) => (
-  <h1 className='text-2xl font-bold'>{children}</h1>
+  <h1 className='font-bold text-2xl'>{children}</h1>
 );
 
 Header.Description = function Description({ children }: DescriptionProps) {

@@ -6,7 +6,7 @@ export function Layout() {
   return (
     <>
       <AppSidebar />
-      <div className='p-8 xl:mx-auto w-full max-w-4xl mb-10'>
+      <div className='mb-10 w-full max-w-4xl p-8 xl:mx-auto'>
         <Outlet />
       </div>
 

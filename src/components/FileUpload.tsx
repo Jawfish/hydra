@@ -41,7 +41,7 @@ export function FileUpload({ onFileUpload, fileName }: FileUploadProps) {
   // Truncate the file name if it's too long, but preserve the extension
   const truncateFileName = (name: string) => {
     const parts = name.split('.');
-    const extension = parts[parts.length - 1];
+    const extension = parts.at(-1);
     const nameOnly = parts[0];
     let truncatedName = nameOnly.slice(0, 20);
 
@@ -53,7 +53,7 @@ export function FileUpload({ onFileUpload, fileName }: FileUploadProps) {
   };
 
   return (
-    <div className='flex gap-2 items-center'>
+    <div className='flex items-center gap-2'>
       <Button asChild={true} variant='secondary'>
         <label className='cursor-pointer'>
           Select File
@@ -66,7 +66,7 @@ export function FileUpload({ onFileUpload, fileName }: FileUploadProps) {
         </label>
       </Button>
       {fileName && (
-        <p className='text-sm text-muted-foreground'>
+        <p className='text-muted-foreground text-sm'>
           <strong className='font-medium'>{truncateFileName(fileName)}</strong>
         </p>
       )}

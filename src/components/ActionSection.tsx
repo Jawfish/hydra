@@ -14,22 +14,14 @@ interface ActionSectionButtonProps {
   disabled?: boolean;
 }
 
-interface ActionSectionContainerProps {
-  children: React.ReactNode;
-}
-
 interface ActionSectionProgressProps {
   value: number;
 }
 
 export const ActionSection = ({ children }: ActionSectionProps) => (
-  <div className='flex flex-col gap-6 bg-muted p-6 -m-6 mt-6 rounded-md'>
+  <div className='-m-6 mt-6 flex items-center gap-6 rounded-md bg-muted p-6'>
     {children}
   </div>
-);
-
-ActionSection.Container = ({ children }: ActionSectionContainerProps) => (
-  <div className='flex gap-4'>{children}</div>
 );
 
 ActionSection.Button = ({
@@ -49,8 +41,5 @@ ActionSection.Button = ({
 );
 
 ActionSection.Progress = ({ value }: ActionSectionProgressProps) => (
-  <div className='flex flex-col gap-2'>
-    <Progress value={value} />
-    <p className='text-sm text-muted-foreground text-center'>{value}% complete</p>
-  </div>
+  <Progress value={value} />
 );

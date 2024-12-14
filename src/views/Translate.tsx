@@ -3,7 +3,6 @@ import { getValueByPath } from '@/lib/parse';
 import type { FileType } from '@/store/store';
 import Anthropic from '@anthropic-ai/sdk';
 import retry from 'async-retry';
-import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 
 const ALL_LANGUAGES = [
@@ -68,7 +67,6 @@ export function Translate() {
   };
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState<number>(0);
-  const [isCancelled, setIsCancelled] = useState(false);
   const [selectedLanguages, setSelectedLanguages] = useState<Set<string>>(
     new Set(DEFAULT_ENABLED_LANGUAGES)
   );
@@ -273,8 +271,6 @@ export function Translate() {
   };
 
   const processCsv = async () => {
-    setIsCancelled(false);
-
     if (
       !validateInputs(
         selectedColumn,
@@ -310,11 +306,6 @@ export function Translate() {
       );
 
       for (let i = 0; i < rows.length; i += chunkSize) {
-        if (isCancelled) {
-          toast.info('Translation process cancelled');
-          return;
-        }
-
         const chunk = rows.slice(i, i + chunkSize);
         const chunkResults = await processRowChunk(
           chunk,
@@ -324,9 +315,6 @@ export function Translate() {
           translationColumnName,
           anthropic,
           () => {
-            if (isCancelled) {
-              return;
-            }
             completedOperations++;
             setProgress(Math.round((completedOperations / totalOperations) * 100));
           },
@@ -346,19 +334,18 @@ export function Translate() {
     } finally {
       setIsProcessing(false);
       setProgress(0);
-      setIsCancelled(false);
     }
   };
 
   return (
-    <div className='flex flex-col mb-12'>
+    <div className='mb-12 flex flex-col'>
       <Header>
         <Header.Title>File Translator</Header.Title>
         <Header.Description>Translate file data</Header.Description>
       </Header>
 
       <div className='mb-4'>
-        <h3 className='text-lg font-semibold'>Working File</h3>
+        <h3 className='font-semibold text-lg'>Working File</h3>
         <p className='text-muted-foreground text-sm'>The file to translate</p>
       </div>
       <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
@@ -368,7 +355,7 @@ export function Translate() {
           <Separator className='my-14 h-[1px]' />
           <div className='flex flex-col gap-8'>
             <div>
-              <h3 className='text-lg font-semibold mb-4'>Anthropic API Key</h3>
+              <h3 className='mb-4 font-semibold text-lg'>Anthropic API Key</h3>
               <form onSubmit={e => e.preventDefault()} className='max-w-md'>
                 {/* Hidden username field for password managers */}
                 <input
@@ -381,7 +368,7 @@ export function Translate() {
                 />
                 <label
                   htmlFor='anthropicApiKey'
-                  className='text-sm font-medium mb-2 hidden'
+                  className='mb-2 hidden font-medium text-sm'
                 >
                   Anthropic API Key
                 </label>
@@ -398,7 +385,7 @@ export function Translate() {
             </div>
 
             <div>
-              <h3 className='text-lg font-semibold mb-4'>Select Column to Process</h3>
+              <h3 className='mb-4 font-semibold text-lg'>Select Column to Process</h3>
               <FieldSelector
                 fields={csvHeaders}
                 selectedField={selectedColumn}
@@ -407,12 +394,12 @@ export function Translate() {
             </div>
 
             <div>
-              <h3 className='text-lg font-semibold mb-4'>Output Column Names</h3>
-              <div className='flex flex-col gap-4 max-w-md'>
+              <h3 className='mb-4 font-semibold text-lg'>Output Column Names</h3>
+              <div className='flex max-w-md flex-col gap-4'>
                 <div>
                   <label
                     htmlFor='languageColumn'
-                    className='block text-sm font-medium mb-2'
+                    className='mb-2 block font-medium text-sm'
                   >
                     Language Column Name
                   </label>
@@ -426,7 +413,7 @@ export function Translate() {
                 <div>
                   <label
                     htmlFor='translationColumn'
-                    className='block text-sm font-medium mb-2'
+                    className='mb-2 block font-medium text-sm'
                   >
                     Translation Column Name
                   </label>
@@ -441,10 +428,10 @@ export function Translate() {
             </div>
 
             <div>
-              <div className='flex gap-2 mb-4'>
+              <div className='mb-4 flex gap-2'>
                 <h3 className='text-lg'>Batch Size</h3>
                 <HelpTooltip
-                  className='mt-1 w-4 h-4 text-muted-foreground'
+                  className='mt-1 h-4 w-4 text-muted-foreground'
                   message='How many items to translate at once. Higher values are faster but more prone to failure.'
                 />
               </div>
@@ -460,12 +447,12 @@ export function Translate() {
             </div>
 
             <div>
-              <h3 className='text-lg font-semibold mb-4'>Languages to Translate To</h3>
+              <h3 className='mb-4 font-semibold text-lg'>Languages to Translate To</h3>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild={true}>
                   <Button variant='outline'>
                     Select Languages
-                    <span className='text-xs text-muted-foreground'>
+                    <span className='text-muted-foreground text-xs'>
                       ({selectedLanguages.size} selected)
                     </span>
                   </Button>
@@ -495,29 +482,13 @@ export function Translate() {
             </div>
 
             <ActionSection>
-              {isProcessing ? (
-                <>
-                  <ActionSection.Container>
-                    <ActionSection.Button disabled={true}>
-                      <div className='flex items-center'>
-                        <LoaderCircle className='mr-2 h-4 w-4 animate-spin' />
-                        Translating...
-                      </div>
-                    </ActionSection.Button>
-                    <ActionSection.Button onClick={() => setIsCancelled(true)}>
-                      Cancel
-                    </ActionSection.Button>
-                  </ActionSection.Container>
-                  <ActionSection.Progress value={progress} />
-                </>
-              ) : (
-                <ActionSection.Button
-                  onClick={processCsv}
-                  disabled={!(selectedColumn && apiKey)}
-                >
-                  Translate
-                </ActionSection.Button>
-              )}
+              <ActionSection.Button
+                onClick={processCsv}
+                disabled={!(selectedColumn && apiKey) || isProcessing}
+              >
+                Translate
+              </ActionSection.Button>
+              <ActionSection.Progress value={progress} />
             </ActionSection>
           </div>
         </>

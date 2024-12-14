@@ -37,20 +37,20 @@ export function UuidExtractor() {
   };
 
   return (
-    <div className='flex flex-col mb-12'>
+    <div className='mb-12 flex flex-col'>
       <Header>
         <Header.Title>Extract UUIDs</Header.Title>
         <Header.Description>Extract UUIDs from an uploaded file</Header.Description>
       </Header>
 
       <div className='mb-4'>
-        <h3 className='text-lg font-semibold'>Working File</h3>
+        <h3 className='font-semibold text-lg'>Working File</h3>
         <p className='text-muted-foreground text-sm'>The file to extract UUIDs from</p>
       </div>
       <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
       {fileContentParsed.length > 0 && (
         <>
-          <h3 className='font-semibold mb-4 mt-10'>
+          <h3 className='mt-10 mb-4 font-semibold'>
             Select field to extract UUIDs from
           </h3>
           <FieldSelector

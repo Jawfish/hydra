@@ -226,7 +226,7 @@ export function Filter() {
   };
 
   return (
-    <div className='flex flex-col mb-12'>
+    <div className='mb-12 flex flex-col'>
       <Header>
         <Header.Title>Filter</Header.Title>
         <Header.Description>
@@ -235,7 +235,7 @@ export function Filter() {
       </Header>
 
       <div className='mb-4'>
-        <h3 className='text-lg font-semibold'>Working File</h3>
+        <h3 className='font-semibold text-lg'>Working File</h3>
         <p className='text-muted-foreground text-sm'>The file to apply filters to</p>
       </div>
       <FileUpload onFileUpload={handleWorkingFileUpload} fileName={workingFileName} />
@@ -244,7 +244,7 @@ export function Filter() {
         <>
           <Separator className='my-14' />
           <div className='mb-8'>
-            <h3 className='text-lg font-semibold mb-6'>Filter Conditions</h3>
+            <h3 className='mb-6 font-semibold text-lg'>Filter Conditions</h3>
 
             <div className='space-y-4'>
               {filterGroup.conditions.map((condition, index) => (
@@ -285,7 +285,7 @@ export function Filter() {
                     <>
                       {condition.referenceFileName ? (
                         <div
-                          className='text-sm text-muted-foreground truncate max-w-[100px]'
+                          className='max-w-[100px] truncate text-muted-foreground text-sm'
                           title={condition.referenceFileName}
                         >
                           {condition.referenceFileName}
@@ -365,7 +365,7 @@ export function Filter() {
 
             <Separator className='my-14' />
 
-            <div className='flex items-center gap-4 mt-14'>
+            <div className='mt-14 flex items-center gap-4'>
               <Select
                 value={filterGroup.mode || 'keep'}
                 onValueChange={(value: 'keep' | 'remove') =>

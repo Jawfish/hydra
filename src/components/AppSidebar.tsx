@@ -20,13 +20,13 @@ const SidebarRouteItem: React.FC<{ route: Route }> = ({ route }) => {
   };
 
   return (
-    <SidebarMenuItem className={`py-2 -my-1 ${isActive ? 'font-semibold' : ''}`}>
+    <SidebarMenuItem className={`-my-1 py-2 ${isActive ? 'font-semibold' : ''}`}>
       <Link
         to={route.path}
         onClick={handleRouteClick}
         className='ml-2 flex items-center gap-2'
       >
-        <route.icon className={`w-4 h-4 ${isActive ? 'text-primary' : ''}`} />
+        <route.icon className={`h-4 w-4 ${isActive ? 'text-primary' : ''}`} />
         <span>{route.title}</span>
       </Link>
     </SidebarMenuItem>

@@ -161,7 +161,7 @@ export function Backfill() {
   };
 
   return (
-    <div className='flex flex-col mb-12'>
+    <div className='mb-12 flex flex-col'>
       <Header>
         <Header.Title>Backfill</Header.Title>
         <Header.Description>
@@ -172,7 +172,7 @@ export function Backfill() {
       <div className='grid grid-cols-2 gap-8'>
         <div>
           <div className='mb-4'>
-            <h3 className='text-lg font-semibold'>Working File</h3>
+            <h3 className='font-semibold text-lg'>Working File</h3>
             <p className='text-muted-foreground text-sm'>
               The file to backfill data into
             </p>
@@ -183,9 +183,9 @@ export function Backfill() {
           />
           {workingFileName && (
             <div className='mt-4'>
-              <div className='flex gap-4 mb-4'>
-                <div className='flex flex-col gap-2 w-full'>
-                  <label htmlFor='matchField' className='text-sm font-medium'>
+              <div className='mb-4 flex gap-4'>
+                <div className='flex w-full flex-col gap-2'>
+                  <label htmlFor='matchField' className='font-medium text-sm'>
                     Field to match on
                   </label>
                   <Select
@@ -204,8 +204,8 @@ export function Backfill() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className='flex flex-col gap-2 w-full'>
-                  <label htmlFor='fillField' className='text-sm font-medium'>
+                <div className='flex w-full flex-col gap-2'>
+                  <label htmlFor='fillField' className='font-medium text-sm'>
                     Field to backfill data into
                   </label>
                   <Select value={workingFillField} onValueChange={setWorkingFillField}>
@@ -228,7 +228,7 @@ export function Backfill() {
 
         <div>
           <div className='mb-4'>
-            <h3 className='text-lg font-semibold'>Reference File</h3>
+            <h3 className='font-semibold text-lg'>Reference File</h3>
             <p className='text-muted-foreground text-sm'>
               The file to retrieve data from
             </p>
@@ -239,9 +239,9 @@ export function Backfill() {
           />
           {referenceFileName && (
             <div className='mt-4'>
-              <div className='flex gap-4 mb-4'>
-                <div className='flex flex-col gap-2 w-full'>
-                  <label htmlFor='matchField' className='text-sm font-medium'>
+              <div className='mb-4 flex gap-4'>
+                <div className='flex w-full flex-col gap-2'>
+                  <label htmlFor='matchField' className='font-medium text-sm'>
                     Field to match on
                   </label>
                   <Select
@@ -260,8 +260,8 @@ export function Backfill() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className='flex flex-col gap-2 w-full'>
-                  <label htmlFor='fillField' className='text-sm font-medium'>
+                <div className='flex w-full flex-col gap-2'>
+                  <label htmlFor='fillField' className='font-medium text-sm'>
                     Field to retrieve data from
                   </label>
                   <Select
