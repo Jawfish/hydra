@@ -1,3 +1,4 @@
+import { ActionSection } from '@/components/ActionSection';
 import { Progress } from '@/shadcn/components/ui/progress';
 import type { FileType } from '@/store/store';
 import Anthropic from '@anthropic-ai/sdk';
@@ -417,20 +418,21 @@ export function Translate() {
                   </p>
                 </div>
               )}
-              <Button
-                onClick={processCsv}
-                disabled={isProcessing || !selectedColumn || !apiKey}
-                className='max-w-min'
-              >
-                {isProcessing ? (
-                  <div className='flex items-center'>
-                    <LoaderCircle className='mr-2 h-4 w-4 animate-spin' />
-                    Translating...
-                  </div>
-                ) : (
-                  'Translate'
-                )}
-              </Button>
+              <ActionSection>
+                <ActionSection.Button
+                  onClick={processCsv}
+                  disabled={isProcessing || !selectedColumn || !apiKey}
+                >
+                  {isProcessing ? (
+                    <div className='flex items-center'>
+                      <LoaderCircle className='mr-2 h-4 w-4 animate-spin' />
+                      Translating...
+                    </div>
+                  ) : (
+                    'Translate'
+                  )}
+                </ActionSection.Button>
+              </ActionSection>
             </div>
           </div>
         </>
