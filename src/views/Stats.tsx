@@ -232,10 +232,13 @@ export const Stats: React.FC = () => {
         </Header.Description>
       </Header>
 
-      <div className='flex flex-col gap-8'>
-        <div>
-          <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
-        </div>
+      <div className='mb-4'>
+        <h3 className='text-lg font-semibold'>Working File</h3>
+        <p className='text-muted-foreground text-sm'>
+          The file to analyze
+        </p>
+      </div>
+      <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
 
         {fileName && fileContentParsed.length > 0 && (
           <div className='flex flex-col gap-6'>
