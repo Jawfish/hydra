@@ -77,11 +77,13 @@ const evaluateCondition = (value: unknown, condition: FilterCondition): boolean 
     case 'lessThan':
       return Number(value) < Number(condition.value);
     case 'isEmpty':
-      return value === null || 
-             value === undefined || 
-             value === '' || 
-             (Array.isArray(value) && value.length === 0) ||
-             (typeof value === 'object' && value !== null && Object.keys(value).length === 0);
+      return (
+        value === null ||
+        value === undefined ||
+        value === '' ||
+        (Array.isArray(value) && value.length === 0) ||
+        (typeof value === 'object' && value !== null && Object.keys(value).length === 0)
+      );
     case 'inFile':
       return condition.referenceFileContent
         ? condition.referenceFileContent.some(
@@ -313,7 +315,7 @@ export function Filter() {
                               updateCondition(index, {
                                 referenceFileContent: parsedContent,
                                 referenceFileName: fileName,
-                                referenceField: '' // Reset reference field
+                                referenceField: ''
                               });
                             } catch (error) {
                               toast.error(
@@ -335,7 +337,7 @@ export function Filter() {
                         />
                       )}
                     </>
-                  ) : !['isEmpty'].includes(condition.comparison) ? (
+                  ) : ['isEmpty'].includes(condition.comparison) ? null : (
                     <Input
                       type='text'
                       placeholder='Value'
@@ -343,8 +345,6 @@ export function Filter() {
                       onChange={e => updateCondition(index, { value: e.target.value })}
                       className='w-[200px]'
                     />
-                  ) : (
-                    null
                   )}
 
                   <Button
