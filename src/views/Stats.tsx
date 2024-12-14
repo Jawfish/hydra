@@ -2,6 +2,13 @@ import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/shadcn/components/ui/tooltip';
+import { HelpCircle } from 'lucide-react';
+import {
   type FieldAnalysisDetail,
   analyzeField,
   analyzeFieldDetails
@@ -126,12 +133,21 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
       <h3 className='font-medium mb-4'>Inspect Empty Fields</h3>
       <div className='flex gap-4 mb-4'>
         <div className='flex flex-col gap-2'>
-          <label htmlFor='identifier-field' className='text-sm font-medium'>
-            Identifier Field
-          </label>
-          <p className='text-muted-foreground text-sm max-w-xs'>
-            The field to use for identifying the objects containing empty values
-          </p>
+          <div className='flex items-center gap-2'>
+            <label htmlFor='identifier-field' className='text-sm font-medium'>
+              Identifier Field
+            </label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <HelpCircle className='w-4 h-4 text-muted-foreground' />
+                </TooltipTrigger>
+                <TooltipContent>
+                  The field to use for identifying the objects containing empty values
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           <Select value={selectedIdentifier} onValueChange={setSelectedIdentifier}>
             <SelectTrigger>
               <SelectValue placeholder='Select identifier field...' />
@@ -147,12 +163,21 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
         </div>
 
         <div className='flex flex-col gap-2'>
-          <label htmlFor='analyze-field' className='text-sm font-medium'>
-            Analyze Field
-          </label>
-          <p className='text-muted-foreground text-sm'>
-            The field to check for empty values
-          </p>
+          <div className='flex items-center gap-2'>
+            <label htmlFor='analyze-field' className='text-sm font-medium'>
+              Analyze Field
+            </label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <HelpCircle className='w-4 h-4 text-muted-foreground' />
+                </TooltipTrigger>
+                <TooltipContent>
+                  The field to check for empty values
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           <Select
             value={selectedAnalysisField}
             onValueChange={setSelectedAnalysisField}
