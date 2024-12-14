@@ -184,14 +184,16 @@ export function Translate() {
       selectedLanguages: Array.from(selectedLanguages)
     });
 
-    const chunkPromises = chunk.flatMap(row => {
-      // Log details about each row before processing
+    const processedRows: Record<string, string>[] = [];
+
+    for (const row of chunk) {
       console.log('Row details:', {
         rowKeys: Object.keys(row),
         selectedColumnValue: row[selectedColumn],
         selectedColumnType: typeof row[selectedColumn]
       });
-      Array.from(selectedLanguages).map(async language => {
+
+      for (const language of Array.from(selectedLanguages)) {
         try {
           const translatedText = await translateText(
             row[selectedColumn],
@@ -201,7 +203,7 @@ export function Translate() {
           const translatedRow = { ...row };
           translatedRow[languageColumnName] = language;
           translatedRow[translationColumnName] = translatedText;
-          return translatedRow;
+          processedRows.push(translatedRow);
         } catch (_error) {
           console.error('Translation failed for row:', {
             row,
@@ -212,14 +214,14 @@ export function Translate() {
           errorRow[languageColumnName] = language;
           errorRow[translationColumnName] =
             'Translation failed after multiple attempts';
-          return errorRow;
+          processedRows.push(errorRow);
         } finally {
           onProgress();
         }
-      })
-    );
+      }
+    }
 
-    return Promise.all(chunkPromises);
+    return processedRows;
   };
 
   const downloadOutput = (
