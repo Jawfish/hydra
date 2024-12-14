@@ -1,8 +1,8 @@
 import { Layout } from '@/components/Layout';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { defaultRoute, routes } from '@/routes';
 import { SidebarProvider } from '@/shadcn/components/ui/sidebar';
 import { Toaster } from '@/shadcn/components/ui/sonner';
-import { defaultRoute, routes } from '@/routes';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 function App() {
