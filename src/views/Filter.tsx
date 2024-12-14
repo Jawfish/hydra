@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/shadcn/components/ui/select';
+import { Separator } from '@/shadcn/components/ui/separator';
 import { type FileType, useWorkingFileStore } from '@/store/store';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -160,20 +161,22 @@ export function Filter() {
       return;
     }
 
-    if (filterGroup.conditions.some(condition => {
-      // Check basic conditions for non-file comparisons
-      if (!['inFile', 'notInFile'].includes(condition.comparison)) {
-        return !(condition.field && condition.value);
-      }
-      
-      // For file-based comparisons, check additional conditions
-      return !(
-        condition.field && 
-        condition.comparison && 
-        condition.referenceFileContent && 
-        condition.referenceField
-      );
-    })) {
+    if (
+      filterGroup.conditions.some(condition => {
+        // Check basic conditions for non-file comparisons
+        if (!['inFile', 'notInFile'].includes(condition.comparison)) {
+          return !(condition.field && condition.value);
+        }
+
+        // For file-based comparisons, check additional conditions
+        return !(
+          condition.field &&
+          condition.comparison &&
+          condition.referenceFileContent &&
+          condition.referenceField
+        );
+      })
+    ) {
       toast.error('Please complete all filter conditions');
       return;
     }
@@ -204,7 +207,7 @@ export function Filter() {
       window.URL.revokeObjectURL(url);
 
       toast.success(
-        `Filtered ${workingFileContent.length - filteredContent.length} entries`
+        `Removed ${workingFileContent.length - filteredContent.length} entries`
       );
     } catch (error) {
       console.error('Filter Error:', error);
@@ -223,177 +226,182 @@ export function Filter() {
         </Header.Description>
       </Header>
 
-      <div className='mb-8'>
-        <div className='mb-4'>
-          <h3 className='text-lg font-semibold'>Working File</h3>
-          <p className='text-muted-foreground text-sm'>The file to apply filters to</p>
-        </div>
-        <FileUpload onFileUpload={handleWorkingFileUpload} fileName={workingFileName} />
+      <div className='mb-4'>
+        <h3 className='text-lg font-semibold'>Working File</h3>
+        <p className='text-muted-foreground text-sm'>The file to apply filters to</p>
       </div>
+      <FileUpload onFileUpload={handleWorkingFileUpload} fileName={workingFileName} />
 
       {workingFileName && (
-        <div className='mb-8'>
-          <div className='flex items-center gap-4 mb-4'>
-            <h3 className='text-lg font-semibold'>Filter Conditions</h3>
-            <Select
-              value={filterGroup.mode || 'keep'}
-              onValueChange={(value: 'keep' | 'remove') =>
-                setFilterGroup(prev => ({ ...prev, mode: value }))
-              }
-            >
-              <SelectTrigger className='w-[180px]'>
-                <SelectValue placeholder='Select mode' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='keep'>Keep matching entries</SelectItem>
-                <SelectItem value='remove'>Remove matching entries</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select
-              value={filterGroup.operator}
-              onValueChange={(value: LogicalOperator) =>
-                setFilterGroup(prev => ({ ...prev, operator: value }))
-              }
-            >
-              <SelectTrigger className='w-[180px]'>
-                <SelectValue placeholder='Select operator' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='AND'>Match ALL conditions</SelectItem>
-                <SelectItem value='OR'>Match ANY condition</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <>
+          <Separator className='my-14' />
+          <div className='mb-8'>
+            <h3 className='text-lg font-semibold mb-6'>Filter Conditions</h3>
 
-          <div className='space-y-4'>
-            {filterGroup.conditions.map((condition, index) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: order is not expected to change
-              <div key={index} className='flex gap-4 items-start'>
-                <FieldSelector
-                  fields={workingFileSchema}
-                  selectedField={condition.field}
-                  onFieldSelect={value => updateCondition(index, { field: value })}
-                  placeholder='Select field'
-                />
-
-                <Select
-                  value={condition.comparison}
-                  onValueChange={(value: ComparisonType) =>
-                    updateCondition(index, { comparison: value })
-                  }
-                >
-                  <SelectTrigger className='w-[200px]'>
-                    <SelectValue placeholder='Select comparison' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='equals'>Equals</SelectItem>
-                    <SelectItem value='notEquals'>Does not equal</SelectItem>
-                    <SelectItem value='contains'>Contains</SelectItem>
-                    <SelectItem value='notContains'>Does not contain</SelectItem>
-                    <SelectItem value='startsWith'>Starts with</SelectItem>
-                    <SelectItem value='endsWith'>Ends with</SelectItem>
-                    <SelectItem value='greaterThan'>Greater than</SelectItem>
-                    <SelectItem value='lessThan'>Less than</SelectItem>
-                    <SelectItem value='inFile'>In File</SelectItem>
-                    <SelectItem value='notInFile'>Not in File</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {['inFile', 'notInFile'].includes(condition.comparison) ? (
-                  <div className='flex items-center gap-2'>
-                    <FileUpload
-                      hideName={true}
-                      onFileUpload={(fileName, fileContent, fileType) => {
-                        let parsedContent: Record<string, unknown>[];
-
-                        try {
-                          switch (fileType) {
-                            case 'csv':
-                              parsedContent = csvToJson(fileContent);
-                              break;
-                            case 'json':
-                              parsedContent = parseJson(fileContent);
-                              break;
-                            case 'jsonl':
-                              parsedContent = jsonlToJson(fileContent);
-                              break;
-                            default:
-                              throw new Error('Unsupported file type');
-                          }
-                        } catch (error) {
-                          toast.error(
-                            `Error parsing file: ${error instanceof Error ? error.message : 'Unknown error'}`
-                          );
-                          return;
-                        }
-
-                        updateCondition(index, {
-                          referenceFileContent: parsedContent,
-                          referenceFileName: fileName
-                        });
-                      }}
-                      fileName={condition.referenceFileName || null}
-                    />
-                    {condition.referenceFileContent && (
-                      <FieldSelector
-                        fields={getAllPaths(condition.referenceFileContent[0] || {})}
-                        selectedField={condition.referenceField || ''}
-                        onFieldSelect={value =>
-                          updateCondition(index, { referenceField: value })
-                        }
-                        placeholder='Select reference field'
-                      />
-                    )}
-                  </div>
-                ) : (
-                  <Input
-                    type='text'
-                    placeholder='Value'
-                    value={condition.value}
-                    onChange={e => updateCondition(index, { value: e.target.value })}
-                    className='w-[200px]'
+            <div className='space-y-4'>
+              {filterGroup.conditions.map((condition, index) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: order is not expected to change
+                <div key={index} className='flex gap-4 items-start'>
+                  <FieldSelector
+                    fields={workingFileSchema}
+                    selectedField={condition.field}
+                    onFieldSelect={value => updateCondition(index, { field: value })}
+                    placeholder='Select field'
                   />
-                )}
 
-                <Button
-                  variant='destructive'
-                  onClick={() => removeCondition(index)}
-                  disabled={filterGroup.conditions.length === 1}
-                >
-                  Remove
-                </Button>
-              </div>
-            ))}
-          </div>
+                  <Select
+                    value={condition.comparison}
+                    onValueChange={(value: ComparisonType) =>
+                      updateCondition(index, { comparison: value })
+                    }
+                  >
+                    <SelectTrigger className='w-[200px]'>
+                      <SelectValue placeholder='Select comparison' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value='equals'>Equals</SelectItem>
+                      <SelectItem value='notEquals'>Does not equal</SelectItem>
+                      <SelectItem value='contains'>Contains</SelectItem>
+                      <SelectItem value='notContains'>Does not contain</SelectItem>
+                      <SelectItem value='startsWith'>Starts with</SelectItem>
+                      <SelectItem value='endsWith'>Ends with</SelectItem>
+                      <SelectItem value='greaterThan'>Greater than</SelectItem>
+                      <SelectItem value='lessThan'>Less than</SelectItem>
+                      <SelectItem value='inFile'>In File</SelectItem>
+                      <SelectItem value='notInFile'>Not in File</SelectItem>
+                    </SelectContent>
+                  </Select>
 
-          <div className='mt-4'>
-            <Button onClick={addCondition} variant='outline'>
-              Add Condition
-            </Button>
-          </div>
+                  {['inFile', 'notInFile'].includes(condition.comparison) ? (
+                    <div className='flex items-center gap-2'>
+                      <FileUpload
+                        hideName={true}
+                        onFileUpload={(fileName, fileContent, fileType) => {
+                          let parsedContent: Record<string, unknown>[];
 
-          <div className='mt-8'>
-            <Button
-              onClick={processFilter}
-              disabled={filterGroup.conditions.some(condition => {
-                // Check basic conditions for non-file comparisons
-                if (!['inFile', 'notInFile'].includes(condition.comparison)) {
-                  return !(condition.field && condition.value);
+                          try {
+                            switch (fileType) {
+                              case 'csv':
+                                parsedContent = csvToJson(fileContent);
+                                break;
+                              case 'json':
+                                parsedContent = parseJson(fileContent);
+                                break;
+                              case 'jsonl':
+                                parsedContent = jsonlToJson(fileContent);
+                                break;
+                              default:
+                                throw new Error('Unsupported file type');
+                            }
+                          } catch (error) {
+                            toast.error(
+                              `Error parsing file: ${error instanceof Error ? error.message : 'Unknown error'}`
+                            );
+                            return;
+                          }
+
+                          updateCondition(index, {
+                            referenceFileContent: parsedContent,
+                            referenceFileName: fileName
+                          });
+                        }}
+                        fileName={condition.referenceFileName || null}
+                      />
+                      {condition.referenceFileContent && (
+                        <FieldSelector
+                          fields={getAllPaths(condition.referenceFileContent[0] || {})}
+                          selectedField={condition.referenceField || ''}
+                          onFieldSelect={value =>
+                            updateCondition(index, { referenceField: value })
+                          }
+                          placeholder='Select reference field'
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <Input
+                      type='text'
+                      placeholder='Value'
+                      value={condition.value}
+                      onChange={e => updateCondition(index, { value: e.target.value })}
+                      className='w-[200px]'
+                    />
+                  )}
+
+                  <Button
+                    variant='destructive'
+                    onClick={() => removeCondition(index)}
+                    disabled={filterGroup.conditions.length === 1}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            <div className='mt-4'>
+              <Button onClick={addCondition} variant='outline'>
+                Add Condition
+              </Button>
+            </div>
+
+            <Separator className='my-14' />
+
+            <div className='flex items-center gap-4 mt-8'>
+              <Select
+                value={filterGroup.mode || 'keep'}
+                onValueChange={(value: 'keep' | 'remove') =>
+                  setFilterGroup(prev => ({ ...prev, mode: value }))
                 }
-                
-                // For file-based comparisons, check additional conditions
-                return !(
-                  condition.field && 
-                  condition.comparison && 
-                  condition.referenceFileContent && 
-                  condition.referenceField
-                );
-              })}
-            >
-              Apply Filters
-            </Button>
+              >
+                <SelectTrigger className='w-[96px]'>
+                  <SelectValue placeholder='Select mode' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='keep'>Keep</SelectItem>
+                  <SelectItem value='remove'>Remove</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>entries that</span>
+              <Select
+                value={filterGroup.operator}
+                onValueChange={(value: LogicalOperator) =>
+                  setFilterGroup(prev => ({ ...prev, operator: value }))
+                }
+              >
+                <SelectTrigger className='w-[180px]'>
+                  <SelectValue placeholder='Select operator' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='AND'>Match ALL conditions</SelectItem>
+                  <SelectItem value='OR'>Match ANY condition</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className='mt-8'>
+              <Button
+                onClick={processFilter}
+                disabled={filterGroup.conditions.some(condition => {
+                  // Check basic conditions for non-file comparisons
+                  if (!['inFile', 'notInFile'].includes(condition.comparison)) {
+                    return !(condition.field && condition.value);
+                  }
+
+                  // For file-based comparisons, check additional conditions
+                  return !(
+                    condition.field &&
+                    condition.comparison &&
+                    condition.referenceFileContent &&
+                    condition.referenceField
+                  );
+                })}
+              >
+                Apply Filters
+              </Button>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
