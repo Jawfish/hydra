@@ -1,10 +1,10 @@
+import { ActionSection } from '@/components/ActionSection';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { getAllPaths, normalizeString } from '@/lib/parse';
 import { getValueByPath } from '@/lib/parse';
 import { serializeJson } from '@/lib/parse';
-import { Button } from '@/shadcn/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -287,8 +287,8 @@ export function Backfill() {
       </div>
 
       {workingFileName && referenceFileName && (
-        <div className='mt-8'>
-          <Button
+        <ActionSection>
+          <ActionSection.Button
             onClick={performBackfill}
             disabled={
               !(
@@ -300,8 +300,8 @@ export function Backfill() {
             }
           >
             Perform Backfill
-          </Button>
-        </div>
+          </ActionSection.Button>
+        </ActionSection>
       )}
     </div>
   );
