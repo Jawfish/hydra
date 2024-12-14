@@ -19,6 +19,56 @@ import {
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+// Helper function to create a normalized set of reference values
+const createReferenceValueSet = (
+  referenceFileContent: Record<string, unknown>[],
+  referenceMatchField: string
+): Set<string> => {
+  return new Set(
+    referenceFileContent.map(row =>
+      normalizeString(getValueByPath(row, referenceMatchField) as string)
+    )
+  );
+};
+
+// Helper function to filter out duplicates
+const filterOutDuplicates = (
+  workingFileContent: Record<string, unknown>[],
+  workingMatchField: string,
+  referenceValues: Set<string>
+): Record<string, unknown>[] => {
+  return workingFileContent.filter(
+    row =>
+      !referenceValues.has(
+        normalizeString(getValueByPath(row, workingMatchField) as string)
+      )
+  );
+};
+
+// Helper function to create and trigger file download
+const downloadFilteredFile = (
+  result: Record<string, unknown>[],
+  workingFileName: string | null
+): void => {
+  const fileType = (workingFileName?.split('.').pop() as FileType) || 'csv';
+  const output = serializeJson(result, fileType);
+  const blob = new Blob([output], {
+    type:
+      fileType === 'json'
+        ? 'application/json'
+        : fileType === 'jsonl'
+          ? 'application/jsonl'
+          : 'text/csv'
+  });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  a.download = `deduplicated_${timestamp}.${fileType}`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+};
+
 export function Deduplicate() {
   const { fileName: workingFileName, fileContentParsed: workingFileContent } =
     useWorkingFileStore();
@@ -49,6 +99,7 @@ export function Deduplicate() {
   const handleReferenceFileUpload = useFileUpload('reference');
 
   const processDeduplicate = () => {
+    // Validation checks
     if (!(workingFileName && referenceFileName)) {
       toast.error('Please upload both files');
       return;
@@ -64,47 +115,31 @@ export function Deduplicate() {
 
       // Create set of normalized reference values
       console.time('reference-set');
-      const referenceValues = new Set(
-        referenceFileContent.map(row =>
-          normalizeString(getValueByPath(row, referenceMatchField) as string)
-        )
+      const referenceValues = createReferenceValueSet(
+        referenceFileContent,
+        referenceMatchField
       );
       console.timeEnd('reference-set');
 
       // Filter working file
       console.time('filter');
       const originalCount = workingFileContent.length;
-      const result = workingFileContent.filter(
-        row =>
-          !referenceValues.has(
-            normalizeString(getValueByPath(row, workingMatchField) as string)
-          )
+      const result = filterOutDuplicates(
+        workingFileContent,
+        workingMatchField,
+        referenceValues
       );
       const finalCount = result.length;
       console.timeEnd('filter');
 
       // Create download
       console.time('download');
-      const fileType = (workingFileName?.split('.').pop() as FileType) || 'csv';
-      const output = serializeJson(result, fileType);
-      const blob = new Blob([output], {
-        type:
-          fileType === 'json'
-            ? 'application/json'
-            : fileType === 'jsonl'
-              ? 'application/jsonl'
-              : 'text/csv'
-      });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      a.download = `deduplicated_${timestamp}.${fileType}`;
-      a.click();
-      window.URL.revokeObjectURL(url);
+      downloadFilteredFile(result, workingFileName);
       console.timeEnd('download');
 
       console.timeEnd('deduplicate');
+
+      // Success toast
       toast.success(
         `Removed ${originalCount - finalCount} duplicate ${
           originalCount - finalCount === 1 ? 'entry' : 'entries'
