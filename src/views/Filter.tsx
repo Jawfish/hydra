@@ -1,5 +1,5 @@
-import { FileUpload } from '@/components/FileUpload';
 import { FieldSelector } from '@/components/FieldSelector';
+import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import {
@@ -9,6 +9,7 @@ import {
   serializeJson
 } from '@/lib/parse';
 import { Button } from '@/shadcn/components/ui/button';
+import { Input } from '@/shadcn/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -16,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/shadcn/components/ui/select';
-import { Input } from '@/shadcn/components/ui/input';
 import {
   type FileType,
   useReferenceFileStore,
@@ -98,8 +98,9 @@ const evaluateFilterGroup = (
 ): boolean => {
   const evaluateConditionWithRef = (condition: FilterCondition) => {
     const value = getValueByPath(row, condition.field);
-    const refValues = 
-      condition.referenceField && referenceValues?.get(condition.referenceField) || undefined;
+    const refValues =
+      (condition.referenceField && referenceValues?.get(condition.referenceField)) ||
+      undefined;
     return evaluateCondition(value, condition, refValues);
   };
 
@@ -213,7 +214,7 @@ export function Filter() {
       <Header>
         <Header.Title>Filter</Header.Title>
         <Header.Description>
-          Filter entries based on multiple conditions
+          Filter entries based on conditions across one or more files
         </Header.Description>
       </Header>
 
