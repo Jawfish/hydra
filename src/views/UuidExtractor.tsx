@@ -5,8 +5,10 @@ import { Metadata } from '@/components/Metadata';
 import { UuidDisplay } from '@/components/UuidDisplay';
 import { UuidInput } from '@/components/UuidInput';
 import { Separator } from '@/components/ui/separator';
-import { extractUuids, extractUuidsFromCsv, extractUuidsFromJsonl } from '@/lib/uuid';
+import { getAllPaths, getValueByPath } from '@/lib/parse';
+import { extractUuids } from '@/lib/uuid';
 import { useFileStore } from '@/store/store';
+import { useMemo } from 'react';
 
 export function UuidExtractor() {
   const {
@@ -16,21 +18,30 @@ export function UuidExtractor() {
     resetFileState,
     input,
     fileType,
-    jsonlSchema,
-    csvHeaders,
+    fileContentParsed,
+    fileName,
     selectedField,
     extractedUuids
   } = useFileStore();
 
+  // Dynamically generate fields based on parsed content
+  const availableFields = useMemo(() => {
+    if (fileContentParsed.length === 0) return [];
+    return getAllPaths(fileContentParsed[0] || {});
+  }, [fileContentParsed]);
+
   const handleFieldSelection = (field: string) => {
     setSelectedField(field);
-    if (fileType === 'jsonl') {
-      const uuids = extractUuidsFromJsonl(useFileStore.getState().fileContent, field);
-      setExtractedUuids(uuids);
-    } else if (fileType === 'csv') {
-      const uuids = extractUuidsFromCsv(useFileStore.getState().fileContent, field);
-      setExtractedUuids(uuids);
-    }
+    
+    // Use consistent extraction method across file types
+    const uuids = fileContentParsed
+      .map(row => {
+        const value = getValueByPath(row, field);
+        return value ? extractUuids(value.toString()) : [];
+      })
+      .flat();
+
+    setExtractedUuids(uuids);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -60,9 +71,10 @@ export function UuidExtractor() {
             Select {fileType === 'jsonl' ? 'field' : 'column'} to extract UUIDs from
           </h3>
           <FieldSelector
-            fields={fileType === 'jsonl' ? jsonlSchema : csvHeaders}
+            fields={availableFields}
             selectedField={selectedField}
             onFieldSelect={handleFieldSelection}
+            placeholder={`Select ${fileType} field`}
           />
         </>
       )}
