@@ -364,7 +364,7 @@ export function Filter() {
 
             <Separator className='my-14' />
 
-            <div className='flex items-center gap-4 mt-8'>
+            <div className='flex items-center gap-4 mt-14'>
               <Select
                 value={filterGroup.mode || 'keep'}
                 onValueChange={(value: 'keep' | 'remove') =>
@@ -395,8 +395,6 @@ export function Filter() {
                 </SelectContent>
               </Select>
             </div>
-
-            <Separator className='my-14' />
 
             <div className='flex flex-col gap-6 bg-muted p-6 -m-6 mt-6 rounded-md'>
               <Button
