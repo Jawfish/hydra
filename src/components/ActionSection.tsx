@@ -19,8 +19,10 @@ interface ActionSectionProgressProps {
 }
 
 export const ActionSection = ({ children }: ActionSectionProps) => (
-  <div className='flex items-center justify-between gap-6 bg-muted p-6 -m-6 mt-6 rounded-md'>
-    {children}
+  <div className='flex flex-col gap-6 bg-muted p-6 -m-6 mt-6 rounded-md'>
+    <div className='flex items-center justify-between'>
+      {children}
+    </div>
   </div>
 );
 
