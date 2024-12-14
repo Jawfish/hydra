@@ -87,8 +87,8 @@ export function MapValues() {
             </Header.Description>
           </Header>
         </div>
-        <FileUpload 
-          onFileUpload={(fileName, fileContent, fileType) => {
+        <FileUpload
+          onFileUpload={(_, fileContent, fileType) => {
             useWorkingFileStore.getState().setFileContent(fileContent, fileType);
           }}
           fileName={fileName}
