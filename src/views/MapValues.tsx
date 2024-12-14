@@ -1,6 +1,7 @@
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
+import { useFileUpload } from '@/hooks/use-file-upload';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,6 +17,8 @@ interface MappedValue {
 
 export function MapValues() {
   const { fileContentParsed, fileName } = useWorkingFileStore();
+  const handleFileUpload = useFileUpload('working');
+  
   const availableFields = fileContentParsed[0] ? getAllPaths(fileContentParsed[0]) : [];
 
   const [keyField, setKeyField] = useState<string>('');
@@ -88,9 +91,7 @@ export function MapValues() {
           </Header>
         </div>
         <FileUpload
-          onFileUpload={(_, fileContent, fileType) => {
-            useWorkingFileStore.getState().setFileContent(fileContent, fileType);
-          }}
+          onFileUpload={handleFileUpload}
           fileName={fileName}
         />
       </div>
