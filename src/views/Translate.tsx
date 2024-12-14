@@ -58,6 +58,12 @@ export function Translate() {
   const [apiKey, setApiKey] = useState<string>(() => {
     return localStorage.getItem('anthropicApiKey') || '';
   });
+
+  const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newApiKey = e.target.value;
+    setApiKey(newApiKey);
+    localStorage.setItem('anthropicApiKey', newApiKey);
+  };
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState<number>(0);
   const [selectedLanguages, setSelectedLanguages] = useState<Set<string>>(
@@ -291,17 +297,20 @@ export function Translate() {
           <div className='flex flex-col gap-8'>
             <div>
               <h3 className='text-lg font-semibold mb-4'>Anthropic API Key</h3>
-              <Input
-                type='password'
-                placeholder='Enter your Anthropic API key'
-                value={apiKey}
-                onChange={e => {
-                  const newApiKey = e.target.value;
-                  setApiKey(newApiKey);
-                  localStorage.setItem('anthropicApiKey', newApiKey);
-                }}
-                className='max-w-md'
-              />
+              <form onSubmit={(e) => e.preventDefault()} className='max-w-md'>
+                <label htmlFor='anthropicApiKey' className='block text-sm font-medium mb-2'>
+                  Anthropic API Key
+                </label>
+                <Input
+                  id='anthropicApiKey'
+                  type='password'
+                  placeholder='Enter your Anthropic API key'
+                  autoComplete='current-password'
+                  value={apiKey}
+                  onChange={handleApiKeyChange}
+                  className='w-full'
+                />
+              </form>
             </div>
 
             <div>
