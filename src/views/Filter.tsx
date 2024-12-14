@@ -273,54 +273,39 @@ export function Filter() {
                   </Select>
 
                   {['inFile', 'notInFile'].includes(condition.comparison) ? (
-                    <div className='flex items-center gap-2'>
-                      <FileUpload
-                        hideName={true}
-                        onFileUpload={(fileName, fileContent, fileType) => {
-                          let parsedContent: Record<string, unknown>[];
+                    <FileUpload
+                      hideName={true}
+                      onFileUpload={(fileName, fileContent, fileType) => {
+                        let parsedContent: Record<string, unknown>[];
 
-                          try {
-                            switch (fileType) {
-                              case 'csv':
-                                parsedContent = csvToJson(fileContent);
-                                break;
-                              case 'json':
-                                parsedContent = parseJson(fileContent);
-                                break;
-                              case 'jsonl':
-                                parsedContent = jsonlToJson(fileContent);
-                                break;
-                              default:
-                                throw new Error('Unsupported file type');
-                            }
-                          } catch (error) {
-                            toast.error(
-                              `Error parsing file: ${error instanceof Error ? error.message : 'Unknown error'}`
-                            );
-                            return;
+                        try {
+                          switch (fileType) {
+                            case 'csv':
+                              parsedContent = csvToJson(fileContent);
+                              break;
+                            case 'json':
+                              parsedContent = parseJson(fileContent);
+                              break;
+                            case 'jsonl':
+                              parsedContent = jsonlToJson(fileContent);
+                              break;
+                            default:
+                              throw new Error('Unsupported file type');
                           }
+                        } catch (error) {
+                          toast.error(
+                            `Error parsing file: ${error instanceof Error ? error.message : 'Unknown error'}`
+                          );
+                          return;
+                        }
 
-                          updateCondition(index, {
-                            referenceFileContent: parsedContent,
-                            referenceFileName: fileName
-                          });
-                        }}
-                        fileName={condition.referenceFileName || null}
-                      />
-                      <FieldSelector
-                        fields={condition.referenceFileContent 
-                          ? getAllPaths(condition.referenceFileContent[0] || {})
-                          : [] // Explicitly pass empty array to force render
-                        }
-                        selectedField={condition.referenceFileContent ? (condition.referenceField || '') : ''}
-                        onFieldSelect={condition.referenceFileContent 
-                          ? (value => updateCondition(index, { referenceField: value }))
-                          : () => {} // No-op handler when no file
-                        }
-                        placeholder='Upload reference file first'
-                        disabled={!condition.referenceFileContent}
-                      />
-                    </div>
+                        updateCondition(index, {
+                          referenceFileContent: parsedContent,
+                          referenceFileName: fileName
+                        });
+                      }}
+                      fileName={condition.referenceFileName || null}
+                    />
                   ) : (
                     <Input
                       type='text'
