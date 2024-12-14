@@ -55,6 +55,11 @@ const evaluateCondition = (
   condition: FilterCondition,
   referenceValues?: Set<string>
 ): boolean => {
+  // Add a null check for referenceValues
+  if (condition.useReference && !referenceValues) {
+    return false;
+  }
+
   const normalizedValue = normalizeString(String(value));
   const normalizedTestValue = normalizeString(condition.value);
 
@@ -93,8 +98,8 @@ const evaluateFilterGroup = (
 ): boolean => {
   const evaluateConditionWithRef = (condition: FilterCondition) => {
     const value = getValueByPath(row, condition.field);
-    const refValues =
-      condition.referenceField && referenceValues?.get(condition.referenceField);
+    const refValues = 
+      condition.referenceField && referenceValues?.get(condition.referenceField) || undefined;
     return evaluateCondition(value, condition, refValues);
   };
 
