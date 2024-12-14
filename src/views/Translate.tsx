@@ -141,7 +141,7 @@ export function Translate() {
     }
 
     return retry(
-      async (bail) => {
+      async () => {
         try {
           const response = await anthropic.messages.create({
             model: 'claude-3-5-sonnet-20241022',
@@ -164,15 +164,6 @@ export function Translate() {
           
           return translatedText;
         } catch (error) {
-          // Determine if we should retry or bail
-          if (error instanceof Anthropic.APIError) {
-            // Bail on client errors (4xx)
-            if (error.status && error.status >= 400 && error.status < 500) {
-              bail(error);
-              return '';
-            }
-          }
-          
           console.error('Translation attempt failed:', {
             error,
             text,
