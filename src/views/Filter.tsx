@@ -335,7 +335,7 @@ export function Filter() {
                         />
                       )}
                     </>
-                  ) : (
+                  ) : !['isEmpty'].includes(condition.comparison) ? (
                     <Input
                       type='text'
                       placeholder='Value'
@@ -343,6 +343,8 @@ export function Filter() {
                       onChange={e => updateCondition(index, { value: e.target.value })}
                       className='w-[200px]'
                     />
+                  ) : (
+                    null
                   )}
 
                   <Button
