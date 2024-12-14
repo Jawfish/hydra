@@ -125,6 +125,19 @@ export function Translate() {
     language: string,
     anthropic: Anthropic
   ): Promise<string> => {
+    console.log('Translating text:', {
+      textLength: text.length,
+      textType: typeof text,
+      textValue: text,
+      language: language
+    });
+
+    // Validate text before translation
+    if (!text || text.trim() === '') {
+      console.warn('Attempted to translate empty text');
+      return 'No text to translate';
+    }
+
     try {
       const response = await anthropic.messages.create({
         model: 'claude-3-5-sonnet-20241022',
@@ -138,12 +151,20 @@ export function Translate() {
         system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
       });
       
-      // Extract text from first content block
+      console.log('Translation response:', {
+        responseContent: response.content,
+        translatedText: response.content[0]?.text
+      });
+
       const translatedText = response.content[0]?.text || '';
       
       return translatedText;
     } catch (error) {
-      console.error('Translation attempt failed:', error);
+      console.error('Translation attempt failed:', {
+        error,
+        text,
+        language
+      });
       throw error;
     }
   };
@@ -157,7 +178,19 @@ export function Translate() {
     anthropic: Anthropic,
     onProgress: () => void
   ): Promise<Record<string, string>[]> => {
-    const chunkPromises = chunk.flatMap(row =>
+    console.log('Processing chunk:', {
+      chunkSize: chunk.length,
+      selectedColumn,
+      selectedLanguages: Array.from(selectedLanguages)
+    });
+
+    const chunkPromises = chunk.flatMap(row => {
+      // Log details about each row before processing
+      console.log('Row details:', {
+        rowKeys: Object.keys(row),
+        selectedColumnValue: row[selectedColumn],
+        selectedColumnType: typeof row[selectedColumn]
+      });
       Array.from(selectedLanguages).map(async language => {
         try {
           const translatedText = await translateText(
@@ -170,6 +203,11 @@ export function Translate() {
           translatedRow[translationColumnName] = translatedText;
           return translatedRow;
         } catch (_error) {
+          console.error('Translation failed for row:', {
+            row,
+            language,
+            error: _error
+          });
           const errorRow = { ...row };
           errorRow[languageColumnName] = language;
           errorRow[translationColumnName] =
