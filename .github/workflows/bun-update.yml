@@ -21,10 +21,23 @@ jobs:
         with:
           bun-version: "latest"
 
+      - name: Check for outdated dependencies
+        id: check_outdated
+        run: |
+          bun outdated > outdated.txt
+          if [[ $(wc -l < outdated.txt) -eq 1 ]]; then
+            echo "::notice::No outdated dependencies found"
+            echo "has_updates=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_updates=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Update dependencies
+        if: steps.check_outdated.outputs.has_updates == 'true'
         run: bun update --latest
 
       - name: Check for changes and commit
+        if: steps.check_outdated.outputs.has_updates == 'true'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
