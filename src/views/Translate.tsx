@@ -67,6 +67,7 @@ export function Translate() {
   };
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState<number>(0);
+  const [isCancelled, setIsCancelled] = useState(false);
   const [selectedLanguages, setSelectedLanguages] = useState<Set<string>>(
     new Set(DEFAULT_ENABLED_LANGUAGES)
   );
@@ -217,6 +218,8 @@ export function Translate() {
   };
 
   const processCsv = async () => {
+    setIsCancelled(false);
+    
     if (
       !validateInputs(
         selectedColumn,
@@ -254,6 +257,11 @@ export function Translate() {
       );
 
       for (let i = 0; i < rows.length; i += chunkSize) {
+        if (isCancelled) {
+          toast.info('Translation process cancelled');
+          return;
+        }
+        
         const chunk = rows.slice(i, i + chunkSize);
         const chunkResults = await processRowChunk(
           chunk,
@@ -263,6 +271,7 @@ export function Translate() {
           translationColumnName,
           anthropic,
           () => {
+            if (isCancelled) return;
             completedOperations++;
             setProgress(Math.round((completedOperations / totalOperations) * 100));
           }
@@ -281,6 +290,7 @@ export function Translate() {
     } finally {
       setIsProcessing(false);
       setProgress(0);
+      setIsCancelled(false);
     }
   };
 
@@ -419,19 +429,26 @@ export function Translate() {
                 </div>
               )}
               <ActionSection>
-                <ActionSection.Button
-                  onClick={processCsv}
-                  disabled={isProcessing || !selectedColumn || !apiKey}
-                >
-                  {isProcessing ? (
-                    <div className='flex items-center'>
-                      <LoaderCircle className='mr-2 h-4 w-4 animate-spin' />
-                      Translating...
-                    </div>
-                  ) : (
-                    'Translate'
-                  )}
-                </ActionSection.Button>
+                {isProcessing ? (
+                  <>
+                    <ActionSection.Button onClick={() => setIsCancelled(true)}>
+                      Cancel
+                    </ActionSection.Button>
+                    <ActionSection.Button disabled={true}>
+                      <div className='flex items-center'>
+                        <LoaderCircle className='mr-2 h-4 w-4 animate-spin' />
+                        Translating...
+                      </div>
+                    </ActionSection.Button>
+                  </>
+                ) : (
+                  <ActionSection.Button
+                    onClick={processCsv}
+                    disabled={!selectedColumn || !apiKey}
+                  >
+                    Translate
+                  </ActionSection.Button>
+                )}
               </ActionSection>
             </div>
           </div>
