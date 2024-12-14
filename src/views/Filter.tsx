@@ -1,4 +1,5 @@
 import { FileUpload } from '@/components/FileUpload';
+import { FieldSelector } from '@/components/FieldSelector';
 import { Header } from '@/components/Header';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { getAllPaths, getValueByPath, normalizeString, serializeJson } from '@/lib/parse';
@@ -226,23 +227,14 @@ export function Filter() {
           <div className="space-y-4">
             {filterGroup.conditions.map((condition, index) => (
               <div key={index} className="flex gap-4 items-start">
-                <Select
-                  value={condition.field}
-                  onValueChange={(value) =>
+                <FieldSelector
+                  fields={workingFileSchema}
+                  selectedField={condition.field}
+                  onFieldSelect={(value) =>
                     updateCondition(index, { field: value })
                   }
-                >
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Select field" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {workingFileSchema.map((field) => (
-                      <SelectItem key={field} value={field}>
-                        {field}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  placeholder="Select field"
+                />
 
                 <Select
                   value={condition.comparison}
