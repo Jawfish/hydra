@@ -20,9 +20,7 @@ const SidebarRouteItem: React.FC<{ route: Route }> = ({ route }) => {
   };
 
   return (
-    <SidebarMenuItem
-      className={`py-2 -my-1 ${isActive ? 'bg-primary/10 font-semibold' : ''}`}
-    >
+    <SidebarMenuItem className={`py-2 -my-1 ${isActive ? 'font-semibold' : ''}`}>
       <Link
         to={route.path}
         onClick={handleRouteClick}
