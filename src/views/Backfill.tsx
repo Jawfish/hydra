@@ -1,17 +1,17 @@
-import { useFileUpload } from '@/hooks/use-file-upload';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
-import { Button } from '@/components/ui/button';
+import { useFileUpload } from '@/hooks/useFileUpload';
+import { getAllPaths, normalizeString } from '@/lib/parse';
+import { getValueByPath } from '@/lib/parse';
+import { serializeJson } from '@/lib/parse';
+import { Button } from '@/shadcn/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from '@/components/ui/select';
-import { getAllPaths, normalizeString } from '@/lib/parse';
-import { getValueByPath } from '@/lib/parse';
-import { serializeJson } from '@/lib/parse';
+} from '@/shadcn/components/ui/select';
 import {
   type FileType,
   useReferenceFileStore,

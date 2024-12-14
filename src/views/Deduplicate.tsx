@@ -1,16 +1,16 @@
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
-import { Button } from '@/components/ui/button';
+import { useFileUpload } from '@/hooks/useFileUpload';
+import { getAllPaths, normalizeString, serializeJson } from '@/lib/parse';
+import { getValueByPath } from '@/lib/parse';
+import { Button } from '@/shadcn/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from '@/components/ui/select';
-import { useFileUpload } from '@/hooks/use-file-upload';
-import { getAllPaths, normalizeString, serializeJson } from '@/lib/parse';
-import { getValueByPath } from '@/lib/parse';
+} from '@/shadcn/components/ui/select';
 import {
   type FileType,
   useReferenceFileStore,
@@ -19,7 +19,6 @@ import {
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-// Helper function to create a normalized set of reference values
 const createReferenceValueSet = (
   referenceFileContent: Record<string, unknown>[],
   referenceMatchField: string
@@ -31,7 +30,6 @@ const createReferenceValueSet = (
   );
 };
 
-// Helper function to filter out duplicates
 const filterOutDuplicates = (
   workingFileContent: Record<string, unknown>[],
   workingMatchField: string,
@@ -45,7 +43,6 @@ const filterOutDuplicates = (
   );
 };
 
-// Helper function to create and trigger file download
 const downloadFilteredFile = (
   result: Record<string, unknown>[],
   workingFileName: string | null
@@ -111,18 +108,11 @@ export function Deduplicate() {
     }
 
     try {
-      console.time('deduplicate');
-
-      // Create set of normalized reference values
-      console.time('reference-set');
       const referenceValues = createReferenceValueSet(
         referenceFileContent,
         referenceMatchField
       );
-      console.timeEnd('reference-set');
 
-      // Filter working file
-      console.time('filter');
       const originalCount = workingFileContent.length;
       const result = filterOutDuplicates(
         workingFileContent,
@@ -130,16 +120,9 @@ export function Deduplicate() {
         referenceValues
       );
       const finalCount = result.length;
-      console.timeEnd('filter');
 
-      // Create download
-      console.time('download');
       downloadFilteredFile(result, workingFileName);
-      console.timeEnd('download');
 
-      console.timeEnd('deduplicate');
-
-      // Success toast
       toast.success(
         `Removed ${originalCount - finalCount} duplicate ${
           originalCount - finalCount === 1 ? 'entry' : 'entries'

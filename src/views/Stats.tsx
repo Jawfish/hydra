@@ -1,20 +1,20 @@
-import { useFileUpload } from '@/hooks/use-file-upload';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
+import { useFileUpload } from '@/hooks/useFileUpload';
 import {
   type FieldAnalysisDetail,
   analyzeField,
   analyzeFieldDetails
 } from '@/lib/fileAnalysis';
 import { getAllPaths } from '@/lib/parse';
+import { ScrollArea } from '@/shadcn/components/ui/scroll-area';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/shadcn/components/ui/select';
 import { useWorkingFileStore } from '@/store/store';
 import { useEffect, useState } from 'react';
 

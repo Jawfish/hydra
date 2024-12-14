@@ -4,10 +4,10 @@ import {
   flattenObject,
   getAllPaths,
   getValueByPath,
-  serializeJson,
   jsonlToJson,
+  normalizeString,
   parseJson,
-  normalizeString
+  serializeJson
 } from '@/lib/parse';
 import type { FileType } from '@/store/store';
 import { describe, expect, it } from 'vitest';

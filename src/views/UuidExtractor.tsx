@@ -1,14 +1,14 @@
-import { useState, useMemo } from 'react';
-import { useWorkingFileStore } from '@/store/store';
-import { getAllPaths, getValueByPath } from '@/lib/parse';
-import { extractUuids } from '@/lib/uuid';
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Metadata } from '@/components/Metadata';
 import { UuidDisplay } from '@/components/UuidDisplay';
-import { Separator } from '@/components/ui/separator';
-import { useFileUpload } from '@/hooks/use-file-upload';
+import { useFileUpload } from '@/hooks/useFileUpload';
+import { getAllPaths, getValueByPath } from '@/lib/parse';
+import { extractUuids } from '@/lib/uuid';
+import { Separator } from '@/shadcn/components/ui/separator';
+import { useWorkingFileStore } from '@/store/store';
+import { useMemo, useState } from 'react';
 
 export function UuidExtractor() {
   const { fileName, fileContentParsed } = useWorkingFileStore();

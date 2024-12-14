@@ -1,9 +1,9 @@
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@/shadcn/components/ui/progress';
+import type { FileType } from '@/store/store';
 import Anthropic from '@anthropic-ai/sdk';
+import retry from 'async-retry';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
-import retry from 'async-retry';
-import type { FileType } from '@/store/store';
 
 const ALL_LANGUAGES = [
   'English',
@@ -29,7 +29,8 @@ const DEFAULT_ENABLED_LANGUAGES = [
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
-import { Button } from '@/components/ui/button';
+import { getAllPaths, serializeJson } from '@/lib/parse';
+import { Button } from '@/shadcn/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -37,12 +38,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
+} from '@/shadcn/components/ui/dropdown-menu';
+import { Input } from '@/shadcn/components/ui/input';
+import { Separator } from '@/shadcn/components/ui/separator';
 import { useWorkingFileStore } from '@/store/store';
 import { toast } from 'sonner';
-import { getAllPaths, serializeJson } from '@/lib/parse';
 
 export function Translate() {
   const { fileName, fileContentRaw, fileContentParsed, setFileName, setFileContent } =
@@ -297,17 +297,20 @@ export function Translate() {
           <div className='flex flex-col gap-8'>
             <div>
               <h3 className='text-lg font-semibold mb-4'>Anthropic API Key</h3>
-              <form onSubmit={(e) => e.preventDefault()} className='max-w-md'>
+              <form onSubmit={e => e.preventDefault()} className='max-w-md'>
                 {/* Hidden username field for password managers */}
-                <input 
-                  type="text" 
-                  name="username" 
-                  autoComplete="username" 
-                  value="anthropic-api" 
-                  className="hidden" 
-                  readOnly 
+                <input
+                  type='text'
+                  name='username'
+                  autoComplete='username'
+                  value='anthropic-api'
+                  className='hidden'
+                  readOnly={true}
                 />
-                <label htmlFor='anthropicApiKey' className='block text-sm font-medium mb-2'>
+                <label
+                  htmlFor='anthropicApiKey'
+                  className='block text-sm font-medium mb-2'
+                >
                   Anthropic API Key
                 </label>
                 <Input
@@ -415,8 +418,8 @@ export function Translate() {
                 className='max-w-min'
               >
                 {isProcessing ? (
-                  <div className="flex items-center">
-                    <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                  <div className='flex items-center'>
+                    <LoaderCircle className='mr-2 h-4 w-4 animate-spin' />
                     Translating...
                   </div>
                 ) : (

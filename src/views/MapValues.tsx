@@ -1,11 +1,11 @@
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
-import { useFileUpload } from '@/hooks/use-file-upload';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Textarea } from '@/components/ui/textarea';
+import { useFileUpload } from '@/hooks/useFileUpload';
 import { getAllPaths, getValueByPath } from '@/lib/parse';
+import { Button } from '@/shadcn/components/ui/button';
+import { Separator } from '@/shadcn/components/ui/separator';
+import { Textarea } from '@/shadcn/components/ui/textarea';
 import { useWorkingFileStore } from '@/store/store';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -18,7 +18,7 @@ interface MappedValue {
 export function MapValues() {
   const { fileContentParsed, fileName } = useWorkingFileStore();
   const handleFileUpload = useFileUpload('working');
-  
+
   const availableFields = fileContentParsed[0] ? getAllPaths(fileContentParsed[0]) : [];
 
   const [keyField, setKeyField] = useState<string>('');
@@ -90,10 +90,7 @@ export function MapValues() {
             </Header.Description>
           </Header>
         </div>
-        <FileUpload
-          onFileUpload={handleFileUpload}
-          fileName={fileName}
-        />
+        <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
       </div>
       {fileContentParsed.length > 0 && (
         <>

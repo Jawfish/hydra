@@ -11,7 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator
-} from '@/components/ui/sidebar';
+} from '@/shadcn/components/ui/sidebar';
 
 const items = [
   {

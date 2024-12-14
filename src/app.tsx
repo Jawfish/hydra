@@ -1,14 +1,15 @@
 import { AppSidebar } from '@/components/AppSidebar';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { Toaster } from '@/components/ui/sonner';
 import { WorkingFileDownloader } from '@/components/WorkingFileDownloader';
-import { Stats } from '@/views/Stats';
-import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { SidebarProvider } from '@/shadcn/components/ui/sidebar';
+import { Toaster } from '@/shadcn/components/ui/sonner';
 import { Backfill } from '@/views/Backfill';
 import { Deduplicate } from '@/views/Deduplicate';
+import { MapValues } from '@/views/MapValues';
+import { Stats } from '@/views/Stats';
 import { Translate } from '@/views/Translate';
 import { UuidExtractor } from '@/views/UuidExtractor';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
           <div className='p-8 xl:mx-auto w-full max-w-4xl mb-10'>
             <Routes>
               <Route path='/extract' element={<UuidExtractor />} />
-              {/* <Route path='/map' element={<MapValues />} /> */}
+              <Route path='/map' element={<MapValues />} />
               <Route path='/translate' element={<Translate />} />
               <Route path='/backfill' element={<Backfill />} />
               <Route path='/deduplicate' element={<Deduplicate />} />

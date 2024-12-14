@@ -1,13 +1,13 @@
-import { type FileType, useWorkingFileStore } from '@/store/store';
-import { Button } from '@/components/ui/button';
+import { serializeJson } from '@/lib/parse';
+import { Button } from '@/shadcn/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from '@/components/ui/select';
-import { serializeJson } from '@/lib/parse';
+} from '@/shadcn/components/ui/select';
+import { type FileType, useWorkingFileStore } from '@/store/store';
 import { useState } from 'react';
 import { toast } from 'sonner';
 

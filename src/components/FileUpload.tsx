@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shadcn/components/ui/button';
 import type { FileType } from '@/store/store';
 import type React from 'react';
 

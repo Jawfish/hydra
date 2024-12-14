@@ -4,7 +4,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue
-} from '@/components/ui/select';
+} from '@/shadcn/components/ui/select';
 
 interface FieldSelectorProps {
   fields: string[];
