@@ -9,13 +9,8 @@ import {
 } from '@/lib/fileAnalysis';
 import { getAllPaths } from '@/lib/parse';
 import { ScrollArea } from '@/shadcn/components/ui/scroll-area';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/shadcn/components/ui/select';
+import { FieldSelector } from '@/components/FieldSelector';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shadcn/components/ui/select';
 import { useWorkingFileStore } from '@/store/store';
 import { useEffect, useState } from 'react';
 
@@ -133,18 +128,12 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
             </label>
             <HelpTooltip message='The field to use for identifying the objects containing empty values' />
           </div>
-          <Select value={selectedIdentifier} onValueChange={setSelectedIdentifier}>
-            <SelectTrigger>
-              <SelectValue placeholder='Select identifier field...' />
-            </SelectTrigger>
-            <SelectContent>
-              {schema.map(field => (
-                <SelectItem key={field} value={field}>
-                  {field}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <FieldSelector
+            fields={schema}
+            selectedField={selectedIdentifier}
+            onFieldSelect={setSelectedIdentifier}
+            placeholder='Select identifier field...'
+          />
         </div>
 
         <div className='flex flex-col gap-2'>
@@ -154,21 +143,12 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
             </label>
             <HelpTooltip message='The field to check for empty values' />
           </div>
-          <Select
-            value={selectedAnalysisField}
-            onValueChange={setSelectedAnalysisField}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder='Select field to analyze...' />
-            </SelectTrigger>
-            <SelectContent>
-              {schema.map(field => (
-                <SelectItem key={field} value={field}>
-                  {field}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <FieldSelector
+            fields={schema}
+            selectedField={selectedAnalysisField}
+            onFieldSelect={setSelectedAnalysisField}
+            placeholder='Select field to analyze...'
+          />
         </div>
       </div>
 
