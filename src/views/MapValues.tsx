@@ -1,3 +1,4 @@
+import { ActionSection } from '@/components/ActionSection';
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
@@ -133,16 +134,18 @@ export function MapValues() {
                 ))}
               </div>
             </div>
-            <div className='flex flex-col gap-6 bg-muted p-6 -m-6 mt-6 rounded-md'>
+            <ActionSection>
               <div className='flex gap-4'>
-                <Button onClick={generateMapping}>Generate Mapping</Button>
-                <Button
-                  variant='outline'
+                <ActionSection.Button onClick={generateMapping}>
+                  Generate Mapping
+                </ActionSection.Button>
+                <ActionSection.Button
                   onClick={copyToClipboard}
-                  disabled={mappedValues.length === 0}
+                  disabled={Object.keys(mappedValues).length === 0}
+                  className="bg-secondary hover:bg-secondary/90"
                 >
                   Copy to Clipboard
-                </Button>
+                </ActionSection.Button>
               </div>
               {mappedValues && (
                 <Textarea

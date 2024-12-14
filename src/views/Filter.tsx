@@ -1,3 +1,4 @@
+import { ActionSection } from '@/components/ActionSection';
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
@@ -396,10 +397,9 @@ export function Filter() {
               </Select>
             </div>
 
-            <div className='flex flex-col gap-6 bg-muted p-6 -m-6 mt-6 rounded-md'>
-              <Button
+            <ActionSection>
+              <ActionSection.Button
                 onClick={processFilter}
-                className='w-min'
                 disabled={filterGroup.conditions.some(condition => {
                   // Check basic conditions for non-file comparisons
                   if (!['inFile', 'notInFile'].includes(condition.comparison)) {
@@ -416,8 +416,8 @@ export function Filter() {
                 })}
               >
                 Apply Filters
-              </Button>
-            </div>
+              </ActionSection.Button>
+            </ActionSection>
           </div>
         </>
       )}
