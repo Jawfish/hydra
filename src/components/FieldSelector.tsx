@@ -11,21 +11,23 @@ interface FieldSelectorProps {
   selectedField: string;
   onFieldSelect: (field: string) => void;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 export function FieldSelector({
   fields,
   selectedField,
   onFieldSelect,
-  placeholder = 'Select field...'
+  placeholder = 'Select field...',
+  disabled = false
 }: FieldSelectorProps) {
   if (fields.length === 0) {
     return null;
   }
 
   return (
-    <Select value={selectedField} onValueChange={onFieldSelect}>
-      <SelectTrigger className='w-[200px]'>
+    <Select value={selectedField} onValueChange={onFieldSelect} disabled={disabled}>
+      <SelectTrigger className='w-[200px]' disabled={disabled}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
