@@ -123,12 +123,15 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
 
   return (
     <div className='rounded-lg border p-4'>
-      <h3 className='font-medium mb-4'>Detailed Analysis</h3>
+      <h3 className='font-medium mb-4'>Inspect Empty Fields</h3>
       <div className='flex gap-4 mb-4'>
         <div className='flex flex-col gap-2'>
           <label htmlFor='identifier-field' className='text-sm font-medium'>
             Identifier Field
           </label>
+          <p className='text-muted-foreground text-sm max-w-xs'>
+            The field to use for identifying the objects containing empty values
+          </p>
           <Select value={selectedIdentifier} onValueChange={setSelectedIdentifier}>
             <SelectTrigger>
               <SelectValue placeholder='Select identifier field...' />
@@ -147,6 +150,9 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
           <label htmlFor='analyze-field' className='text-sm font-medium'>
             Analyze Field
           </label>
+          <p className='text-muted-foreground text-sm'>
+            The field to check for empty values
+          </p>
           <Select
             value={selectedAnalysisField}
             onValueChange={setSelectedAnalysisField}
@@ -165,28 +171,27 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
         </div>
       </div>
 
-      {fieldAnalysis.length > 0 ? (
-        <div>
-          <h4 className='text-sm font-medium mb-2'>
-            Empty values in {selectedAnalysisField} ( {fieldAnalysis.length})
-          </h4>
-          <ScrollArea className='h-[200px]'>
-            <ul className='space-y-2'>
-              {fieldAnalysis.map((detail, idx) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: static data
-                <li key={idx} className='text-sm'>
-                  {selectedIdentifier}: {detail.identifier}
-                </li>
-              ))}
-            </ul>
-          </ScrollArea>
-        </div>
-      ) : (
-        <div className='text-sm text-muted-foreground'>
-          {selectedIdentifier && selectedAnalysisField
-            ? 'No empty values found for the selected field.'
-            : 'Please select both identifier and analysis fields to see results.'}
-        </div>
+      {fieldAnalysis.length > 0 && (
+        <>
+          <div>
+            <h4 className='text-sm font-medium mb-2'>
+              Empty values in {selectedAnalysisField} ( {fieldAnalysis.length})
+            </h4>
+            <ScrollArea className='h-[200px]'>
+              <ul className='space-y-2'>
+                {fieldAnalysis.map((detail, idx) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: static data
+                  <li key={idx} className='text-sm'>
+                    {selectedIdentifier}: {detail.identifier}
+                  </li>
+                ))}
+              </ul>
+            </ScrollArea>
+          </div>
+          <p className='text-sm text-muted-foreground'>
+            No empty values found for the selected field.
+          </p>
+        </>
       )}
     </div>
   );
