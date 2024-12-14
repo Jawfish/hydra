@@ -1,5 +1,6 @@
 import { Progress } from '@/components/ui/progress';
 import Anthropic from '@anthropic-ai/sdk';
+import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import retry from 'async-retry';
 import type { FileType } from '@/store/store';
@@ -389,7 +390,14 @@ export function Translate() {
                 disabled={isProcessing || !selectedColumn || !apiKey}
                 className='max-w-min'
               >
-                {isProcessing ? 'Translating...' : 'Translate'}
+                {isProcessing ? (
+                  <div className="flex items-center">
+                    <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                    Translating...
+                  </div>
+                ) : (
+                  'Translate'
+                )}
               </Button>
             </div>
           </div>
