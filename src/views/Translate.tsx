@@ -1,6 +1,7 @@
 import { ActionSection } from '@/components/ActionSection';
 import { Progress } from '@/shadcn/components/ui/progress';
 import type { FileType } from '@/store/store';
+import { getValueByPath } from '@/lib/parse';
 import Anthropic from '@anthropic-ai/sdk';
 import retry from 'async-retry';
 import { LoaderCircle } from 'lucide-react';
@@ -187,16 +188,25 @@ export function Translate() {
     const processedRows: Record<string, string>[] = [];
 
     for (const row of chunk) {
+      const textToTranslate = getValueByPath(row, selectedColumn);
+
       console.log('Row details:', {
         rowKeys: Object.keys(row),
-        selectedColumnValue: row[selectedColumn],
-        selectedColumnType: typeof row[selectedColumn]
+        selectedColumnValue: textToTranslate,
+        selectedColumnType: typeof textToTranslate
       });
+
+      if (!textToTranslate) {
+        console.warn(`No text found for column ${selectedColumn}`);
+        processedRows.push(row);
+        onProgress();
+        continue;
+      }
 
       for (const language of Array.from(selectedLanguages)) {
         try {
           const translatedText = await translateText(
-            row[selectedColumn],
+            String(textToTranslate),
             language,
             anthropic
           );
