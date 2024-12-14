@@ -396,6 +396,8 @@ export function Filter() {
               </Select>
             </div>
 
+            <Separator className='my-14' />
+
             <div className='flex flex-col gap-6 bg-muted p-6 -m-6 mt-6 rounded-md'>
               <Button
                 onClick={processFilter}
