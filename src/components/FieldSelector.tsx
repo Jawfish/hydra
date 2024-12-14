@@ -21,12 +21,17 @@ export function FieldSelector({
   placeholder = 'Select field...',
   disabled = false
 }: FieldSelectorProps) {
+  // Only return null if there are NO fields
   if (fields.length === 0) {
     return null;
   }
 
   return (
-    <Select value={selectedField} onValueChange={onFieldSelect} disabled={disabled}>
+    <Select 
+      value={selectedField} 
+      onValueChange={onFieldSelect} 
+      disabled={disabled}
+    >
       <SelectTrigger className='w-[200px]' disabled={disabled}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
