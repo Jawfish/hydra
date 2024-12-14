@@ -125,48 +125,27 @@ export function Translate() {
     language: string,
     anthropic: Anthropic
   ): Promise<string> => {
-    return await retry(
-      async () => {
-        try {
-          const response = await anthropic.messages.create({
-            model: 'claude-3-5-sonnet-20241022',
-            max_tokens: 4096,
-            messages: [
-              {
-                role: 'user',
-                content: [
-                  {
-                    type: 'text',
-                    text: text
-                  }
-                ]
-              }
-            ],
-            system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
-          });
-          
-          // Ensure we're extracting text correctly
-          const translatedText = response.content.find(
-            content => content.type === 'text'
-          )?.text || '';
-          
-          console.debug('Translation response:', response);
-          return translatedText;
-        } catch (error) {
-          // Log the error for debugging
-          console.warn('Translation attempt failed:', error);
-          // Rethrow to trigger retry
-          throw error;
-        }
-      },
-      {
-        retries: 7,
-        factor: 2,
-        minTimeout: 1000,
-        maxTimeout: 60000,
-        randomize: true
-      }
-    );
+    try {
+      const response = await anthropic.messages.create({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 4096,
+        messages: [
+          {
+            role: 'user',
+            content: text  // Simplify to direct text, not nested array
+          }
+        ],
+        system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
+      });
+      
+      // Simplified text extraction
+      const translatedText = response.content[0]?.text || '';
+      
+      return translatedText;
+    } catch (error) {
+      console.error('Translation attempt failed:', error);
+      throw error;
+    }
   };
 
   const processRowChunk = async (
