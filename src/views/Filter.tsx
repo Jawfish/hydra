@@ -158,7 +158,20 @@ export function Filter() {
       return;
     }
 
-    if (filterGroup.conditions.some(c => !(c.field && c.value))) {
+    if (filterGroup.conditions.some(condition => {
+      // Check basic conditions for non-file comparisons
+      if (!['inFile', 'notInFile'].includes(condition.comparison)) {
+        return !(condition.field && condition.value);
+      }
+      
+      // For file-based comparisons, check additional conditions
+      return !(
+        condition.field && 
+        condition.comparison && 
+        condition.referenceFileContent && 
+        condition.referenceField
+      );
+    })) {
       toast.error('Please complete all filter conditions');
       return;
     }
