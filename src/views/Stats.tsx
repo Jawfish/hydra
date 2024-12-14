@@ -131,9 +131,7 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
             <label htmlFor='identifier-field' className='text-sm font-medium'>
               Identifier Field
             </label>
-            <HelpTooltip 
-              message="The field to use for identifying the objects containing empty values" 
-            />
+            <HelpTooltip message='The field to use for identifying the objects containing empty values' />
           </div>
           <Select value={selectedIdentifier} onValueChange={setSelectedIdentifier}>
             <SelectTrigger>
@@ -154,9 +152,7 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
             <label htmlFor='analyze-field' className='text-sm font-medium'>
               Analyze Field
             </label>
-            <HelpTooltip 
-              message="The field to check for empty values" 
-            />
+            <HelpTooltip message='The field to check for empty values' />
           </div>
           <Select
             value={selectedAnalysisField}
