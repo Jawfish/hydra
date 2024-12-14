@@ -3,9 +3,12 @@ import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import {
+  csvToJson,
   getAllPaths,
   getValueByPath,
+  jsonlToJson,
   normalizeString,
+  parseJson,
   serializeJson
 } from '@/lib/parse';
 import { Button } from '@/shadcn/components/ui/button';
@@ -17,11 +20,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/shadcn/components/ui/select';
-import {
-  type FileType,
-  useReferenceFileStore,
-  useWorkingFileStore
-} from '@/store/store';
+import { type FileType, useWorkingFileStore } from '@/store/store';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -53,10 +52,7 @@ type FilterGroup = {
   conditions: FilterCondition[];
 };
 
-const evaluateCondition = (
-  value: unknown,
-  condition: FilterCondition
-): boolean => {
+const evaluateCondition = (value: unknown, condition: FilterCondition): boolean => {
   const normalizedValue = normalizeString(String(value));
   const normalizedTestValue = normalizeString(condition.value);
 
@@ -78,17 +74,21 @@ const evaluateCondition = (
     case 'lessThan':
       return Number(value) < Number(condition.value);
     case 'inFile':
-      return condition.referenceFileContent 
-        ? condition.referenceFileContent.some(refRow => 
-            normalizeString(String(getValueByPath(refRow, condition.referenceField || ''))) === 
-            normalizeString(String(value))
+      return condition.referenceFileContent
+        ? condition.referenceFileContent.some(
+            refRow =>
+              normalizeString(
+                String(getValueByPath(refRow, condition.referenceField || ''))
+              ) === normalizeString(String(value))
           )
         : false;
     case 'notInFile':
-      return condition.referenceFileContent 
-        ? !condition.referenceFileContent.some(refRow => 
-            normalizeString(String(getValueByPath(refRow, condition.referenceField || ''))) === 
-            normalizeString(String(value))
+      return condition.referenceFileContent
+        ? !condition.referenceFileContent.some(
+            refRow =>
+              normalizeString(
+                String(getValueByPath(refRow, condition.referenceField || ''))
+              ) === normalizeString(String(value))
           )
         : true;
     default:
@@ -215,7 +215,6 @@ export function Filter() {
         <FileUpload onFileUpload={handleWorkingFileUpload} fileName={workingFileName} />
       </div>
 
-
       {workingFileName && (
         <div className='mb-8'>
           <div className='flex items-center gap-4 mb-4'>
@@ -271,28 +270,36 @@ export function Filter() {
                 </Select>
 
                 {['inFile', 'notInFile'].includes(condition.comparison) ? (
-                  <div className="flex items-center gap-2">
-                    <FileUpload 
+                  <div className='flex items-center gap-2'>
+                    <FileUpload
+                      hideName={true}
                       onFileUpload={(fileName, fileContent, fileType) => {
                         let parsedContent: Record<string, unknown>[];
-                        switch (fileType) {
-                          case 'csv':
-                            parsedContent = csvToJson(fileContent);
-                            break;
-                          case 'json':
-                            parsedContent = parseJson(fileContent);
-                            break;
-                          case 'jsonl':
-                            parsedContent = jsonlToJson(fileContent);
-                            break;
-                          default:
-                            toast.error('Unsupported file type');
-                            return;
+
+                        try {
+                          switch (fileType) {
+                            case 'csv':
+                              parsedContent = csvToJson(fileContent);
+                              break;
+                            case 'json':
+                              parsedContent = parseJson(fileContent);
+                              break;
+                            case 'jsonl':
+                              parsedContent = jsonlToJson(fileContent);
+                              break;
+                            default:
+                              throw new Error('Unsupported file type');
+                          }
+                        } catch (error) {
+                          toast.error(
+                            `Error parsing file: ${error instanceof Error ? error.message : 'Unknown error'}`
+                          );
+                          return;
                         }
 
-                        updateCondition(index, { 
+                        updateCondition(index, {
                           referenceFileContent: parsedContent,
-                          referenceFileName: fileName 
+                          referenceFileName: fileName
                         });
                       }}
                       fileName={condition.referenceFileName || null}
@@ -301,7 +308,9 @@ export function Filter() {
                       <FieldSelector
                         fields={getAllPaths(condition.referenceFileContent[0] || {})}
                         selectedField={condition.referenceField || ''}
-                        onFieldSelect={value => updateCondition(index, { referenceField: value })}
+                        onFieldSelect={value =>
+                          updateCondition(index, { referenceField: value })
+                        }
                         placeholder='Select reference field'
                       />
                     )}
