@@ -1,4 +1,4 @@
-import { Button } from '@/shadcn/components/ui/button';
+import { ActionSection } from '@/components/ActionSection';
 import { toast } from 'sonner';
 
 interface UuidDisplayProps {
@@ -30,21 +30,17 @@ export function UuidDisplay({ extractedUuids }: UuidDisplayProps) {
   };
 
   return (
-    <div className='flex flex-col gap-6 mt-12 bg-muted p-6 -m-6 rounded-md'>
+    <ActionSection>
       {extractedUuids.length > 0 && (
         <div className='flex gap-2'>
-          <Button className='w-min' onClick={() => handleCopy('python')}>
+          <ActionSection.Button onClick={() => handleCopy('python')}>
             Copy as Python list
-          </Button>
-          <Button
-            variant='outline'
-            className='w-min'
-            onClick={() => handleCopy('plaintext')}
-          >
+          </ActionSection.Button>
+          <ActionSection.Button onClick={() => handleCopy('plaintext')}>
             Copy as plain text
-          </Button>
+          </ActionSection.Button>
         </div>
       )}
-    </div>
+    </ActionSection>
   );
 }
