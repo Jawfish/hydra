@@ -22,7 +22,7 @@ jobs:
           bun-version: "latest"
 
       - name: Update dependencies
-        run: bun update
+        run: bun update --latest
 
       - name: Check for changes and commit
         run: |
