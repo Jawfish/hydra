@@ -1,6 +1,7 @@
 import {
   BarChart,
   Bot,
+  FileFilter,
   FileText,
   FileX,
   IdCard,
@@ -12,6 +13,7 @@ import { Navigate } from 'react-router-dom';
 
 import { Backfill } from '@/views/Backfill';
 import { Deduplicate } from '@/views/Deduplicate';
+import { Filter } from '@/views/Filter';
 import { MapValues } from '@/views/MapValues';
 import { Stats } from '@/views/Stats';
 import { Translate } from '@/views/Translate';
@@ -64,6 +66,12 @@ export const routes: Route[] = [
     element: <Stats />,
     title: 'Stats',
     icon: BarChart
+  },
+  {
+    path: '/filter',
+    element: <Filter />,
+    title: 'Filter',
+    icon: FileFilter
   }
 ];
 
