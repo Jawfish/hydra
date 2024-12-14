@@ -75,6 +75,7 @@ export function Translate() {
   const [languageColumnName, setLanguageColumnName] = useState<string>('Language');
   const [translationColumnName, setTranslationColumnName] =
     useState<string>('Translated Text');
+  const [chunkSize, setChunkSize] = useState<number>(20);
 
   const handleColumnSelect = (column: string) => {
     setSelectedColumn(column);
@@ -177,7 +178,8 @@ export function Translate() {
     languageColumnName: string,
     translationColumnName: string,
     anthropic: Anthropic,
-    onProgress: () => void
+    onProgress: () => void,
+    chunkSize: number
   ): Promise<Record<string, string>[]> => {
     console.log('Processing chunk:', {
       chunkSize: chunk.length,
@@ -289,8 +291,6 @@ export function Translate() {
       );
       let completedOperations = 0;
 
-      const chunkSize = 20;
-
       console.debug(
         `Beginning translation of ${totalRows} rows in chunks of ${chunkSize}`
       );
@@ -313,7 +313,8 @@ export function Translate() {
             if (isCancelled) return;
             completedOperations++;
             setProgress(Math.round((completedOperations / totalOperations) * 100));
-          }
+          },
+          chunkSize
         );
         processedRows.push(...chunkResults);
       }
@@ -421,6 +422,19 @@ export function Translate() {
                   />
                 </div>
               </div>
+            </div>
+
+            <div>
+              <h3 className='text-lg font-semibold mb-4'>Chunk Size</h3>
+              <Input
+                type="number"
+                min={1}
+                max={100}
+                value={chunkSize}
+                onChange={e => setChunkSize(Number(e.target.value))}
+                placeholder="Enter chunk size (default 20)"
+                className='max-w-md'
+              />
             </div>
 
             <div>
