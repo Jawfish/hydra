@@ -310,16 +310,14 @@ export function Filter() {
                       <FieldSelector
                         fields={condition.referenceFileContent 
                           ? getAllPaths(condition.referenceFileContent[0] || {})
-                          : []
+                          : [] // Explicitly pass empty array to force render
                         }
-                        selectedField={condition.referenceField || ''}
-                        onFieldSelect={value =>
-                          updateCondition(index, { referenceField: value })
+                        selectedField={condition.referenceFileContent ? (condition.referenceField || '') : ''}
+                        onFieldSelect={condition.referenceFileContent 
+                          ? (value => updateCondition(index, { referenceField: value }))
+                          : () => {} // No-op handler when no file
                         }
-                        placeholder={condition.referenceFileContent 
-                          ? 'Select reference field'
-                          : 'Upload reference file first'
-                        }
+                        placeholder='Upload reference file first'
                         disabled={!condition.referenceFileContent}
                       />
                     </div>
