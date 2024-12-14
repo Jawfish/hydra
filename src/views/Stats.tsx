@@ -240,27 +240,26 @@ export const Stats: React.FC = () => {
       </div>
       <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
 
-        {fileName && fileContentParsed.length > 0 && (
-          <div className='flex flex-col gap-6'>
-            <div className='grid grid-cols-2 gap-4'>
-              <FileStatistics fileName={fileName} rowCount={fileContentParsed.length} />
-              {schema && <SchemaDisplay schema={schema} />}
-            </div>
-
-            <FieldAnalysisTable schema={schema} data={fileContentParsed} />
-
-            <DetailedAnalysisSection
-              schema={schema}
-              data={fileContentParsed}
-              selectedIdentifier={selectedIdentifier}
-              setSelectedIdentifier={setSelectedIdentifier}
-              selectedAnalysisField={selectedAnalysisField}
-              setSelectedAnalysisField={setSelectedAnalysisField}
-              fieldAnalysis={fieldAnalysis}
-            />
+      {fileName && fileContentParsed.length > 0 && (
+        <div className='flex flex-col gap-6'>
+          <div className='grid grid-cols-2 gap-4'>
+            <FileStatistics fileName={fileName} rowCount={fileContentParsed.length} />
+            {schema && <SchemaDisplay schema={schema} />}
           </div>
-        )}
-      </div>
+
+          <FieldAnalysisTable schema={schema} data={fileContentParsed} />
+
+          <DetailedAnalysisSection
+            schema={schema}
+            data={fileContentParsed}
+            selectedIdentifier={selectedIdentifier}
+            setSelectedIdentifier={setSelectedIdentifier}
+            selectedAnalysisField={selectedAnalysisField}
+            setSelectedAnalysisField={setSelectedAnalysisField}
+            fieldAnalysis={fieldAnalysis}
+          />
+        </div>
+      )}
     </div>
   );
 };
