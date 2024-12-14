@@ -1,48 +1,45 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
 import { routes } from '@/routes';
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator
 } from '@/shadcn/components/ui/sidebar';
 
-export function AppSidebar() {
-  const handleRouteClick = (title: string) => {
-    document.title = `Hydra - ${title}`;
+const SidebarRouteItem: React.FC<{ route: typeof routes[number] }> = ({ route }) => {
+  const handleRouteClick = () => {
+    document.title = `Hydra - ${route.title}`;
   };
 
   return (
+    <SidebarMenuItem>
+      <Link 
+        to={route.path} 
+        onClick={handleRouteClick}
+        className="flex items-center gap-2"
+      >
+        <route.icon />
+        <span>{route.title}</span>
+      </Link>
+    </SidebarMenuItem>
+  );
+};
+
+export function AppSidebar() {
+  return (
     <Sidebar collapsible='icon'>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {routes.map(route => (
-                <React.Fragment key={route.title}>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild={true}>
-                      <Link
-                        to={route.path}
-                        onClick={() => handleRouteClick(route.title)}
-                      >
-                        <route.icon />
-                        <span>{route.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  {routes.indexOf(route) < routes.length - 1 && <SidebarSeparator />}
-                </React.Fragment>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <SidebarMenu>
+          {routes.map((route, index) => (
+            <React.Fragment key={route.title}>
+              <SidebarRouteItem route={route} />
+              {index < routes.length - 1 && <SidebarSeparator />}
+            </React.Fragment>
+          ))}
+        </SidebarMenu>
       </SidebarContent>
     </Sidebar>
   );
