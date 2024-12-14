@@ -81,17 +81,20 @@ export function MapValues() {
 
   return (
     <div className='flex flex-col mb-12'>
-      <div>
-        <div className='mb-10'>
-          <Header>
-            <Header.Title>Map Values</Header.Title>
-            <Header.Description>
-              Create a mapping of key-value pairs from an uploaded file
-            </Header.Description>
-          </Header>
-        </div>
-        <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
+      <Header>
+        <Header.Title>Map Values</Header.Title>
+        <Header.Description>
+          Create a mapping of key-value pairs from an uploaded file
+        </Header.Description>
+      </Header>
+
+      <div className='mb-4'>
+        <h3 className='text-lg font-semibold'>Working File</h3>
+        <p className='text-muted-foreground text-sm'>
+          The file to generate a mapping from
+        </p>
       </div>
+      <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
       {fileContentParsed.length > 0 && (
         <>
           <Separator className='my-14 h-[1px]' />
