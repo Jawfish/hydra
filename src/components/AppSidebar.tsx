@@ -24,7 +24,7 @@ export function AppSidebar() {
                 <React.Fragment key={route.title}>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild={true}>
-                      <Link to={route.path}>
+                      <Link to={route.path} onClick={() => document.title = `Hydra - ${route.title}`}>
                         <route.icon />
                         <span>{route.title}</span>
                       </Link>
