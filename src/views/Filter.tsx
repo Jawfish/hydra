@@ -399,6 +399,7 @@ export function Filter() {
             <div className='flex flex-col gap-6 bg-muted p-6 -m-6 mt-6 rounded-md'>
               <Button
                 onClick={processFilter}
+                className='w-min'
                 disabled={filterGroup.conditions.some(condition => {
                   // Check basic conditions for non-file comparisons
                   if (!['inFile', 'notInFile'].includes(condition.comparison)) {
