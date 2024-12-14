@@ -12,8 +12,8 @@ function AppContent() {
 
   useEffect(() => {
     const currentRoute = routes.find(route => route.path === location.pathname);
-    document.title = currentRoute 
-      ? `${APP_CONFIG.name} - ${currentRoute.title}` 
+    document.title = currentRoute
+      ? `${APP_CONFIG.name} - ${currentRoute.title}`
       : APP_CONFIG.name;
   }, [location.pathname]);
 
