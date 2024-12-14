@@ -1,7 +1,8 @@
+import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
-import { useFileUpload } from '@/hooks/useFileUpload';
 import { HelpTooltip } from '@/components/HelpTooltip';
+import { useFileUpload } from '@/hooks/useFileUpload';
 import {
   type FieldAnalysisDetail,
   analyzeField,
@@ -9,8 +10,6 @@ import {
 } from '@/lib/fileAnalysis';
 import { getAllPaths } from '@/lib/parse';
 import { ScrollArea } from '@/shadcn/components/ui/scroll-area';
-import { FieldSelector } from '@/components/FieldSelector';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shadcn/components/ui/select';
 import { useWorkingFileStore } from '@/store/store';
 import { useEffect, useState } from 'react';
 
@@ -153,26 +152,22 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
       </div>
 
       {fieldAnalysis.length > 0 && (
-        <>
-          <div>
-            <h4 className='text-sm font-medium mb-2'>
-              Empty values in {selectedAnalysisField} ( {fieldAnalysis.length})
-            </h4>
-            <ScrollArea className='h-[200px]'>
-              <ul className='space-y-2'>
-                {fieldAnalysis.map((detail, idx) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: static data
-                  <li key={idx} className='text-sm'>
-                    {selectedIdentifier}: {detail.identifier}
-                  </li>
-                ))}
-              </ul>
-            </ScrollArea>
-          </div>
-          <p className='text-sm text-muted-foreground'>
-            No empty values found for the selected field.
-          </p>
-        </>
+        <div>
+          <h4 className='text-sm font-medium mb-2'>
+            {fieldAnalysis.length} empty '{selectedAnalysisField}' listed by '
+            {selectedIdentifier}':
+          </h4>
+          <ScrollArea className='h-[200px]'>
+            <ul className='space-y-2'>
+              {fieldAnalysis.map((detail, idx) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: static data
+                <li key={idx} className='text-sm'>
+                  {detail.identifier}
+                </li>
+              ))}
+            </ul>
+          </ScrollArea>
+        </div>
       )}
     </div>
   );

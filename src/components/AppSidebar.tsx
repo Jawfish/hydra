@@ -1,6 +1,5 @@
 import { APP_CONFIG } from '@/config';
 import { type Route, routes } from '@/routes';
-import { useLocation } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
@@ -9,6 +8,7 @@ import {
   SidebarSeparator
 } from '@/shadcn/components/ui/sidebar';
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 const SidebarRouteItem: React.FC<{ route: Route }> = ({ route }) => {

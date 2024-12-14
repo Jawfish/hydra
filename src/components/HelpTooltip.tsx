@@ -1,19 +1,19 @@
-import { HelpCircle } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
 } from '@/shadcn/components/ui/tooltip';
+import { HelpCircle } from 'lucide-react';
 
 interface HelpTooltipProps {
   message: string;
   className?: string;
 }
 
-export const HelpTooltip: React.FC<HelpTooltipProps> = ({ 
-  message, 
-  className = 'w-3 h-3 text-muted-foreground' 
+export const HelpTooltip: React.FC<HelpTooltipProps> = ({
+  message,
+  className = 'w-4 h-4 text-muted-foreground'
 }) => (
   <TooltipProvider>
     <Tooltip>
