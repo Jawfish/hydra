@@ -274,39 +274,45 @@ export function Filter() {
 
                   {['inFile', 'notInFile'].includes(condition.comparison) ? (
                     <>
-                      <FileUpload
-                        onFileUpload={(fileName, fileContent, fileType) => {
-                          let parsedContent: Record<string, unknown>[];
+                      {condition.referenceFileName ? (
+                        <div className="text-sm text-muted-foreground">
+                          {condition.referenceFileName}
+                        </div>
+                      ) : (
+                        <FileUpload
+                          hideName={true}
+                          onFileUpload={(fileName, fileContent, fileType) => {
+                            let parsedContent: Record<string, unknown>[];
 
-                          try {
-                            switch (fileType) {
-                              case 'csv':
-                                parsedContent = csvToJson(fileContent);
-                                break;
-                              case 'json':
-                                parsedContent = parseJson(fileContent);
-                                break;
-                              case 'jsonl':
-                                parsedContent = jsonlToJson(fileContent);
-                                break;
-                              default:
-                                throw new Error('Unsupported file type');
+                            try {
+                              switch (fileType) {
+                                case 'csv':
+                                  parsedContent = csvToJson(fileContent);
+                                  break;
+                                case 'json':
+                                  parsedContent = parseJson(fileContent);
+                                  break;
+                                case 'jsonl':
+                                  parsedContent = jsonlToJson(fileContent);
+                                  break;
+                                default:
+                                  throw new Error('Unsupported file type');
+                              }
+
+                              updateCondition(index, {
+                                referenceFileContent: parsedContent,
+                                referenceFileName: fileName,
+                                referenceField: '' // Reset reference field
+                              });
+                            } catch (error) {
+                              toast.error(
+                                `Error parsing file: ${error instanceof Error ? error.message : 'Unknown error'}`
+                              );
                             }
-
-                            updateCondition(index, {
-                              referenceFileContent: parsedContent,
-                              referenceFileName: fileName,
-                              referenceField: '' // Reset reference field
-                            });
-                          } catch (error) {
-                            toast.error(
-                              `Error parsing file: ${error instanceof Error ? error.message : 'Unknown error'}`
-                            );
-                            return;
-                          }
-                        }}
-                        fileName={condition.referenceFileName || null}
-                      />
+                          }}
+                          fileName={null}
+                        />
+                      )}
                       {condition.referenceFileContent && (
                         <FieldSelector
                           fields={getAllPaths(condition.referenceFileContent[0] || {})}
