@@ -49,6 +49,7 @@ type FilterCondition = {
 
 type FilterGroup = {
   operator: LogicalOperator;
+  mode?: 'keep' | 'remove';
   conditions: FilterCondition[];
 };
 
@@ -117,6 +118,7 @@ export function Filter() {
   const [workingFileSchema, setWorkingFileSchema] = useState<string[]>([]);
   const [filterGroup, setFilterGroup] = useState<FilterGroup>({
     operator: 'AND',
+    mode: 'keep',
     conditions: [{ field: '', comparison: 'equals', value: '' }]
   });
 
@@ -177,9 +179,10 @@ export function Filter() {
     }
 
     try {
-      const filteredContent = workingFileContent.filter(row =>
-        evaluateFilterGroup(row, filterGroup)
-      );
+      const filteredContent = workingFileContent.filter(row => {
+        const matchesConditions = evaluateFilterGroup(row, filterGroup);
+        return filterGroup.mode === 'remove' ? !matchesConditions : matchesConditions;
+      });
 
       const fileType = (workingFileName?.split('.').pop() as FileType) || 'csv';
       const output = serializeJson(filteredContent, fileType);
@@ -232,6 +235,20 @@ export function Filter() {
         <div className='mb-8'>
           <div className='flex items-center gap-4 mb-4'>
             <h3 className='text-lg font-semibold'>Filter Conditions</h3>
+            <Select
+              value={filterGroup.mode || 'keep'}
+              onValueChange={(value: 'keep' | 'remove') =>
+                setFilterGroup(prev => ({ ...prev, mode: value }))
+              }
+            >
+              <SelectTrigger className='w-[180px]'>
+                <SelectValue placeholder='Select mode' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='keep'>Keep matching entries</SelectItem>
+                <SelectItem value='remove'>Remove matching entries</SelectItem>
+              </SelectContent>
+            </Select>
             <Select
               value={filterGroup.operator}
               onValueChange={(value: LogicalOperator) =>
