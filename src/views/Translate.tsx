@@ -140,35 +140,63 @@ export function Translate() {
       return 'No text to translate';
     }
 
-    try {
-      const response = await anthropic.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 4096,
-        messages: [
-          {
-            role: 'user',
-            content: [{ type: 'text', text: text }]
-          }
-        ],
-        system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
-      });
-      
-      console.log('Translation response:', {
-        responseContent: response.content,
-        translatedText: response.content[0]?.text
-      });
+    return retry(
+      async (bail) => {
+        try {
+          const response = await anthropic.messages.create({
+            model: 'claude-3-5-sonnet-20241022',
+            max_tokens: 4096,
+            messages: [
+              {
+                role: 'user',
+                content: [{ type: 'text', text: text }]
+              }
+            ],
+            system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
+          });
+          
+          console.log('Translation response:', {
+            responseContent: response.content,
+            translatedText: response.content[0]?.text
+          });
 
-      const translatedText = response.content[0]?.text || '';
-      
-      return translatedText;
-    } catch (error) {
-      console.error('Translation attempt failed:', {
-        error,
-        text,
-        language
-      });
-      throw error;
-    }
+          const translatedText = response.content[0]?.text || '';
+          
+          return translatedText;
+        } catch (error) {
+          // Determine if we should retry or bail
+          if (error instanceof Anthropic.APIError) {
+            // Bail on client errors (4xx)
+            if (error.status && error.status >= 400 && error.status < 500) {
+              bail(error);
+              return '';
+            }
+          }
+          
+          console.error('Translation attempt failed:', {
+            error,
+            text,
+            language
+          });
+          
+          // Rethrow to trigger retry
+          throw error;
+        }
+      },
+      {
+        retries: 7,
+        factor: 2,
+        minTimeout: 1000,   // 1 second
+        maxTimeout: 60000,  // 60 seconds
+        onRetry: (error, attempt) => {
+          console.warn(`Translation retry attempt ${attempt}:`, {
+            error: error.message,
+            text: text.slice(0, 100) + (text.length > 100 ? '...' : ''),
+            language
+          });
+        }
+      }
+    );
   };
 
   const processRowChunk = async (
