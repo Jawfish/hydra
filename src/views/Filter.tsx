@@ -275,8 +275,8 @@ export function Filter() {
                   {['inFile', 'notInFile'].includes(condition.comparison) ? (
                     <>
                       {condition.referenceFileName ? (
-                        <div 
-                          className="text-sm text-muted-foreground truncate max-w-[200px]" 
+                        <div
+                          className='text-sm text-muted-foreground truncate max-w-[100px]'
                           title={condition.referenceFileName}
                         >
                           {condition.referenceFileName}
