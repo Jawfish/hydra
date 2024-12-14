@@ -129,19 +129,29 @@ export function Translate() {
       async () => {
         try {
           const response = await anthropic.messages.create({
-            // biome-ignore lint/style/useNamingConvention: API requires snake_case
+            model: 'claude-3-5-sonnet-20241022',
             max_tokens: 4096,
             messages: [
               {
                 role: 'user',
-                content: text
+                content: [
+                  {
+                    type: 'text',
+                    text: text
+                  }
+                ]
               }
             ],
-            model: 'claude-3-5-sonnet-20241022',
             system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
           });
+          
+          // Ensure we're extracting text correctly
+          const translatedText = response.content.find(
+            content => content.type === 'text'
+          )?.text || '';
+          
           console.debug('Translation response:', response);
-          return response.content[0].type === 'text' ? response.content[0].text : '';
+          return translatedText;
         } catch (error) {
           // Log the error for debugging
           console.warn('Translation attempt failed:', error);
