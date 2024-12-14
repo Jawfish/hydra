@@ -298,6 +298,15 @@ export function Translate() {
             <div>
               <h3 className='text-lg font-semibold mb-4'>Anthropic API Key</h3>
               <form onSubmit={(e) => e.preventDefault()} className='max-w-md'>
+                {/* Hidden username field for password managers */}
+                <input 
+                  type="text" 
+                  name="username" 
+                  autoComplete="username" 
+                  value="anthropic-api" 
+                  className="hidden" 
+                  readOnly 
+                />
                 <label htmlFor='anthropicApiKey' className='block text-sm font-medium mb-2'>
                   Anthropic API Key
                 </label>
