@@ -179,33 +179,21 @@ export function Translate() {
     translationColumnName: string,
     anthropic: Anthropic,
     onProgress: () => void,
-    chunkSize: number
+    chunkSize: number = 20
   ): Promise<Record<string, string>[]> => {
-    console.log('Processing chunk:', {
-      chunkSize: chunk.length,
-      selectedColumn,
-      selectedLanguages: Array.from(selectedLanguages)
-    });
-
     const processedRows: Record<string, string>[] = [];
+    const translationPromises: Promise<Record<string, string>>[] = [];
 
     for (const row of chunk) {
       const textToTranslate = getValueByPath(row, selectedColumn);
 
-      console.log('Row details:', {
-        rowKeys: Object.keys(row),
-        selectedColumnValue: textToTranslate,
-        selectedColumnType: typeof textToTranslate
-      });
-
       if (!textToTranslate) {
-        console.warn(`No text found for column ${selectedColumn}`);
         processedRows.push(row);
         onProgress();
         continue;
       }
 
-      for (const language of Array.from(selectedLanguages)) {
+      const languagePromises = Array.from(selectedLanguages).map(async (language) => {
         try {
           const translatedText = await translateText(
             String(textToTranslate),
@@ -215,25 +203,29 @@ export function Translate() {
           const translatedRow = { ...row };
           translatedRow[languageColumnName] = language;
           translatedRow[translationColumnName] = translatedText;
-          processedRows.push(translatedRow);
+          onProgress();
+          return translatedRow;
         } catch (_error) {
-          console.error('Translation failed for row:', {
-            row,
-            language,
-            error: _error
-          });
+          console.error('Translation failed', { language, error: _error });
           const errorRow = { ...row };
           errorRow[languageColumnName] = language;
-          errorRow[translationColumnName] =
-            'Translation failed after multiple attempts';
-          processedRows.push(errorRow);
-        } finally {
+          errorRow[translationColumnName] = 'Translation failed';
           onProgress();
+          return errorRow;
         }
-      }
+      });
+
+      translationPromises.push(...languagePromises);
     }
 
-    return processedRows;
+    const results: Record<string, string>[] = [];
+    for (let i = 0; i < translationPromises.length; i += chunkSize) {
+      const chunk = translationPromises.slice(i, i + chunkSize);
+      const chunkResults = await Promise.all(chunk);
+      results.push(...chunkResults);
+    }
+
+    return results;
   };
 
   const downloadOutput = (
