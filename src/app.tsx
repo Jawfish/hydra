@@ -7,6 +7,8 @@ import { Stats } from '@/views/Stats';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { Backfill } from '@/views/Backfill';
 import { Deduplicate } from '@/views/Deduplicate';
+import { Translate } from '@/views/Translate';
+import { UuidExtractor } from '@/views/UuidExtractor';
 
 function App() {
   return (
@@ -16,9 +18,9 @@ function App() {
           <AppSidebar />
           <div className='p-8 xl:mx-auto w-full max-w-4xl mb-10'>
             <Routes>
-              {/* <Route path='/extract' element={<UuidExtractor />} /> */}
+              <Route path='/extract' element={<UuidExtractor />} />
               {/* <Route path='/map' element={<MapValues />} /> */}
-              {/* <Route path='/translate' element={<Translate />} /> */}
+              <Route path='/translate' element={<Translate />} />
               <Route path='/backfill' element={<Backfill />} />
               <Route path='/deduplicate' element={<Deduplicate />} />
               <Route path='/stats' element={<Stats />} />

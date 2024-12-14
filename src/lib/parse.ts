@@ -30,7 +30,6 @@ export const jsonlToJson = (content: string): Record<string, unknown>[] => {
  * @returns Array of paths (e.g., ["name", "address.street", "address.city"])
  */
 export const getAllPaths = (obj: object, prefix = ''): string[] => {
-  console.debug('Getting paths for object:', obj);
   let paths: string[] = [];
 
   if (!obj || typeof obj !== 'object') {
@@ -51,7 +50,6 @@ export const getAllPaths = (obj: object, prefix = ''): string[] => {
     }
   }
 
-  console.debug('Generated paths:', paths);
   return paths;
 };
 

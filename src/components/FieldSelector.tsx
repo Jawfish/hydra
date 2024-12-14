@@ -25,7 +25,7 @@ export function FieldSelector({
 
   return (
     <Select value={selectedField} onValueChange={onFieldSelect}>
-      <SelectTrigger>
+      <SelectTrigger className='w-[200px]'>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>

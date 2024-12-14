@@ -3,7 +3,7 @@ import type { FileType } from '@/store/store';
 import type React from 'react';
 
 type FileUploadProps = {
-  onFileUpload: (fileName: string, fileContent: string, fileType: string) => void;
+  onFileUpload: (fileName: string, fileContent: string, fileType: FileType) => void;
   fileName: string | null;
 };
 

@@ -6,7 +6,6 @@ interface UuidDisplayProps {
 }
 
 export function UuidDisplay({ extractedUuids }: UuidDisplayProps) {
-
   const handleCopy = (listType: 'python' | 'plaintext') => {
     if (extractedUuids.length === 0) {
       toast.warning('No UUIDs to copy');

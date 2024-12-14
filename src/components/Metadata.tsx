@@ -1,9 +1,7 @@
-import { countCsvRows } from '@/lib/parse';
-import { jsonlToJson } from '@/lib/parse';
 import { useWorkingFileStore } from '@/store/store';
 
 export function Metadata() {
-  const { fileContentRaw, fileContentParsed, fileName } = useWorkingFileStore();
+  const { fileContentParsed, fileName } = useWorkingFileStore();
 
   const getCount = () => {
     return fileContentParsed.length;

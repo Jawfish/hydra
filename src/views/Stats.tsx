@@ -193,7 +193,7 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
 };
 
 export const Stats: React.FC = () => {
-  const { fileName, fileContentParsed, setFileContent } = useWorkingFileStore();
+  const { fileName, fileContentParsed } = useWorkingFileStore();
   const [selectedIdentifier, setSelectedIdentifier] = useState<string>('');
   const [selectedAnalysisField, setSelectedAnalysisField] = useState<string>('');
   const [fieldAnalysis, setFieldAnalysis] = useState<FieldAnalysisDetail[]>([]);
@@ -244,14 +244,12 @@ export const Stats: React.FC = () => {
 
   return (
     <div className='flex flex-col mb-12'>
-      <div className='mb-10'>
-        <Header>
-          <Header.Title>File Statistics</Header.Title>
-          <Header.Description>
-            Analyze CSV, JSON, or JSONL files to get detailed statistics
-          </Header.Description>
-        </Header>
-      </div>
+      <Header>
+        <Header.Title>File Statistics</Header.Title>
+        <Header.Description>
+          Analyze CSV, JSON, or JSONL files to get detailed statistics
+        </Header.Description>
+      </Header>
 
       <div className='flex flex-col gap-8'>
         <div>

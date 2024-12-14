@@ -1,4 +1,3 @@
-import type React from 'react';
 import { useState, useMemo } from 'react';
 import { useWorkingFileStore } from '@/store/store';
 import { getAllPaths, getValueByPath } from '@/lib/parse';
@@ -8,18 +7,11 @@ import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Metadata } from '@/components/Metadata';
 import { UuidDisplay } from '@/components/UuidDisplay';
-import { UuidInput } from '@/components/UuidInput';
 import { Separator } from '@/components/ui/separator';
 import { useFileUpload } from '@/hooks/use-file-upload';
 
 export function UuidExtractor() {
-  const {
-    fileName,
-    fileContentRaw,
-    fileContentParsed,
-    setFileContent,
-    resetFileState
-  } = useWorkingFileStore();
+  const { fileName, fileContentParsed } = useWorkingFileStore();
 
   const [selectedField, setSelectedField] = useState('');
   const [extractedUuids, setExtractedUuids] = useState<string[]>([]);
@@ -45,13 +37,6 @@ export function UuidExtractor() {
     setExtractedUuids(uuids);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newText = e.target.value;
-    setFileContent(newText, 'unknown');
-    setExtractedUuids(extractUuids(newText));
-    resetFileState();
-  };
-
   return (
     <div className='flex flex-col mb-12'>
       <Header>
@@ -60,16 +45,12 @@ export function UuidExtractor() {
           Extract UUIDs from pasted text or uploaded CSV or JSONL files
         </Header.Description>
       </Header>
-      <UuidInput
-        input={fileContentRaw}
-        onChange={handleInputChange}
-        className='mb-4 mt-10'
-      />
       <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
       {fileContentParsed.length > 0 && (
         <>
-          <Separator className='my-14 h-[1px]' />
-          <h3 className='font-semibold mb-4'>Select field to extract UUIDs from</h3>
+          <h3 className='font-semibold mb-4 mt-10'>
+            Select field to extract UUIDs from
+          </h3>
           <FieldSelector
             fields={availableFields}
             selectedField={selectedField}
