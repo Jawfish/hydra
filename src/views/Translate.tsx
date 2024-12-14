@@ -114,10 +114,11 @@ export function Translate() {
     language: string,
     anthropic: Anthropic
   ): Promise<string> => {
-    return retry(
+    return await retry(
       async () => {
         try {
           const response = await anthropic.messages.create({
+            // biome-ignore lint/style/useNamingConvention: API requires snake_case
             max_tokens: 4096,
             messages: [
               {
@@ -185,7 +186,6 @@ export function Translate() {
 
   const downloadOutput = (
     processedRows: Record<string, string>[],
-    fileName: string | null,
     fileType: FileType
   ) => {
     const outputContent = serializeJson(processedRows, fileType);
@@ -237,7 +237,12 @@ export function Translate() {
       );
       let completedOperations = 0;
 
-      const chunkSize = 5;
+      const chunkSize = 20;
+
+      console.debug(
+        `Beginning translation of ${totalRows} rows in chunks of ${chunkSize}`
+      );
+
       for (let i = 0; i < rows.length; i += chunkSize) {
         const chunk = rows.slice(i, i + chunkSize);
         const chunkResults = await processRowChunk(
@@ -256,7 +261,7 @@ export function Translate() {
       }
 
       const fileType = (fileName?.split('.').pop() as FileType) || 'csv';
-      downloadOutput(processedRows, fileName, fileType);
+      downloadOutput(processedRows, fileType);
 
       toast.success('Processing complete! File downloaded.');
     } catch (error) {
