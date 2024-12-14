@@ -291,7 +291,6 @@ export function Filter() {
                         </div>
                       ) : (
                         <FileUpload
-                          hideName={true}
                           onFileUpload={(fileName, fileContent, fileType) => {
                             try {
                               const parsedContent = getParsedContentFromFile(
