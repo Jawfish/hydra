@@ -83,7 +83,7 @@ export function UuidExtractor() {
           <Separator className='my-14 h-[1px]' />
           <h3 className='font-semibold'>Extraction results</h3>
           <Metadata />
-          <UuidDisplay />
+          <UuidDisplay extractedUuids={extractedUuids} />
         </>
       )}
       {fileContentParsed.length > 0 && selectedField && extractedUuids.length === 0 && (

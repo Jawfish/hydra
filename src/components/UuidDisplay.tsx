@@ -1,9 +1,11 @@
 import { Button } from '@/components/ui/button';
-import { useFileStore } from '@/store/store';
 import { toast } from 'sonner';
 
-export function UuidDisplay() {
-  const { extractedUuids } = useFileStore();
+interface UuidDisplayProps {
+  extractedUuids: string[];
+}
+
+export function UuidDisplay({ extractedUuids }: UuidDisplayProps) {
 
   const handleCopy = (listType: 'python' | 'plaintext') => {
     if (extractedUuids.length === 0) {
