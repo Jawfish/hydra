@@ -1,33 +1,23 @@
 import { countCsvRows } from '@/lib/parse';
-import { parseJsonl } from '@/lib/json';
-import { useFileStore } from '@/store/store';
+import { jsonlToJson } from '@/lib/parse';
+import { useWorkingFileStore } from '@/store/store';
 
 export function Metadata() {
-  const { fileType, fileContent, extractedUuids } = useFileStore();
+  const { fileContentRaw, fileContentParsed, fileName } = useWorkingFileStore();
 
   const getCount = () => {
-    if (fileType === 'csv') {
-      // Subtract 1 to exclude header row
-      return countCsvRows(fileContent) - 1;
-    }
-    // For JSONL, count valid JSON objects
-    return parseJsonl(fileContent).length;
+    return fileContentParsed.length;
   };
 
   const count = getCount();
 
   return (
     <>
-      {fileContent && (
+      {fileName && (
         <p className='text-sm text-muted-foreground mt-2'>
-          {fileType === 'csv'
+          {fileName.endsWith('.csv')
             ? `CSV file contains ${count} data rows`
-            : `JSONL file contains ${count} objects`}
-        </p>
-      )}
-      {extractedUuids.length > 0 && (
-        <p className='text-sm text-muted-foreground'>
-          {`Found ${extractedUuids.length} UUIDs`}
+            : `File contains ${count} objects`}
         </p>
       )}
     </>
