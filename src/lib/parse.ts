@@ -193,3 +193,25 @@ export const parseJson = (content: string): Record<string, unknown>[] => {
 
   return Array.isArray(parsedContent) ? parsedContent : [parsedContent];
 };
+
+/**
+ * Get the parsed content from a file based on its type
+ * @param {string} fileContent - Raw file content
+ * @param {FileType} fileType - Type of the file
+ * @returns {Record<string, unknown>[]} - Array of objects parsed from the file content
+ */
+export const getParsedContentFromFile = (
+  fileContent: string,
+  fileType: FileType
+): Record<string, unknown>[] => {
+  switch (fileType) {
+    case 'json':
+      return parseJson(fileContent);
+    case 'jsonl':
+      return jsonlToJson(fileContent);
+    case 'csv':
+      return csvToJson(fileContent);
+    default:
+      throw new Error(`Unsupported file type: ${fileType}`);
+  }
+};

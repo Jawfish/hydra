@@ -1,7 +1,7 @@
 import {
   BarChart,
   Bot,
-  FileFilter,
+  Filter as FileFilter,
   FileText,
   FileX,
   IdCard,

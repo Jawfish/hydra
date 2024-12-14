@@ -27,11 +27,7 @@ export function FieldSelector({
   }
 
   return (
-    <Select 
-      value={selectedField} 
-      onValueChange={onFieldSelect} 
-      disabled={disabled}
-    >
+    <Select value={selectedField} onValueChange={onFieldSelect} disabled={disabled}>
       <SelectTrigger className='w-[200px]' disabled={disabled}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

@@ -3,12 +3,10 @@ import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import {
-  csvToJson,
   getAllPaths,
+  getParsedContentFromFile,
   getValueByPath,
-  jsonlToJson,
   normalizeString,
-  parseJson,
   serializeJson
 } from '@/lib/parse';
 import { Button } from '@/shadcn/components/ui/button';
@@ -56,11 +54,12 @@ type FilterGroup = {
   conditions: FilterCondition[];
 };
 
-const createLookupMap = (fileContent: Record<string, unknown>[], field: string): Set<string> => {
+const createLookupMap = (
+  fileContent: Record<string, unknown>[],
+  field: string
+): Set<string> => {
   return new Set(
-    fileContent.map(row => 
-      normalizeString(String(getValueByPath(row, field)))
-    )
+    fileContent.map(row => normalizeString(String(getValueByPath(row, field))))
   );
 };
 
@@ -294,24 +293,13 @@ export function Filter() {
                         <FileUpload
                           hideName={true}
                           onFileUpload={(fileName, fileContent, fileType) => {
-                            let parsedContent: Record<string, unknown>[];
-
                             try {
-                              switch (fileType) {
-                                case 'csv':
-                                  parsedContent = csvToJson(fileContent);
-                                  break;
-                                case 'json':
-                                  parsedContent = parseJson(fileContent);
-                                  break;
-                                case 'jsonl':
-                                  parsedContent = jsonlToJson(fileContent);
-                                  break;
-                                default:
-                                  throw new Error('Unsupported file type');
-                              }
-
-                              // Don't create lookup structure yet since we don't have the reference field
+                              const parsedContent = getParsedContentFromFile(
+                                fileContent,
+                                fileType
+                              );
+                              // Don't create lookup structure yet since we don't have
+                              // the reference field
                               updateCondition(index, {
                                 referenceFileContent: parsedContent,
                                 referenceFileName: fileName,
@@ -335,8 +323,11 @@ export function Filter() {
                             const newField = value;
                             updateCondition(index, {
                               referenceField: newField,
-                              lookupStructure: condition.referenceFileContent 
-                                ? createLookupMap(condition.referenceFileContent, newField)
+                              lookupStructure: condition.referenceFileContent
+                                ? createLookupMap(
+                                    condition.referenceFileContent,
+                                    newField
+                                  )
                                 : undefined
                             });
                           }}

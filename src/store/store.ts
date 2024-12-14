@@ -1,4 +1,4 @@
-import { csvToJson, jsonlToJson, parseJson } from '@/lib/parse';
+import { getParsedContentFromFile } from '@/lib/parse';
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
@@ -24,24 +24,6 @@ const initialState: FileState = {
   fileContentParsed: []
 };
 
-const parseContent = (
-  content: string,
-  fileType: FileType
-): Record<string, unknown>[] => {
-  console.debug('Parsing content...');
-
-  switch (fileType) {
-    case 'jsonl':
-      return jsonlToJson(content);
-    case 'csv':
-      return csvToJson(content);
-    case 'json':
-      return parseJson(content);
-    default:
-      throw new Error(`Unsupported file type: ${fileType}`);
-  }
-};
-
 const createFileStore = () =>
   create<FileStore>()(
     immer(set => ({
@@ -60,7 +42,7 @@ const createFileStore = () =>
           state.fileContentRaw = content;
 
           try {
-            state.fileContentParsed = parseContent(content, fileType);
+            state.fileContentParsed = getParsedContentFromFile(content, fileType);
             console.debug('Parse complete', {
               parsedType: typeof state.fileContentParsed,
               parsedLength: state.fileContentParsed.length

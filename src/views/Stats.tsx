@@ -234,9 +234,7 @@ export const Stats: React.FC = () => {
 
       <div className='mb-4'>
         <h3 className='text-lg font-semibold'>Working File</h3>
-        <p className='text-muted-foreground text-sm'>
-          The file to analyze
-        </p>
+        <p className='text-muted-foreground text-sm'>The file to analyze</p>
       </div>
       <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
 
