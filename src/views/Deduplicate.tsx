@@ -1,4 +1,3 @@
-import { useFileUpload } from '@/hooks/use-file-upload';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,8 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { getAllPaths, serializeJson, normalizeString } from '@/lib/parse';
+import { useFileUpload } from '@/hooks/use-file-upload';
+import { getAllPaths, normalizeString, serializeJson } from '@/lib/parse';
 import { getValueByPath } from '@/lib/parse';
 import {
   type FileType,
