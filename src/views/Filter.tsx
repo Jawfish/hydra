@@ -19,13 +19,24 @@ import {
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-type ComparisonType = 'equals' | 'contains' | 'startsWith' | 'endsWith' | 'greaterThan' | 'lessThan';
+type ComparisonType = 
+  | 'equals' 
+  | 'contains' 
+  | 'startsWith' 
+  | 'endsWith' 
+  | 'greaterThan' 
+  | 'lessThan'
+  | 'notEquals'
+  | 'notContains';
+
 type LogicalOperator = 'AND' | 'OR';
 
 interface FilterCondition {
   field: string;
   comparison: ComparisonType;
   value: string;
+  referenceField?: string;
+  useReference?: boolean;
 }
 
 interface FilterGroup {
@@ -35,16 +46,27 @@ interface FilterGroup {
 
 const evaluateCondition = (
   value: unknown,
-  condition: FilterCondition
+  condition: FilterCondition,
+  referenceValues?: Set<string>
 ): boolean => {
   const normalizedValue = normalizeString(String(value));
   const normalizedTestValue = normalizeString(condition.value);
 
+  // Handle reference comparison if enabled
+  if (condition.useReference && referenceValues) {
+    const isInReference = referenceValues.has(normalizedValue);
+    return condition.comparison.startsWith('not') ? !isInReference : isInReference;
+  }
+
   switch (condition.comparison) {
     case 'equals':
       return normalizedValue === normalizedTestValue;
+    case 'notEquals':
+      return normalizedValue !== normalizedTestValue;
     case 'contains':
       return normalizedValue.includes(normalizedTestValue);
+    case 'notContains':
+      return !normalizedValue.includes(normalizedTestValue);
     case 'startsWith':
       return normalizedValue.startsWith(normalizedTestValue);
     case 'endsWith':
@@ -60,15 +82,18 @@ const evaluateCondition = (
 
 const evaluateFilterGroup = (
   row: Record<string, unknown>,
-  group: FilterGroup
+  group: FilterGroup,
+  referenceValues?: Map<string, Set<string>>
 ): boolean => {
+  const evaluateConditionWithRef = (condition: FilterCondition) => {
+    const value = getValueByPath(row, condition.field);
+    const refValues = condition.referenceField && referenceValues?.get(condition.referenceField);
+    return evaluateCondition(value, condition, refValues);
+  };
+
   return group.operator === 'AND'
-    ? group.conditions.every((condition) =>
-        evaluateCondition(getValueByPath(row, condition.field), condition)
-      )
-    : group.conditions.some((condition) =>
-        evaluateCondition(getValueByPath(row, condition.field), condition)
-      );
+    ? group.conditions.every(evaluateConditionWithRef)
+    : group.conditions.some(evaluateConditionWithRef);
 };
 
 export function Filter() {
@@ -230,7 +255,9 @@ export function Filter() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="equals">Equals</SelectItem>
+                    <SelectItem value="notEquals">Does not equal</SelectItem>
                     <SelectItem value="contains">Contains</SelectItem>
+                    <SelectItem value="notContains">Does not contain</SelectItem>
                     <SelectItem value="startsWith">Starts with</SelectItem>
                     <SelectItem value="endsWith">Ends with</SelectItem>
                     <SelectItem value="greaterThan">Greater than</SelectItem>
