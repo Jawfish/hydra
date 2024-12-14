@@ -1,8 +1,8 @@
 export const APP_CONFIG = {
-  NAME: 'Hydra',
-  VERSION: '1.0.0',
-  THEME: {
-    DEFAULT: 'system',
-    STORAGE_KEY: 'vite-ui-theme'
+  name: 'Hydra',
+  version: '1.0.0',
+  theme: {
+    default: 'system' as const,
+    storageKey: 'vite-ui-theme'
   }
 };

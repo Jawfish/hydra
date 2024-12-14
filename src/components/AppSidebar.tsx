@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 
 const SidebarRouteItem: React.FC<{ route: Route }> = ({ route }) => {
   const handleRouteClick = () => {
-    document.title = `${APP_CONFIG.NAME} - ${route.title}`;
+    document.title = `${APP_CONFIG.name} - ${route.title}`;
   };
 
   return (

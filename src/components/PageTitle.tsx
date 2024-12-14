@@ -7,7 +7,7 @@ interface PageTitleProps {
 
 export function PageTitle({ title }: PageTitleProps) {
   useEffect(() => {
-    document.title = `${APP_CONFIG.NAME} - ${title}`;
+    document.title = `${APP_CONFIG.name} - ${title}`;
   }, [title]);
 
   return null;
