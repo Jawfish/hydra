@@ -47,12 +47,21 @@ type FilterCondition = {
   referenceField?: string;
   referenceFileContent?: Record<string, unknown>[];
   referenceFileName?: string;
+  lookupStructure?: Set<string>;
 };
 
 type FilterGroup = {
   operator: LogicalOperator;
   mode?: 'keep' | 'remove';
   conditions: FilterCondition[];
+};
+
+const createLookupMap = (fileContent: Record<string, unknown>[], field: string): Set<string> => {
+  return new Set(
+    fileContent.map(row => 
+      normalizeString(String(getValueByPath(row, field)))
+    )
+  );
 };
 
 const evaluateCondition = (value: unknown, condition: FilterCondition): boolean => {
@@ -85,22 +94,12 @@ const evaluateCondition = (value: unknown, condition: FilterCondition): boolean 
         (typeof value === 'object' && value !== null && Object.keys(value).length === 0)
       );
     case 'inFile':
-      return condition.referenceFileContent
-        ? condition.referenceFileContent.some(
-            refRow =>
-              normalizeString(
-                String(getValueByPath(refRow, condition.referenceField || ''))
-              ) === normalizeString(String(value))
-          )
+      return condition.lookupStructure
+        ? condition.lookupStructure.has(normalizeString(String(value)))
         : false;
     case 'notInFile':
-      return condition.referenceFileContent
-        ? !condition.referenceFileContent.some(
-            refRow =>
-              normalizeString(
-                String(getValueByPath(refRow, condition.referenceField || ''))
-              ) === normalizeString(String(value))
-          )
+      return condition.lookupStructure
+        ? !condition.lookupStructure.has(normalizeString(String(value)))
         : true;
     default:
       return false;
@@ -312,10 +311,12 @@ export function Filter() {
                                   throw new Error('Unsupported file type');
                               }
 
+                              // Don't create lookup structure yet since we don't have the reference field
                               updateCondition(index, {
                                 referenceFileContent: parsedContent,
                                 referenceFileName: fileName,
-                                referenceField: ''
+                                referenceField: '',
+                                lookupStructure: undefined
                               });
                             } catch (error) {
                               toast.error(
@@ -330,9 +331,15 @@ export function Filter() {
                         <FieldSelector
                           fields={getAllPaths(condition.referenceFileContent[0] || {})}
                           selectedField={condition.referenceField || ''}
-                          onFieldSelect={value =>
-                            updateCondition(index, { referenceField: value })
-                          }
+                          onFieldSelect={value => {
+                            const newField = value;
+                            updateCondition(index, {
+                              referenceField: newField,
+                              lookupStructure: condition.referenceFileContent 
+                                ? createLookupMap(condition.referenceFileContent, newField)
+                                : undefined
+                            });
+                          }}
                           placeholder='Select reference field'
                         />
                       )}
