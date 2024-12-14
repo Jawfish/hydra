@@ -142,7 +142,7 @@ export function MapValues() {
                 <ActionSection.Button
                   onClick={copyToClipboard}
                   disabled={Object.keys(mappedValues).length === 0}
-                  className="bg-secondary hover:bg-secondary/90"
+                  variant='outline'
                 >
                   Copy to Clipboard
                 </ActionSection.Button>
@@ -156,7 +156,7 @@ export function MapValues() {
                   className='font-mono rounded-md resize-none'
                 />
               )}
-            </div>
+            </ActionSection>
           </div>
         </>
       )}

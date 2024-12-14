@@ -9,9 +9,13 @@ interface ActionSectionProps {
 
 interface ActionSectionButtonProps {
   children: React.ReactNode;
-  variant?: 'default' | 'outline';
+  variant?: 'default' | 'outline' | 'destructive';
   onClick?: () => void;
   disabled?: boolean;
+}
+
+interface ActionSectionContainerProps {
+  children: React.ReactNode;
 }
 
 interface ActionSectionProgressProps {
@@ -20,10 +24,12 @@ interface ActionSectionProgressProps {
 
 export const ActionSection = ({ children }: ActionSectionProps) => (
   <div className='flex flex-col gap-6 bg-muted p-6 -m-6 mt-6 rounded-md'>
-    <div className='flex items-center justify-between'>
-      {children}
-    </div>
+    {children}
   </div>
+);
+
+ActionSection.Container = ({ children }: ActionSectionContainerProps) => (
+  <div className='flex gap-4'>{children}</div>
 );
 
 ActionSection.Button = ({
@@ -45,8 +51,6 @@ ActionSection.Button = ({
 ActionSection.Progress = ({ value }: ActionSectionProgressProps) => (
   <div className='flex flex-col gap-2'>
     <Progress value={value} />
-    <p className='text-sm text-muted-foreground text-center'>
-      {value}% complete
-    </p>
+    <p className='text-sm text-muted-foreground text-center'>{value}% complete</p>
   </div>
 );

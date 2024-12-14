@@ -1,7 +1,6 @@
 import { ActionSection } from '@/components/ActionSection';
-import { Progress } from '@/shadcn/components/ui/progress';
-import type { FileType } from '@/store/store';
 import { getValueByPath } from '@/lib/parse';
+import type { FileType } from '@/store/store';
 import Anthropic from '@anthropic-ai/sdk';
 import retry from 'async-retry';
 import { LoaderCircle } from 'lucide-react';
@@ -31,6 +30,7 @@ const DEFAULT_ENABLED_LANGUAGES = [
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
+import { HelpTooltip } from '@/components/HelpTooltip';
 import { getAllPaths, serializeJson } from '@/lib/parse';
 import { Button } from '@/shadcn/components/ui/button';
 import {
@@ -127,7 +127,7 @@ export function Translate() {
     language: string,
     anthropic: Anthropic
   ): Promise<string> => {
-    console.log('Translating text:', {
+    console.debug('Translating text:', {
       textLength: text.length,
       textType: typeof text,
       textValue: text,
@@ -145,6 +145,7 @@ export function Translate() {
         try {
           const response = await anthropic.messages.create({
             model: 'claude-3-5-sonnet-20241022',
+            // biome-ignore lint/style/useNamingConvention: api structure
             max_tokens: 4096,
             messages: [
               {
@@ -154,14 +155,16 @@ export function Translate() {
             ],
             system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
           });
-          
-          console.log('Translation response:', {
+
+          console.debug('Translation response:', {
             responseContent: response.content,
-            translatedText: response.content[0]?.text
+            translatedText:
+              response.content[0]?.type === 'text' ? response.content[0].text : ''
           });
 
-          const translatedText = response.content[0]?.text || '';
-          
+          const translatedText =
+            response.content[0]?.type === 'text' ? response.content[0].text : '';
+
           return translatedText;
         } catch (error) {
           console.error('Translation attempt failed:', {
@@ -169,7 +172,7 @@ export function Translate() {
             text,
             language
           });
-          
+
           // Rethrow to trigger retry
           throw error;
         }
@@ -177,11 +180,11 @@ export function Translate() {
       {
         retries: 7,
         factor: 2,
-        minTimeout: 1000,   // 1 second
-        maxTimeout: 60000,  // 60 seconds
+        minTimeout: 1000, // 1 second
+        maxTimeout: 60000, // 60 seconds
         onRetry: (error, attempt) => {
           console.warn(`Translation retry attempt ${attempt}:`, {
-            error: error.message,
+            error: error instanceof Error ? error.message : String(error),
             text: text.slice(0, 100) + (text.length > 100 ? '...' : ''),
             language
           });
@@ -198,7 +201,7 @@ export function Translate() {
     translationColumnName: string,
     anthropic: Anthropic,
     onProgress: () => void,
-    chunkSize: number = 20
+    chunkSize = 20
   ): Promise<Record<string, string>[]> => {
     const processedRows: Record<string, string>[] = [];
     const translationPromises: Promise<Record<string, string>>[] = [];
@@ -212,7 +215,7 @@ export function Translate() {
         continue;
       }
 
-      const languagePromises = Array.from(selectedLanguages).map(async (language) => {
+      const languagePromises = Array.from(selectedLanguages).map(async language => {
         try {
           const translatedText = await translateText(
             String(textToTranslate),
@@ -321,7 +324,9 @@ export function Translate() {
           translationColumnName,
           anthropic,
           () => {
-            if (isCancelled) return;
+            if (isCancelled) {
+              return;
+            }
             completedOperations++;
             setProgress(Math.round((completedOperations / totalOperations) * 100));
           },
@@ -436,14 +441,20 @@ export function Translate() {
             </div>
 
             <div>
-              <h3 className='text-lg font-semibold mb-4'>Chunk Size</h3>
+              <div className='flex gap-2 mb-4'>
+                <h3 className='text-lg'>Batch Size</h3>
+                <HelpTooltip
+                  className='mt-1 w-4 h-4 text-muted-foreground'
+                  message='How many items to translate at once. Higher values are faster but more prone to failure.'
+                />
+              </div>
               <Input
-                type="number"
+                type='number'
                 min={1}
                 max={100}
                 value={chunkSize}
                 onChange={e => setChunkSize(Number(e.target.value))}
-                placeholder="Enter chunk size (default 20)"
+                placeholder='Enter chunk size (default 20)'
                 className='max-w-md'
               />
             </div>
@@ -483,31 +494,31 @@ export function Translate() {
               </DropdownMenu>
             </div>
 
-            <div className='flex flex-col gap-4'>
-              <ActionSection>
-                {isProcessing ? (
-                  <>
-                    <ActionSection.Button onClick={() => setIsCancelled(true)}>
-                      Cancel
-                    </ActionSection.Button>
+            <ActionSection>
+              {isProcessing ? (
+                <>
+                  <ActionSection.Container>
                     <ActionSection.Button disabled={true}>
                       <div className='flex items-center'>
                         <LoaderCircle className='mr-2 h-4 w-4 animate-spin' />
                         Translating...
                       </div>
                     </ActionSection.Button>
-                    <ActionSection.Progress value={progress} />
-                  </>
-                ) : (
-                  <ActionSection.Button
-                    onClick={processCsv}
-                    disabled={!selectedColumn || !apiKey}
-                  >
-                    Translate
-                  </ActionSection.Button>
-                )}
-              </ActionSection>
-            </div>
+                    <ActionSection.Button onClick={() => setIsCancelled(true)}>
+                      Cancel
+                    </ActionSection.Button>
+                  </ActionSection.Container>
+                  <ActionSection.Progress value={progress} />
+                </>
+              ) : (
+                <ActionSection.Button
+                  onClick={processCsv}
+                  disabled={!(selectedColumn && apiKey)}
+                >
+                  Translate
+                </ActionSection.Button>
+              )}
+            </ActionSection>
           </div>
         </>
       )}

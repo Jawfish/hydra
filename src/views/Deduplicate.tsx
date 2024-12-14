@@ -1,10 +1,9 @@
+import { ActionSection } from '@/components/ActionSection';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { getAllPaths, normalizeString, serializeJson } from '@/lib/parse';
 import { getValueByPath } from '@/lib/parse';
-import { ActionSection } from '@/components/ActionSection';
-import { Button } from '@/shadcn/components/ui/button';
 import {
   Select,
   SelectContent,

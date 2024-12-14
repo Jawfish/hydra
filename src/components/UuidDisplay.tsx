@@ -36,7 +36,10 @@ export function UuidDisplay({ extractedUuids }: UuidDisplayProps) {
           <ActionSection.Button onClick={() => handleCopy('python')}>
             Copy as Python list
           </ActionSection.Button>
-          <ActionSection.Button onClick={() => handleCopy('plaintext')}>
+          <ActionSection.Button
+            onClick={() => handleCopy('plaintext')}
+            variant='outline'
+          >
             Copy as plain text
           </ActionSection.Button>
         </div>

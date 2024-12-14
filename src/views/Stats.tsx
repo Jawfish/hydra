@@ -236,8 +236,9 @@ export const Stats: React.FC = () => {
         <h3 className='text-lg font-semibold'>Working File</h3>
         <p className='text-muted-foreground text-sm'>The file to analyze</p>
       </div>
-      <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
-
+      <div className='mb-6'>
+        <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
+      </div>
       {fileName && fileContentParsed.length > 0 && (
         <div className='flex flex-col gap-6'>
           <div className='grid grid-cols-2 gap-4'>
