@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import type React from 'react';
+import { useState, useMemo } from 'react';
 import { useWorkingFileStore } from '@/store/store';
 import { getAllPaths, getValueByPath } from '@/lib/parse';
 import { extractUuids } from '@/lib/uuid';
@@ -25,7 +26,9 @@ export function UuidExtractor() {
 
   // Dynamically generate fields based on parsed content
   const availableFields = useMemo(() => {
-    if (fileContentParsed.length === 0) return [];
+    if (fileContentParsed.length === 0) {
+      return [];
+    }
     return getAllPaths(fileContentParsed[0] || {});
   }, [fileContentParsed]);
 
@@ -33,7 +36,7 @@ export function UuidExtractor() {
 
   const handleFieldSelection = (field: string) => {
     setSelectedField(field);
-    
+
     const uuids = fileContentParsed.flatMap(row => {
       const value = getValueByPath(row, field);
       return value ? extractUuids(value.toString()) : [];
@@ -57,17 +60,16 @@ export function UuidExtractor() {
           Extract UUIDs from pasted text or uploaded CSV or JSONL files
         </Header.Description>
       </Header>
-      <UuidInput input={fileContentRaw} onChange={handleInputChange} className='mb-4 mt-10' />
-      <FileUpload 
-        onFileUpload={handleFileUpload}
-        fileName={fileName}
+      <UuidInput
+        input={fileContentRaw}
+        onChange={handleInputChange}
+        className='mb-4 mt-10'
       />
+      <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
       {fileContentParsed.length > 0 && (
         <>
           <Separator className='my-14 h-[1px]' />
-          <h3 className='font-semibold mb-4'>
-            Select field to extract UUIDs from
-          </h3>
+          <h3 className='font-semibold mb-4'>Select field to extract UUIDs from</h3>
           <FieldSelector
             fields={availableFields}
             selectedField={selectedField}
@@ -84,7 +86,7 @@ export function UuidExtractor() {
           <UuidDisplay />
         </>
       )}
-      {(fileContentParsed.length > 0 && selectedField) && extractedUuids.length === 0 && (
+      {fileContentParsed.length > 0 && selectedField && extractedUuids.length === 0 && (
         <>
           <Separator className='my-14 h-[1px]' />
           <div className='text-muted-foreground'>
