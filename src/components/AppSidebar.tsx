@@ -14,6 +14,10 @@ import {
 } from '@/shadcn/components/ui/sidebar';
 
 export function AppSidebar() {
+  const handleRouteClick = (title: string) => {
+    document.title = `Hydra - ${title}`;
+  };
+
   return (
     <Sidebar collapsible='icon'>
       <SidebarContent>
@@ -26,7 +30,7 @@ export function AppSidebar() {
                     <SidebarMenuButton asChild={true}>
                       <Link
                         to={route.path}
-                        onClick={() => (document.title = `Hydra - ${route.title}`)}
+                        onClick={() => handleRouteClick(route.title)}
                       >
                         <route.icon />
                         <span>{route.title}</span>
