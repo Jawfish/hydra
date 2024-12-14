@@ -1,3 +1,4 @@
+import { APP_CONFIG } from '@/config';
 import { Layout } from '@/components/Layout';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { defaultRoute, routes } from '@/routes';
@@ -8,7 +9,7 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 function App() {
   return (
     <Router>
-      <ThemeProvider defaultTheme='system' storageKey='vite-ui-theme'>
+      <ThemeProvider defaultTheme={APP_CONFIG.THEME.DEFAULT} storageKey={APP_CONFIG.THEME.STORAGE_KEY}>
         <SidebarProvider>
           <Routes>
             <Route element={<Layout />}>

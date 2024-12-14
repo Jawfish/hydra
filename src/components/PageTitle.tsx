@@ -1,3 +1,4 @@
+import { APP_CONFIG } from '@/config';
 import { useEffect } from 'react';
 
 interface PageTitleProps {
@@ -6,8 +7,7 @@ interface PageTitleProps {
 
 export function PageTitle({ title }: PageTitleProps) {
   useEffect(() => {
-    const appName = 'Hydra';
-    document.title = `${appName} - ${title}`;
+    document.title = `${APP_CONFIG.NAME} - ${title}`;
   }, [title]);
 
   return null;

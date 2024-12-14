@@ -1,3 +1,4 @@
+import { APP_CONFIG } from '@/config';
 import { type Route, routes } from '@/routes';
 import {
   Sidebar,
@@ -11,7 +12,7 @@ import { Link } from 'react-router-dom';
 
 const SidebarRouteItem: React.FC<{ route: Route }> = ({ route }) => {
   const handleRouteClick = () => {
-    document.title = `Hydra - ${route.title}`;
+    document.title = `${APP_CONFIG.NAME} - ${route.title}`;
   };
 
   return (
