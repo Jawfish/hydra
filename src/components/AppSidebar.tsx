@@ -1,4 +1,3 @@
-import { BarChart, Bot, FileText, FileX, IdCard, Map as MapIcon } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -12,39 +11,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator
 } from '@/shadcn/components/ui/sidebar';
-
-const items = [
-  {
-    title: 'Extract UUIDs',
-    url: '/extract',
-    icon: IdCard
-  },
-  {
-    title: 'Map Values',
-    url: '/map',
-    icon: MapIcon
-  },
-  {
-    title: 'Translate',
-    url: '/translate',
-    icon: Bot
-  },
-  {
-    title: 'Backfill',
-    url: '/backfill',
-    icon: FileText
-  },
-  {
-    title: 'Deduplicate',
-    url: '/deduplicate',
-    icon: FileX
-  },
-  {
-    title: 'Stats',
-    url: '/stats',
-    icon: BarChart
-  }
-];
+import { routes } from '@/routes';
 
 export function AppSidebar() {
   return (
@@ -53,17 +20,17 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map(item => (
-                <React.Fragment key={item.title}>
+              {routes.map(route => (
+                <React.Fragment key={route.title}>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild={true}>
-                      <Link to={item.url}>
-                        <item.icon />
-                        <span>{item.title}</span>
+                      <Link to={route.path}>
+                        <route.icon />
+                        <span>{route.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                  {items.indexOf(item) < items.length - 1 && <SidebarSeparator />}
+                  {routes.indexOf(route) < routes.length - 1 && <SidebarSeparator />}
                 </React.Fragment>
               ))}
             </SidebarMenu>
