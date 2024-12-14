@@ -41,8 +41,6 @@ type FilterCondition = {
   field: string;
   comparison: ComparisonType;
   value: string;
-  referenceField?: string;
-  useReference?: boolean;
 };
 
 type FilterGroup = {
