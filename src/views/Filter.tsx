@@ -241,7 +241,7 @@ export function Filter() {
             <div className='space-y-4'>
               {filterGroup.conditions.map((condition, index) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: order is not expected to change
-                <div key={index} className='flex gap-4 items-start'>
+                <div key={index} className='flex gap-4 items-start justify-between'>
                   <FieldSelector
                     fields={workingFileSchema}
                     selectedField={condition.field}
@@ -324,7 +324,7 @@ export function Filter() {
                       placeholder='Value'
                       value={condition.value}
                       onChange={e => updateCondition(index, { value: e.target.value })}
-                      className='w-[200px]'
+                      className='w-[200px] ml-auto'
                     />
                   )}
 
