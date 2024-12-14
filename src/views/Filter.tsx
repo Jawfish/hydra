@@ -241,7 +241,7 @@ export function Filter() {
             <div className='space-y-4'>
               {filterGroup.conditions.map((condition, index) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: order is not expected to change
-                <div key={index} className='flex gap-4 items-start justify-between'>
+                <div key={index} className='flex items-center gap-4'>
                   <FieldSelector
                     fields={workingFileSchema}
                     selectedField={condition.field}
@@ -312,7 +312,7 @@ export function Filter() {
                       placeholder='Value'
                       value={condition.value}
                       onChange={e => updateCondition(index, { value: e.target.value })}
-                      className='w-[200px] ml-auto'
+                      className='w-[200px]'
                     />
                   )}
 
@@ -320,6 +320,7 @@ export function Filter() {
                     variant='destructive'
                     onClick={() => removeCondition(index)}
                     disabled={filterGroup.conditions.length === 1}
+                    className='ml-auto'
                   >
                     Remove
                   </Button>
