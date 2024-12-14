@@ -140,7 +140,7 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <HelpCircle className='w-4 h-4 text-muted-foreground' />
+                  <HelpCircle className='w-3 h-3 text-muted-foreground' />
                 </TooltipTrigger>
                 <TooltipContent>
                   The field to use for identifying the objects containing empty values
@@ -170,11 +170,9 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <HelpCircle className='w-4 h-4 text-muted-foreground' />
+                  <HelpCircle className='w-3 h-3 text-muted-foreground' />
                 </TooltipTrigger>
-                <TooltipContent>
-                  The field to check for empty values
-                </TooltipContent>
+                <TooltipContent>The field to check for empty values</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
