@@ -137,7 +137,7 @@ export function Translate() {
                 content: text
               }
             ],
-            model: 'claude-3-5-sonnet-latest',
+            model: 'claude-3-5-sonnet-20241022',
             system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
           });
           console.debug('Translation response:', response);
@@ -219,7 +219,7 @@ export function Translate() {
 
   const processCsv = async () => {
     setIsCancelled(false);
-    
+
     if (
       !validateInputs(
         selectedColumn,
@@ -261,7 +261,7 @@ export function Translate() {
           toast.info('Translation process cancelled');
           return;
         }
-        
+
         const chunk = rows.slice(i, i + chunkSize);
         const chunkResults = await processRowChunk(
           chunk,
