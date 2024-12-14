@@ -275,9 +275,12 @@ export function Filter() {
                   {['inFile', 'notInFile'].includes(condition.comparison) ? (
                     <>
                       {condition.referenceFileName ? (
-                        <span className='text-sm text-muted-foreground'>
+                        <div 
+                          className="text-sm text-muted-foreground truncate max-w-[200px]" 
+                          title={condition.referenceFileName}
+                        >
                           {condition.referenceFileName}
-                        </span>
+                        </div>
                       ) : (
                         <FileUpload
                           hideName={true}
