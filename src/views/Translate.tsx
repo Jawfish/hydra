@@ -55,7 +55,9 @@ export function Translate() {
   const csvHeaders =
     fileContentParsed.length > 0 ? getAllPaths(fileContentParsed[0]) : [];
   const [selectedColumn, setSelectedColumn] = useState<string>('');
-  const [apiKey, setApiKey] = useState<string>('');
+  const [apiKey, setApiKey] = useState<string>(() => {
+    return localStorage.getItem('anthropicApiKey') || '';
+  });
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState<number>(0);
   const [selectedLanguages, setSelectedLanguages] = useState<Set<string>>(
@@ -293,7 +295,11 @@ export function Translate() {
                 type='password'
                 placeholder='Enter your Anthropic API key'
                 value={apiKey}
-                onChange={e => setApiKey(e.target.value)}
+                onChange={e => {
+                  const newApiKey = e.target.value;
+                  setApiKey(newApiKey);
+                  localStorage.setItem('anthropicApiKey', newApiKey);
+                }}
                 className='max-w-md'
               />
             </div>
