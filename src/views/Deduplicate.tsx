@@ -3,6 +3,7 @@ import { Header } from '@/components/Header';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { getAllPaths, normalizeString, serializeJson } from '@/lib/parse';
 import { getValueByPath } from '@/lib/parse';
+import { ActionSection } from '@/components/ActionSection';
 import { Button } from '@/shadcn/components/ui/button';
 import {
   Select,
@@ -219,14 +220,14 @@ export function Deduplicate() {
       </div>
 
       {workingFileName && referenceFileName && (
-        <div className='mt-8'>
-          <Button
+        <ActionSection>
+          <ActionSection.Button
             onClick={processDeduplicate}
             disabled={!(workingMatchField && referenceMatchField)}
           >
             Process Deduplication
-          </Button>
-        </div>
+          </ActionSection.Button>
+        </ActionSection>
       )}
     </div>
   );
