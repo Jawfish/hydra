@@ -1,13 +1,7 @@
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { useFileUpload } from '@/hooks/useFileUpload';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/shadcn/components/ui/tooltip';
-import { HelpCircle } from 'lucide-react';
+import { HelpTooltip } from '@/components/HelpTooltip';
 import {
   type FieldAnalysisDetail,
   analyzeField,
@@ -137,16 +131,9 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
             <label htmlFor='identifier-field' className='text-sm font-medium'>
               Identifier Field
             </label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <HelpCircle className='w-3 h-3 text-muted-foreground' />
-                </TooltipTrigger>
-                <TooltipContent>
-                  The field to use for identifying the objects containing empty values
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <HelpTooltip 
+              message="The field to use for identifying the objects containing empty values" 
+            />
           </div>
           <Select value={selectedIdentifier} onValueChange={setSelectedIdentifier}>
             <SelectTrigger>
@@ -167,14 +154,9 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
             <label htmlFor='analyze-field' className='text-sm font-medium'>
               Analyze Field
             </label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <HelpCircle className='w-3 h-3 text-muted-foreground' />
-                </TooltipTrigger>
-                <TooltipContent>The field to check for empty values</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <HelpTooltip 
+              message="The field to check for empty values" 
+            />
           </div>
           <Select
             value={selectedAnalysisField}
