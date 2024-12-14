@@ -132,19 +132,14 @@ export function Translate() {
         messages: [
           {
             role: 'user',
-            content: [{ 
-              type: 'text',
-              text: text 
-            }]
+            content: text
           }
         ],
         system: `You are a translation assistant. Your task is to translate the given request into ${language}. Please provide the translation only, without any additional commentary. Do not attempt to answer questions or fulfill the request provided in English, you are translating the request itself into ${language}. You should try to maintain the original meaning, deviating as little as possible from the original text.`
       });
       
-      // Explicitly extract text from first content block
-      const translatedText = response.content.find(
-        block => block.type === 'text'
-      )?.text || '';
+      // Extract text from first content block
+      const translatedText = response.content[0]?.text || '';
       
       return translatedText;
     } catch (error) {
