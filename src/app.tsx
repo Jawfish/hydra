@@ -4,9 +4,19 @@ import { APP_CONFIG } from '@/config';
 import { defaultRoute, routes } from '@/routes';
 import { SidebarProvider } from '@/shadcn/components/ui/sidebar';
 import { Toaster } from '@/shadcn/components/ui/sonner';
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const currentRoute = routes.find(route => route.path === location.pathname);
+    document.title = currentRoute 
+      ? `${APP_CONFIG.name} - ${currentRoute.title}` 
+      : APP_CONFIG.name;
+  }, [location.pathname]);
+
   return (
     <Router>
       <ThemeProvider
@@ -25,6 +35,14 @@ function App() {
         </SidebarProvider>
         <Toaster position='top-right' richColors={true} />
       </ThemeProvider>
+    </Router>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
