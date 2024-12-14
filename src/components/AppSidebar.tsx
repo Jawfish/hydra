@@ -36,14 +36,17 @@ const SidebarRouteItem: React.FC<{ route: Route }> = ({ route }) => {
 };
 
 export function AppSidebar() {
+  // Sort routes alphabetically by title
+  const sortedRoutes = [...routes].sort((a, b) => a.title.localeCompare(b.title));
+
   return (
     <Sidebar collapsible='icon'>
       <SidebarContent>
         <SidebarMenu>
-          {routes.map((route, index) => (
+          {sortedRoutes.map((route, index) => (
             <React.Fragment key={route.title}>
               <SidebarRouteItem route={route} />
-              {index < routes.length - 1 && <SidebarSeparator />}
+              {index < sortedRoutes.length - 1 && <SidebarSeparator />}
             </React.Fragment>
           ))}
         </SidebarMenu>
