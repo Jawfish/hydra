@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { routes } from '@/routes';
 import {
   Sidebar,
   SidebarContent,
@@ -11,7 +12,6 @@ import {
   SidebarMenuItem,
   SidebarSeparator
 } from '@/shadcn/components/ui/sidebar';
-import { routes } from '@/routes';
 
 export function AppSidebar() {
   return (
@@ -24,7 +24,10 @@ export function AppSidebar() {
                 <React.Fragment key={route.title}>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild={true}>
-                      <Link to={route.path} onClick={() => document.title = `Hydra - ${route.title}`}>
+                      <Link
+                        to={route.path}
+                        onClick={() => (document.title = `Hydra - ${route.title}`)}
+                      >
                         <route.icon />
                         <span>{route.title}</span>
                       </Link>
