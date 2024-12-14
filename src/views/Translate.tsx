@@ -314,7 +314,7 @@ export function Translate() {
                 />
                 <label
                   htmlFor='anthropicApiKey'
-                  className='block text-sm font-medium mb-2'
+                  className='text-sm font-medium mb-2 hidden'
                 >
                   Anthropic API Key
                 </label>
