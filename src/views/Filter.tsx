@@ -44,6 +44,8 @@ type FilterCondition = {
   comparison: ComparisonType;
   value: string;
   referenceField?: string;
+  referenceFileContent?: Record<string, unknown>[];
+  referenceFileName?: string;
 };
 
 type FilterGroup = {
@@ -53,8 +55,7 @@ type FilterGroup = {
 
 const evaluateCondition = (
   value: unknown,
-  condition: FilterCondition,
-  referenceFileContent?: Record<string, unknown>[]
+  condition: FilterCondition
 ): boolean => {
   const normalizedValue = normalizeString(String(value));
   const normalizedTestValue = normalizeString(condition.value);
@@ -77,15 +78,15 @@ const evaluateCondition = (
     case 'lessThan':
       return Number(value) < Number(condition.value);
     case 'inFile':
-      return referenceFileContent 
-        ? referenceFileContent.some(refRow => 
+      return condition.referenceFileContent 
+        ? condition.referenceFileContent.some(refRow => 
             normalizeString(String(getValueByPath(refRow, condition.referenceField || ''))) === 
             normalizeString(String(value))
           )
         : false;
     case 'notInFile':
-      return referenceFileContent 
-        ? !referenceFileContent.some(refRow => 
+      return condition.referenceFileContent 
+        ? !condition.referenceFileContent.some(refRow => 
             normalizeString(String(getValueByPath(refRow, condition.referenceField || ''))) === 
             normalizeString(String(value))
           )
@@ -97,12 +98,11 @@ const evaluateCondition = (
 
 const evaluateFilterGroup = (
   row: Record<string, unknown>,
-  group: FilterGroup,
-  referenceFileContent?: Record<string, unknown>[]
+  group: FilterGroup
 ): boolean => {
   const evaluateConditionWithRef = (condition: FilterCondition) => {
     const value = getValueByPath(row, condition.field);
-    return evaluateCondition(value, condition, referenceFileContent);
+    return evaluateCondition(value, condition);
   };
 
   return group.operator === 'AND'
@@ -271,12 +271,41 @@ export function Filter() {
                 </Select>
 
                 {['inFile', 'notInFile'].includes(condition.comparison) ? (
-                  <FieldSelector
-                    fields={referenceFileSchema}
-                    selectedField={condition.referenceField || ''}
-                    onFieldSelect={value => updateCondition(index, { referenceField: value })}
-                    placeholder='Select reference field'
-                  />
+                  <div className="flex items-center gap-2">
+                    <FileUpload 
+                      onFileUpload={(fileName, fileContent, fileType) => {
+                        let parsedContent: Record<string, unknown>[];
+                        switch (fileType) {
+                          case 'csv':
+                            parsedContent = csvToJson(fileContent);
+                            break;
+                          case 'json':
+                            parsedContent = parseJson(fileContent);
+                            break;
+                          case 'jsonl':
+                            parsedContent = jsonlToJson(fileContent);
+                            break;
+                          default:
+                            toast.error('Unsupported file type');
+                            return;
+                        }
+
+                        updateCondition(index, { 
+                          referenceFileContent: parsedContent,
+                          referenceFileName: fileName 
+                        });
+                      }}
+                      fileName={condition.referenceFileName || null}
+                    />
+                    {condition.referenceFileContent && (
+                      <FieldSelector
+                        fields={getAllPaths(condition.referenceFileContent[0] || {})}
+                        selectedField={condition.referenceField || ''}
+                        onFieldSelect={value => updateCondition(index, { referenceField: value })}
+                        placeholder='Select reference field'
+                      />
+                    )}
+                  </div>
                 ) : (
                   <Input
                     type='text'
