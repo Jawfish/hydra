@@ -1,4 +1,5 @@
 import { Button } from '@/shadcn/components/ui/button';
+import { Progress } from '@/shadcn/components/ui/progress';
 import type React from 'react';
 
 interface ActionSectionProps {
@@ -11,6 +12,10 @@ interface ActionSectionButtonProps {
   variant?: 'default' | 'outline';
   onClick?: () => void;
   disabled?: boolean;
+}
+
+interface ActionSectionProgressProps {
+  value: number;
 }
 
 export const ActionSection = ({ children }: ActionSectionProps) => (
@@ -33,4 +38,13 @@ ActionSection.Button = ({
   >
     {children}
   </Button>
+);
+
+ActionSection.Progress = ({ value }: ActionSectionProgressProps) => (
+  <div className='flex flex-col gap-2'>
+    <Progress value={value} />
+    <p className='text-sm text-muted-foreground text-center'>
+      {value}% complete
+    </p>
+  </div>
 );

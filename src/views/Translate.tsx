@@ -484,14 +484,6 @@ export function Translate() {
             </div>
 
             <div className='flex flex-col gap-4'>
-              {isProcessing && (
-                <div className='flex flex-col gap-2'>
-                  <Progress value={progress} />
-                  <p className='text-sm text-muted-foreground text-center'>
-                    {progress}% complete
-                  </p>
-                </div>
-              )}
               <ActionSection>
                 {isProcessing ? (
                   <>
@@ -504,6 +496,7 @@ export function Translate() {
                         Translating...
                       </div>
                     </ActionSection.Button>
+                    <ActionSection.Progress value={progress} />
                   </>
                 ) : (
                   <ActionSection.Button
