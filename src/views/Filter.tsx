@@ -345,11 +345,20 @@ export function Filter() {
           <div className='mt-8'>
             <Button
               onClick={processFilter}
-              disabled={filterGroup.conditions.some(c => 
-                !(c.field && c.value) || 
-                (['inFile', 'notInFile'].includes(c.comparison) && 
-                 (!c.referenceFileContent || !c.referenceField))
-              )}
+              disabled={filterGroup.conditions.some(condition => {
+                // Check basic conditions for non-file comparisons
+                if (!['inFile', 'notInFile'].includes(condition.comparison)) {
+                  return !(condition.field && condition.value);
+                }
+                
+                // For file-based comparisons, check additional conditions
+                return !(
+                  condition.field && 
+                  condition.comparison && 
+                  condition.referenceFileContent && 
+                  condition.referenceField
+                );
+              })}
             >
               Apply Filters
             </Button>
