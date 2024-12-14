@@ -1,5 +1,6 @@
 import { APP_CONFIG } from '@/config';
 import { type Route, routes } from '@/routes';
+import { useLocation } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
@@ -11,18 +12,23 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const SidebarRouteItem: React.FC<{ route: Route }> = ({ route }) => {
+  const location = useLocation();
+  const isActive = location.pathname === route.path;
+
   const handleRouteClick = () => {
     document.title = `${APP_CONFIG.name} - ${route.title}`;
   };
 
   return (
-    <SidebarMenuItem className='ml-4 py-1'>
+    <SidebarMenuItem 
+      className={`ml-4 py-1 ${isActive ? 'bg-primary/10 font-semibold' : ''}`}
+    >
       <Link
         to={route.path}
         onClick={handleRouteClick}
         className='flex items-center gap-2'
       >
-        <route.icon className='w-4 h-4' />
+        <route.icon className={`w-4 h-4 ${isActive ? 'text-primary' : ''}`} />
         <span>{route.title}</span>
       </Link>
     </SidebarMenuItem>
