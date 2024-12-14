@@ -275,7 +275,6 @@ export function Filter() {
                   {['inFile', 'notInFile'].includes(condition.comparison) ? (
                     <>
                       <FileUpload
-                        hideName={true}
                         onFileUpload={(fileName, fileContent, fileType) => {
                           let parsedContent: Record<string, unknown>[];
 
@@ -312,7 +311,9 @@ export function Filter() {
                         <FieldSelector
                           fields={getAllPaths(condition.referenceFileContent[0] || {})}
                           selectedField={condition.referenceField || ''}
-                          onFieldSelect={value => updateCondition(index, { referenceField: value })}
+                          onFieldSelect={value =>
+                            updateCondition(index, { referenceField: value })
+                          }
                           placeholder='Select reference field'
                         />
                       )}
