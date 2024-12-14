@@ -7,22 +7,23 @@ import { UuidInput } from '@/components/UuidInput';
 import { Separator } from '@/components/ui/separator';
 import { getAllPaths, getValueByPath } from '@/lib/parse';
 import { extractUuids } from '@/lib/uuid';
-import { useFileStore } from '@/store/store';
-import { useMemo } from 'react';
+import { useWorkingFileStore } from '@/store/store';
+import { useMemo, useState } from 'react';
 
 export function UuidExtractor() {
   const {
-    setInput,
-    setExtractedUuids,
-    setSelectedField,
+    setFileName,
+    setFileContent,
     resetFileState,
-    input,
+    fileName,
     fileType,
     fileContentParsed,
-    fileName,
-    selectedField,
-    extractedUuids
-  } = useFileStore();
+    fileContentRaw: input,
+    setFileContentRaw: setInput
+  } = useWorkingFileStore();
+
+  const [selectedField, setSelectedField] = useState('');
+  const [extractedUuids, setExtractedUuids] = useState<string[]>([]);
 
   // Dynamically generate fields based on parsed content
   const availableFields = useMemo(() => {
