@@ -108,13 +108,6 @@ export function Filter() {
     }
   }, [workingFileContent]);
 
-  useEffect(() => {
-    if (referenceFileContent.length > 0) {
-      const schema = getAllPaths(referenceFileContent[0] || {});
-      setReferenceFileSchema(schema);
-    }
-  }, [referenceFileContent]);
-
   const handleWorkingFileUpload = useFileUpload('working');
 
   const addCondition = () => {
