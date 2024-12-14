@@ -307,24 +307,18 @@ export function Filter() {
                         }}
                         fileName={condition.referenceFileName || null}
                       />
-                      {condition.referenceFileContent ? (
-                        <FieldSelector
-                          fields={getAllPaths(condition.referenceFileContent[0] || {})}
-                          selectedField={condition.referenceField || ''}
-                          onFieldSelect={value =>
-                            updateCondition(index, { referenceField: value })
-                          }
-                          placeholder='Select reference field'
-                        />
-                      ) : (
-                        <FieldSelector
-                          fields={[]}
-                          selectedField=''
-                          onFieldSelect={() => {}}
-                          placeholder='Upload reference file first'
-                          disabled={true}
-                        />
-                      )}
+                      <FieldSelector
+                        fields={condition.referenceFileContent 
+                          ? getAllPaths(condition.referenceFileContent[0] || {}) 
+                          : []
+                        }
+                        selectedField={condition.referenceField || ''}
+                        onFieldSelect={value =>
+                          updateCondition(index, { referenceField: value })
+                        }
+                        placeholder='Select reference field'
+                        disabled={!condition.referenceFileContent}
+                      />
                     </div>
                   ) : (
                     <Input
