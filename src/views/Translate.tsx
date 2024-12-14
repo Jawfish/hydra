@@ -67,6 +67,7 @@ export function Translate() {
   };
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState<number>(0);
+  const [cancelTranslation, setCancelTranslation] = useState<(() => void) | null>(null);
   const [selectedLanguages, setSelectedLanguages] = useState<Set<string>>(
     new Set(DEFAULT_ENABLED_LANGUAGES)
   );
@@ -232,6 +233,16 @@ export function Translate() {
 
     try {
       setIsProcessing(true);
+      let isCancelled = false;
+
+      // Create a cancellation mechanism
+      const cancellationPromise = new Promise<void>((_, reject) => {
+        setCancelTranslation(() => {
+          isCancelled = true;
+          reject(new Error('Translation cancelled by user'));
+        });
+      });
+
       const anthropic = new Anthropic({
         apiKey: apiKey,
         dangerouslyAllowBrowser: true
@@ -242,45 +253,51 @@ export function Translate() {
 
       const totalRows = rows.length;
       const totalOperations = totalRows * selectedLanguages.size;
-      console.debug(
-        `Processing ${totalRows} rows into ${selectedLanguages.size} languages`
-      );
       let completedOperations = 0;
 
       const chunkSize = 20;
 
-      console.debug(
-        `Beginning translation of ${totalRows} rows in chunks of ${chunkSize}`
-      );
-
       for (let i = 0; i < rows.length; i += chunkSize) {
+        // Check for cancellation before each chunk
+        if (isCancelled) break;
+
         const chunk = rows.slice(i, i + chunkSize);
-        const chunkResults = await processRowChunk(
-          chunk,
-          selectedLanguages,
-          selectedColumn,
-          languageColumnName,
-          translationColumnName,
-          anthropic,
-          () => {
-            completedOperations++;
-            setProgress(Math.round((completedOperations / totalOperations) * 100));
-          }
-        );
+        const chunkResults = await Promise.race([
+          processRowChunk(
+            chunk,
+            selectedLanguages,
+            selectedColumn,
+            languageColumnName,
+            translationColumnName,
+            anthropic,
+            () => {
+              completedOperations++;
+              setProgress(Math.round((completedOperations / totalOperations) * 100));
+            }
+          ),
+          cancellationPromise
+        ]);
+
         processedRows.push(...chunkResults);
       }
 
-      const fileType = (fileName?.split('.').pop() as FileType) || 'csv';
-      downloadOutput(processedRows, fileType);
-
-      toast.success('Processing complete! File downloaded.');
+      if (!isCancelled) {
+        const fileType = (fileName?.split('.').pop() as FileType) || 'csv';
+        downloadOutput(processedRows, fileType);
+        toast.success('Processing complete! File downloaded.');
+      }
     } catch (error) {
-      toast.error(
-        `Error processing file: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      if (error instanceof Error && error.message === 'Translation cancelled by user') {
+        toast.warning('Translation process cancelled.');
+      } else {
+        toast.error(
+          `Error processing file: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
+      }
     } finally {
       setIsProcessing(false);
       setProgress(0);
+      setCancelTranslation(null);
     }
   };
 
@@ -419,19 +436,32 @@ export function Translate() {
                 </div>
               )}
               <ActionSection>
-                <ActionSection.Button
-                  onClick={processCsv}
-                  disabled={isProcessing || !selectedColumn || !apiKey}
-                >
-                  {isProcessing ? (
-                    <div className='flex items-center'>
-                      <LoaderCircle className='mr-2 h-4 w-4 animate-spin' />
-                      Translating...
-                    </div>
-                  ) : (
-                    'Translate'
-                  )}
-                </ActionSection.Button>
+                {isProcessing ? (
+                  <div className='flex gap-4'>
+                    <ActionSection.Button
+                      onClick={processCsv}
+                      disabled={true}
+                    >
+                      <div className='flex items-center'>
+                        <LoaderCircle className='mr-2 h-4 w-4 animate-spin' />
+                        Translating...
+                      </div>
+                    </ActionSection.Button>
+                    <ActionSection.Button
+                      variant='outline'
+                      onClick={() => cancelTranslation?.()}
+                    >
+                      Cancel Translation
+                    </ActionSection.Button>
+                  </div>
+                ) : (
+                  <ActionSection.Button
+                    onClick={processCsv}
+                    disabled={!selectedColumn || !apiKey}
+                  >
+                    Translate
+                  </ActionSection.Button>
+                )}
               </ActionSection>
             </div>
           </div>
