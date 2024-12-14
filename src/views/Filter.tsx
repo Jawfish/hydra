@@ -345,7 +345,11 @@ export function Filter() {
           <div className='mt-8'>
             <Button
               onClick={processFilter}
-              disabled={filterGroup.conditions.some(c => !(c.field && c.value))}
+              disabled={filterGroup.conditions.some(c => 
+                !(c.field && c.value) || 
+                (['inFile', 'notInFile'].includes(c.comparison) && 
+                 (!c.referenceFileContent || !c.referenceField))
+              )}
             >
               Apply Filters
             </Button>
