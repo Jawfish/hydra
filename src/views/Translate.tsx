@@ -441,7 +441,7 @@ const ColumnConfig = ({
 }: ColumnConfigProps): JSX.Element => (
   <Section>
     <Section.Title>Field Config</Section.Title>
-    <div className='flex gap-4'>
+    <Section.Items direction='row' className="grid grid-cols-2 gap-4">
       <div>
         <label htmlFor='languageColumn' className='mb-2 block font-medium text-sm'>
           Language Column Name
@@ -464,7 +464,7 @@ const ColumnConfig = ({
           onChange={(e): void => setTranslationColumnName(e.target.value)}
         />
       </div>
-    </div>
+    </Section.Items>
   </Section>
 );
 
