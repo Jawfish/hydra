@@ -1,5 +1,5 @@
-import type { JSX } from 'react';
 import { Label } from '@/components/Label';
+import type { JSX } from 'react';
 
 import {
   Select,
@@ -12,7 +12,7 @@ interface FieldSelectorProps {
   fields: string[];
   selectedField: string;
   onFieldSelect: (field: string) => void;
-  labelText: string;
+  label?: string;
   placeholder?: string;
   disabled?: boolean;
 }
@@ -21,7 +21,7 @@ export function FieldSelector({
   fields,
   selectedField,
   onFieldSelect,
-  labelText,
+  label,
   placeholder = 'Select field',
   disabled = false
 }: FieldSelectorProps): JSX.Element | null {
@@ -32,9 +32,9 @@ export function FieldSelector({
 
   return (
     <div>
-      <Label htmlFor={labelText.toLowerCase().replace(/[^a-z-]/g, '')}>
-        {labelText}
-      </Label>
+      {label && (
+        <Label htmlFor={label.toLowerCase().replace(/[^a-z-]/g, '')}>{label}</Label>
+      )}
       <Select value={selectedField} onValueChange={onFieldSelect} disabled={disabled}>
         <SelectTrigger disabled={disabled}>
           <SelectValue placeholder={placeholder} />
