@@ -396,7 +396,7 @@ const ConditionRow = ({
   removeCondition: (index: number) => void;
   isOnlyCondition: boolean;
 }): JSX.Element => (
-  <div className='relative flex items-center'>
+  <div className='flex items-center relative'>
     <div className='grid w-full grid-flow-col items-center gap-4'>
       <FieldSelector
         fields={workingFileSchema}
@@ -436,7 +436,7 @@ const ConditionRow = ({
     {!isOnlyCondition && (
       <X
         size={20}
-        className='ml-4 cursor-pointer text-red-500 hover:text-red-700'
+        className='absolute left-full ml-2 cursor-pointer text-destructive hover:opacity-75'
         onClick={(): void => removeCondition(index)}
       />
     )}
