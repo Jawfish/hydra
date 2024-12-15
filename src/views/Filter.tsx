@@ -279,15 +279,6 @@ export function Filter(): JSX.Element {
   );
 }
 
-type FilterConditionsProps = {
-  filterGroup: FilterGroup;
-  updateCondition: (index: number, updates: Partial<FilterCondition>) => void;
-  addCondition: () => void;
-  removeCondition: (index: number) => void;
-  setFilterGroup: (group: FilterGroup) => void;
-  workingFileSchema: string[];
-};
-
 const renderConditionValue = (
   condition: FilterCondition,
   index: number,
@@ -351,6 +342,15 @@ const renderConditionValue = (
       className='w-[200px]'
     />
   );
+};
+
+type FilterConditionsProps = {
+  filterGroup: FilterGroup;
+  updateCondition: (index: number, updates: Partial<FilterCondition>) => void;
+  addCondition: () => void;
+  removeCondition: (index: number) => void;
+  setFilterGroup: (group: FilterGroup) => void;
+  workingFileSchema: string[];
 };
 
 const FilterConditions = ({
