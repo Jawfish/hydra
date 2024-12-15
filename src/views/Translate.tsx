@@ -27,26 +27,24 @@ const DEFAULT_ENABLED_LANGUAGES = [
   'Japanese',
   'Korean'
 ] as const;
-
-import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
+import { HelpTooltip } from '@/components/HelpTooltip';
 import { Section } from '@/components/Section';
 import { getAllPaths, serializeJson } from '@/lib/parse';
-import { Input } from '@/shadcn/components/ui/input';
-import { Separator } from '@/shadcn/components/ui/separator';
-import { useWorkingFileStore } from '@/store/store';
-import { toast } from 'sonner';
 import { Button } from '@/shadcn/components/ui/button';
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuCheckboxItem
+  DropdownMenuTrigger
 } from '@/shadcn/components/ui/dropdown-menu';
-import { HelpTooltip } from '@/components/HelpTooltip';
+import { Input } from '@/shadcn/components/ui/input';
+import { useWorkingFileStore } from '@/store/store';
+import { toast } from 'sonner';
+import { FieldSelector } from '@/components/FieldSelector';
 export function Translate(): JSX.Element {
   const { fileName, fileContentRaw, fileContentParsed, setFileName, setFileContent } =
     useWorkingFileStore();
@@ -340,58 +338,48 @@ export function Translate(): JSX.Element {
   };
 
   return (
-    <div className='mb-12 flex flex-col'>
+    <div className='mb-12 flex flex-col gap-16'>
       <Header>
         <Header.Title>File Translator</Header.Title>
         <Header.Description>Translate file data</Header.Description>
       </Header>
 
-      <div className='mb-4'>
-        <h3 className='font-semibold text-lg'>Working File</h3>
-        <p className='text-muted-foreground text-sm'>The file to translate</p>
-      </div>
-      <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
+      <Section>
+        <Section.Title>Working File</Section.Title>
+        <Section.Description>The file to translate</Section.Description>
+        <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
+      </Section>
 
       {fileContentParsed.length > 0 && (
         <>
-          <Separator className='my-14 h-[1px]' />
-          <div className='flex flex-col gap-8'>
-            <Section>
-              <Section.Title>Input Field</Section.Title>
-              <Section.Items>
-                <FieldSelector
-                  fields={csvHeaders}
-                  selectedField={selectedColumn}
-                  onFieldSelect={handleColumnSelect}
-                />
-              </Section.Items>
-            </Section>
+          <ColumnConfig
+            languageColumnName={languageColumnName}
+            setLanguageColumnName={setLanguageColumnName}
+            translationColumnName={translationColumnName}
+            setTranslationColumnName={setTranslationColumnName}
+            csvHeaders={csvHeaders}
+            selectedColumn={selectedColumn}
+            handleColumnSelect={handleColumnSelect}
+          />
 
-            <ColumnConfig
-              languageColumnName={languageColumnName}
-              setLanguageColumnName={setLanguageColumnName}
-              translationColumnName={translationColumnName}
-              setTranslationColumnName={setTranslationColumnName}
-            />
+          <TranslateConfig
+            selectedLanguages={selectedLanguages}
+            setSelectedLanguages={setSelectedLanguages}
+            chunkSize={chunkSize}
+            setChunkSize={setChunkSize}
+            apiKey={apiKey}
+            handleApiKeyChange={handleApiKeyChange}
+          />
 
-            <TranslateConfig
-              selectedLanguages={selectedLanguages}
-              setSelectedLanguages={setSelectedLanguages}
-              chunkSize={chunkSize}
-              setChunkSize={setChunkSize}
-            />
-
-            <Separator />
-            <ActionSection>
-              <ActionSection.Button
-                onClick={processCsv}
-                disabled={!(selectedColumn && apiKey) || isProcessing}
-              >
-                Translate
-              </ActionSection.Button>
-              {isProcessing && <ActionSection.Progress value={progress} />}
-            </ActionSection>
-          </div>
+          <ActionSection>
+            <ActionSection.Button
+              onClick={processCsv}
+              disabled={!(selectedColumn && apiKey) || isProcessing}
+            >
+              Translate
+            </ActionSection.Button>
+            {isProcessing && <ActionSection.Progress value={progress} />}
+          </ActionSection>
         </>
       )}
     </div>
@@ -433,20 +421,32 @@ type ColumnConfigProps = {
   setLanguageColumnName: (value: string) => void;
   translationColumnName: string;
   setTranslationColumnName: (value: string) => void;
+  csvHeaders: string[];
+  selectedColumn: string;
+  handleColumnSelect: (column: string) => void;
 };
 
 const ColumnConfig = ({
   languageColumnName,
   setLanguageColumnName,
   translationColumnName,
-  setTranslationColumnName
+  setTranslationColumnName,
+  csvHeaders,
+  selectedColumn,
+  handleColumnSelect
 }: ColumnConfigProps): JSX.Element => (
   <Section>
     <Section.Title>Field Config</Section.Title>
-    <Section.Items direction='row' className="grid grid-cols-2 gap-4">
+    <Section.Items direction='row' className='grid grid-cols-2 gap-4'>
+      <FieldSelector
+        labelText='Input Field to Translate'
+        fields={csvHeaders}
+        selectedField={selectedColumn}
+        onFieldSelect={handleColumnSelect}
+      />
       <div>
         <label htmlFor='languageColumn' className='mb-2 block font-medium text-sm'>
-          Language Column Name
+          Output Language Field
         </label>
         <Input
           id='languageColumn'
@@ -457,7 +457,7 @@ const ColumnConfig = ({
       </div>
       <div>
         <label htmlFor='translationColumn' className='mb-2 block font-medium text-sm'>
-          Translation Column Name
+          Output Translation Field
         </label>
         <Input
           id='translationColumn'
@@ -489,7 +489,7 @@ const TranslateConfig = ({
 }: TranslateConfigProps): JSX.Element => (
   <Section>
     <Section.Title>Translation Config</Section.Title>
-    <Section.Items direction='row' className="grid grid-cols-3 gap-4">
+    <Section.Items direction='row' className='grid grid-cols-3 gap-4'>
       <div className='flex flex-col'>
         <label htmlFor='languages' className='mb-2 block font-medium text-sm'>
           Languages
