@@ -15,6 +15,7 @@ interface FieldSelectorProps {
   label?: string;
   placeholder?: string;
   disabled?: boolean;
+  className?: string;
 }
 
 export function FieldSelector({
@@ -23,7 +24,8 @@ export function FieldSelector({
   onFieldSelect,
   label,
   placeholder = 'Select field',
-  disabled = false
+  disabled = false,
+  className
 }: FieldSelectorProps): JSX.Element | null {
   // Only return null if there are NO fields
   if (fields.length === 0) {
@@ -31,17 +33,17 @@ export function FieldSelector({
   }
 
   return (
-    <div>
+    <div className={className}>
       {label && (
         <Label htmlFor={label.toLowerCase().replace(/[^a-z-]/g, '')}>{label}</Label>
       )}
       <Select value={selectedField} onValueChange={onFieldSelect} disabled={disabled}>
-        <SelectTrigger className="w-48 truncate" disabled={disabled}>
+        <SelectTrigger className="w-full truncate" disabled={disabled}>
           <SelectValue placeholder={placeholder} className="truncate overflow-hidden" />
         </SelectTrigger>
         <SelectContent>
           {fields.map(field => (
-            <SelectItem key={field} value={field} className="max-w-48 truncate">
+            <SelectItem key={field} value={field} className="w-full truncate">
               {field}
             </SelectItem>
           ))}

@@ -402,6 +402,7 @@ const ConditionRow = ({
         selectedField={condition.field}
         onFieldSelect={(value): void => updateCondition(index, { field: value })}
         placeholder='Select field'
+        className='w-full'
       />
 
       <Select
