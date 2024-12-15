@@ -95,10 +95,11 @@ export function UuidExtractor(): JSX.Element {
               <Section.Title>Extraction Results</Section.Title>
               <Section.Description>
                 {extractedUuids.length > 0
-                  ? `Found ${extractedUuids.length} UUIDs`
+                  ? `Found ${extractedUuids.length} UUIDs from ${fileContentParsed.length} ${
+                      fileName?.endsWith('.csv') ? 'CSV rows' : 'objects'
+                    }`
                   : 'No UUIDs found in selected field'}
               </Section.Description>
-              <Metadata />
             </Section>
           )}
 
@@ -122,19 +123,3 @@ export function UuidExtractor(): JSX.Element {
     </div>
   );
 }
-
-const Metadata = (): JSX.Element => {
-  const { fileContentParsed, fileName } = useWorkingFileStore();
-
-  return (
-    <>
-      {fileName && (
-        <p className='mt-2 text-muted-foreground text-sm'>
-          {fileName.endsWith('.csv')
-            ? `CSV file contains ${fileContentParsed.length} data rows`
-            : `File contains ${fileContentParsed.length} objects`}
-        </p>
-      )}
-    </>
-  );
-};
