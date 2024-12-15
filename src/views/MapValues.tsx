@@ -3,17 +3,16 @@ import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Section } from '@/components/Section';
-import { Header } from '@/components/Header';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { getAllPaths, getValueByPath } from '@/lib/parse';
 import { Button } from '@/shadcn/components/ui/button';
-import { Separator } from '@/shadcn/components/ui/separator';
 import { Textarea } from '@/shadcn/components/ui/textarea';
 import { useWorkingFileStore } from '@/store/store';
 import { useState } from 'react';
+import type { JSX } from 'react';
 import { toast } from 'sonner';
 
-export function MapValues() {
+export function MapValues(): JSX.Element {
   const { fileContentParsed, fileName } = useWorkingFileStore();
   const handleFileUpload = useFileUpload('working');
 
@@ -23,11 +22,11 @@ export function MapValues() {
   const [valueFields, setValueFields] = useState<string[]>([]);
   const [mappedValues, setMappedValues] = useState<Record<string, unknown>>({});
 
-  const handleKeyFieldSelect = (field: string) => {
+  const handleKeyFieldSelect = (field: string): void => {
     setKeyField(field);
   };
 
-  const handleValueFieldSelect = (field: string) => {
+  const handleValueFieldSelect = (field: string): void => {
     setValueFields(prev => {
       if (prev.includes(field)) {
         return prev.filter(f => f !== field);
@@ -36,7 +35,7 @@ export function MapValues() {
     });
   };
 
-  const generateMapping = () => {
+  const generateMapping = (): void => {
     if (!keyField || valueFields.length === 0) {
       toast.error('Please select a key field and at least one value field');
       return;
@@ -68,7 +67,7 @@ export function MapValues() {
     }
   };
 
-  const copyToClipboard = () => {
+  const copyToClipboard = (): void => {
     const pythonDict = JSON.stringify(mappedValues, null, 2)
       .replace(/"/g, "'")
       .replace(/\[/g, '[')
@@ -123,7 +122,7 @@ export function MapValues() {
                   <Button
                     key={field}
                     variant={valueFields.includes(field) ? 'default' : 'outline'}
-                    onClick={() => handleValueFieldSelect(field)}
+                    onClick={(): void => handleValueFieldSelect(field)}
                     className='h-8'
                   >
                     {field}
@@ -132,33 +131,32 @@ export function MapValues() {
               </div>
             </Section.Items>
           </Section>
-            <ActionSection>
-              <div className='flex gap-4'>
-                <ActionSection.Button
-                  onClick={generateMapping}
-                  disabled={!keyField || valueFields.length === 0}
-                >
-                  Generate Mapping
-                </ActionSection.Button>
-                <ActionSection.Button
-                  onClick={copyToClipboard}
-                  disabled={Object.keys(mappedValues).length === 0}
-                  variant='outline'
-                >
-                  Copy to Clipboard
-                </ActionSection.Button>
-              </div>
-              {mappedValues && (
-                <Textarea
-                  id='mappedValues'
-                  rows={12}
-                  value={JSON.stringify(mappedValues, null, 2)}
-                  readOnly={true}
-                  className='resize-none rounded-md font-mono'
-                />
-              )}
-            </ActionSection>
-          </div>
+          <ActionSection>
+            <div className='flex gap-4'>
+              <ActionSection.Button
+                onClick={generateMapping}
+                disabled={!keyField || valueFields.length === 0}
+              >
+                Generate Mapping
+              </ActionSection.Button>
+              <ActionSection.Button
+                onClick={copyToClipboard}
+                disabled={Object.keys(mappedValues).length === 0}
+                variant='outline'
+              >
+                Copy to Clipboard
+              </ActionSection.Button>
+            </div>
+            {mappedValues && (
+              <Textarea
+                id='mappedValues'
+                rows={12}
+                value={JSON.stringify(mappedValues, null, 2)}
+                readOnly={true}
+                className='resize-none rounded-md font-mono'
+              />
+            )}
+          </ActionSection>
         </>
       )}
     </div>
