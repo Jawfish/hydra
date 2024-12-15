@@ -2,6 +2,7 @@ import { ActionSection } from '@/components/ActionSection';
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
+import { Section } from '@/components/Section';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import {
   getAllPaths,
@@ -19,10 +20,10 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/shadcn/components/ui/select';
-import { Separator } from '@/shadcn/components/ui/separator';
 import { type FileType, useWorkingFileStore } from '@/store/store';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import type { JSX } from 'react';
 
 type ComparisonType =
   | 'equals'
@@ -110,7 +111,7 @@ const evaluateFilterGroup = (
   row: Record<string, unknown>,
   group: FilterGroup
 ): boolean => {
-  const evaluateConditionWithRef = (condition: FilterCondition) => {
+  const evaluateConditionWithRef = (condition: FilterCondition): boolean => {
     const value = getValueByPath(row, condition.field);
     return evaluateCondition(value, condition);
   };
@@ -120,7 +121,7 @@ const evaluateFilterGroup = (
     : group.conditions.some(evaluateConditionWithRef);
 };
 
-export function Filter() {
+export function Filter(): JSX.Element {
   const { fileName: workingFileName, fileContentParsed: workingFileContent } =
     useWorkingFileStore();
 
@@ -140,21 +141,21 @@ export function Filter() {
 
   const handleWorkingFileUpload = useFileUpload('working');
 
-  const addCondition = () => {
+  const addCondition = (): void => {
     setFilterGroup(prev => ({
       ...prev,
       conditions: [...prev.conditions, { field: '', comparison: 'equals', value: '' }]
     }));
   };
 
-  const removeCondition = (index: number) => {
+  const removeCondition = (index: number): void => {
     setFilterGroup(prev => ({
       ...prev,
       conditions: prev.conditions.filter((_, i) => i !== index)
     }));
   };
 
-  const updateCondition = (index: number, updates: Partial<FilterCondition>) => {
+  const updateCondition = (index: number, updates: Partial<FilterCondition>): void => {
     setFilterGroup(prev => ({
       ...prev,
       conditions: prev.conditions.map((condition, i) =>
@@ -163,7 +164,7 @@ export function Filter() {
     }));
   };
 
-  const processFilter = () => {
+  const processFilter = (): void => {
     if (!workingFileName) {
       toast.error('Please upload a file to filter');
       return;
@@ -197,14 +198,15 @@ export function Filter() {
 
       const fileType = (workingFileName?.split('.').pop() as FileType) || 'csv';
       const output = serializeJson(filteredContent, fileType);
-      const blob = new Blob([output], {
-        type:
-          fileType === 'json'
-            ? 'application/json'
-            : fileType === 'jsonl'
-              ? 'application/jsonl'
-              : 'text/csv'
-      });
+      let mimeType = 'text/csv';
+
+      if (fileType === 'json') {
+        mimeType = 'application/json';
+      } else if (fileType === 'jsonl') {
+        mimeType = 'application/jsonl';
+      }
+
+      const blob = new Blob([output], { type: mimeType });
 
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -226,7 +228,7 @@ export function Filter() {
   };
 
   return (
-    <div className='mb-12 flex flex-col'>
+    <div className='mb-12 flex flex-col gap-16'>
       <Header>
         <Header.Title>Filter</Header.Title>
         <Header.Description>
@@ -241,186 +243,194 @@ export function Filter() {
       <FileUpload onFileUpload={handleWorkingFileUpload} fileName={workingFileName} />
 
       {workingFileName && (
-        <>
-          <Separator className='my-14' />
-          <div className='mb-8'>
-            <h3 className='mb-6 font-semibold text-lg'>Filter Conditions</h3>
-
-            <div className='space-y-4'>
-              {filterGroup.conditions.map((condition, index) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: order is not expected to change
-                <div key={index} className='flex items-center gap-4'>
-                  <FieldSelector
-                    fields={workingFileSchema}
-                    selectedField={condition.field}
-                    onFieldSelect={value => updateCondition(index, { field: value })}
-                    placeholder='Select field'
-                  />
-
-                  <Select
-                    value={condition.comparison}
-                    onValueChange={(value: ComparisonType) =>
-                      updateCondition(index, { comparison: value })
-                    }
-                  >
-                    <SelectTrigger className='w-[200px]'>
-                      <SelectValue placeholder='Select comparison' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='equals'>Equals</SelectItem>
-                      <SelectItem value='notEquals'>Does not equal</SelectItem>
-                      <SelectItem value='contains'>Contains</SelectItem>
-                      <SelectItem value='notContains'>Does not contain</SelectItem>
-                      <SelectItem value='startsWith'>Starts with</SelectItem>
-                      <SelectItem value='endsWith'>Ends with</SelectItem>
-                      <SelectItem value='greaterThan'>Greater than</SelectItem>
-                      <SelectItem value='lessThan'>Less than</SelectItem>
-                      <SelectItem value='isEmpty'>Is Empty</SelectItem>
-                      <SelectItem value='inFile'>In File</SelectItem>
-                      <SelectItem value='notInFile'>Not in File</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  {['inFile', 'notInFile'].includes(condition.comparison) ? (
-                    <>
-                      {condition.referenceFileName ? (
-                        <div
-                          className='max-w-[100px] truncate text-muted-foreground text-sm'
-                          title={condition.referenceFileName}
-                        >
-                          {condition.referenceFileName}
-                        </div>
-                      ) : (
-                        <FileUpload
-                          onFileUpload={(fileName, fileContent, fileType) => {
-                            try {
-                              const parsedContent = getParsedContentFromFile(
-                                fileContent,
-                                fileType
-                              );
-                              // Don't create lookup structure yet since we don't have
-                              // the reference field
-                              updateCondition(index, {
-                                referenceFileContent: parsedContent,
-                                referenceFileName: fileName,
-                                referenceField: '',
-                                lookupStructure: undefined
-                              });
-                            } catch (error) {
-                              toast.error(
-                                `Error parsing file: ${error instanceof Error ? error.message : 'Unknown error'}`
-                              );
-                            }
-                          }}
-                          fileName={null}
-                        />
-                      )}
-                      {condition.referenceFileContent && (
-                        <FieldSelector
-                          fields={getAllPaths(condition.referenceFileContent[0] || {})}
-                          selectedField={condition.referenceField || ''}
-                          onFieldSelect={value => {
-                            const newField = value;
-                            updateCondition(index, {
-                              referenceField: newField,
-                              lookupStructure: condition.referenceFileContent
-                                ? createLookupMap(
-                                    condition.referenceFileContent,
-                                    newField
-                                  )
-                                : undefined
-                            });
-                          }}
-                          placeholder='Select reference field'
-                        />
-                      )}
-                    </>
-                  ) : ['isEmpty'].includes(condition.comparison) ? null : (
-                    <Input
-                      type='text'
-                      placeholder='Value'
-                      value={condition.value}
-                      onChange={e => updateCondition(index, { value: e.target.value })}
-                      className='w-[200px]'
-                    />
-                  )}
-
-                  <Button
-                    variant='destructive'
-                    onClick={() => removeCondition(index)}
-                    disabled={filterGroup.conditions.length === 1}
-                    className='ml-auto'
-                  >
-                    Remove
-                  </Button>
-                </div>
-              ))}
-            </div>
-
-            <div className='mt-4'>
-              <Button onClick={addCondition} variant='outline'>
-                Add Condition
-              </Button>
-            </div>
-
-            <Separator className='my-14' />
-
-            <div className='mt-14 flex items-center gap-4'>
-              <Select
-                value={filterGroup.mode || 'keep'}
-                onValueChange={(value: 'keep' | 'remove') =>
-                  setFilterGroup(prev => ({ ...prev, mode: value }))
+        <div>
+          <FilterConditions
+            filterGroup={filterGroup}
+            setFilterGroup={setFilterGroup}
+            updateCondition={updateCondition}
+            addCondition={addCondition}
+            removeCondition={removeCondition}
+            workingFileSchema={workingFileSchema}
+          />
+          <ActionSection>
+            <ActionSection.Button
+              onClick={processFilter}
+              disabled={filterGroup.conditions.some(condition => {
+                // Check basic conditions for non-file comparisons
+                if (!['inFile', 'notInFile'].includes(condition.comparison)) {
+                  return !(condition.field && condition.value);
                 }
-              >
-                <SelectTrigger className='w-[96px]'>
-                  <SelectValue placeholder='Select mode' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='keep'>Keep</SelectItem>
-                  <SelectItem value='remove'>Remove</SelectItem>
-                </SelectContent>
-              </Select>
-              <span>entries that</span>
-              <Select
-                value={filterGroup.operator}
-                onValueChange={(value: LogicalOperator) =>
-                  setFilterGroup(prev => ({ ...prev, operator: value }))
-                }
-              >
-                <SelectTrigger className='w-[180px]'>
-                  <SelectValue placeholder='Select operator' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='AND'>Match ALL conditions</SelectItem>
-                  <SelectItem value='OR'>Match ANY condition</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
 
-            <ActionSection>
-              <ActionSection.Button
-                onClick={processFilter}
-                disabled={filterGroup.conditions.some(condition => {
-                  // Check basic conditions for non-file comparisons
-                  if (!['inFile', 'notInFile'].includes(condition.comparison)) {
-                    return !(condition.field && condition.value);
-                  }
-
-                  // For file-based comparisons, check additional conditions
-                  return !(
-                    condition.field &&
-                    condition.comparison &&
-                    condition.referenceFileContent &&
-                    condition.referenceField
-                  );
-                })}
-              >
-                Apply Filters
-              </ActionSection.Button>
-            </ActionSection>
-          </div>
-        </>
+                // For file-based comparisons, check additional conditions
+                return !(
+                  condition.field &&
+                  condition.comparison &&
+                  condition.referenceFileContent &&
+                  condition.referenceField
+                );
+              })}
+            >
+              Apply Filters
+            </ActionSection.Button>
+          </ActionSection>
+        </div>
       )}
     </div>
   );
 }
+
+type FilterConditionsProps = {
+  filterGroup: FilterGroup;
+  updateCondition: (index: number, updates: Partial<FilterCondition>) => void;
+  addCondition: () => void;
+  removeCondition: (index: number) => void;
+  setFilterGroup: (group: FilterGroup) => void;
+  workingFileSchema: string[];
+};
+
+const FilterConditions = ({
+  filterGroup,
+  setFilterGroup,
+  updateCondition,
+  addCondition,
+  removeCondition,
+  workingFileSchema
+}: FilterConditionsProps): JSX.Element => (
+  <Section>
+    <Section.Title>Filter Conditions</Section.Title>
+    <Section.Items>
+      <Select
+        value={filterGroup.mode || 'keep'}
+        onValueChange={(value: 'keep' | 'remove'): void =>
+          setFilterGroup((prev): void => ({ ...prev, mode: value }))
+        }
+      >
+        <SelectTrigger>
+          <SelectValue placeholder='Select mode' />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value='keep'>Keep maches</SelectItem>
+          <SelectItem value='remove'>Remove matches</SelectItem>
+        </SelectContent>
+      </Select>
+      <Select
+        value={filterGroup.operator}
+        onValueChange={(value: LogicalOperator): void =>
+          setFilterGroup((prev): void => ({ ...prev, operator: value }))
+        }
+      >
+        <SelectTrigger>
+          <SelectValue placeholder='Select operator' />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value='AND'>Match ALL conditions</SelectItem>
+          <SelectItem value='OR'>Match ANY condition</SelectItem>
+        </SelectContent>
+      </Select>
+      {filterGroup.conditions.map((condition, index) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: order is not expected to change
+        <div key={index} className='flex items-center gap-4'>
+          <FieldSelector
+            fields={workingFileSchema}
+            selectedField={condition.field}
+            onFieldSelect={(value): void => updateCondition(index, { field: value })}
+            placeholder='Select field'
+          />
+
+          <Select
+            value={condition.comparison}
+            onValueChange={(value: ComparisonType): void =>
+              updateCondition(index, { comparison: value })
+            }
+          >
+            <SelectTrigger className='w-[200px]'>
+              <SelectValue placeholder='Select comparison' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='equals'>Equals</SelectItem>
+              <SelectItem value='notEquals'>Does not equal</SelectItem>
+              <SelectItem value='contains'>Contains</SelectItem>
+              <SelectItem value='notContains'>Does not contain</SelectItem>
+              <SelectItem value='startsWith'>Starts with</SelectItem>
+              <SelectItem value='endsWith'>Ends with</SelectItem>
+              <SelectItem value='greaterThan'>Greater than</SelectItem>
+              <SelectItem value='lessThan'>Less than</SelectItem>
+              <SelectItem value='isEmpty'>Is Empty</SelectItem>
+              <SelectItem value='inFile'>In File</SelectItem>
+              <SelectItem value='notInFile'>Not in File</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {['inFile', 'notInFile'].includes(condition.comparison) ? (
+            <>
+              {!condition.referenceFileName && (
+                <FileUpload
+                  onFileUpload={(fileName, fileContent, fileType): void => {
+                    try {
+                      const parsedContent = getParsedContentFromFile(
+                        fileContent,
+                        fileType
+                      );
+                      // Don't create lookup structure yet since we don't have
+                      // the reference field
+                      updateCondition(index, {
+                        referenceFileContent: parsedContent,
+                        referenceFileName: fileName,
+                        referenceField: '',
+                        lookupStructure: undefined
+                      });
+                    } catch (error) {
+                      toast.error(
+                        `Error parsing file: ${error instanceof Error ? error.message : 'Unknown error'}`
+                      );
+                    }
+                  }}
+                  fileName={null}
+                />
+              )}
+              {condition.referenceFileContent && (
+                <FieldSelector
+                  fields={getAllPaths(condition.referenceFileContent[0] || {})}
+                  selectedField={condition.referenceField || ''}
+                  onFieldSelect={(value): void => {
+                    const newField = value;
+                    updateCondition(index, {
+                      referenceField: newField,
+                      lookupStructure: condition.referenceFileContent
+                        ? createLookupMap(condition.referenceFileContent, newField)
+                        : undefined
+                    });
+                  }}
+                  placeholder='Select reference field'
+                />
+              )}
+            </>
+          ) : ['isEmpty'].includes(condition.comparison) ? null : (
+            <Input
+              type='text'
+              placeholder='Value'
+              value={condition.value}
+              onChange={e => updateCondition(index, { value: e.target.value })}
+              className='w-[200px]'
+            />
+          )}
+
+          <Button
+            variant='destructive'
+            onClick={(): void => removeCondition(index)}
+            disabled={filterGroup.conditions.length === 1}
+            className='ml-auto'
+          >
+            Remove
+          </Button>
+        </div>
+      ))}
+
+      <div className='mt-4'>
+        <Button onClick={addCondition} variant='outline'>
+          Add Condition
+        </Button>
+      </div>
+    </Section.Items>
+  </Section>
+);
