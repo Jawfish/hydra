@@ -38,7 +38,13 @@ Section.Items = ({
   className
 }: SectionItemsProps): JSX.Element => {
   const childCount = React.Children.count(children);
-  const gridClass = childCount === 1 ? 'grid-cols-1' : 'grid-cols-2';
+  const gridClass = childCount === 1 
+    ? 'grid-cols-1' 
+    : `grid-cols-${Math.min(childCount, 3)}`;
 
-  return <div className={`grid ${gridClass} gap-4 ${className || ''}`}>{children}</div>;
+  return (
+    <div className={`grid ${gridClass} gap-4 ${className || ''}`}>
+      {children}
+    </div>
+  );
 };
