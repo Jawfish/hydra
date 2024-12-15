@@ -3,7 +3,12 @@ import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Section } from '@/components/Section';
 import { useFileUpload } from '@/hooks/useFileUpload';
-import { getAllPaths, normalizeString, getValueByPath, serializeJson } from '@/lib/parse';
+import {
+  getAllPaths,
+  getValueByPath,
+  normalizeString,
+  serializeJson
+} from '@/lib/parse';
 import {
   Select,
   SelectContent,
@@ -17,9 +22,10 @@ import {
   useWorkingFileStore
 } from '@/store/store';
 import { useEffect, useState } from 'react';
+import type { JSX } from 'react';
 import { toast } from 'sonner';
 
-export function Backfill() {
+export function Backfill(): JSX.Element {
   const { fileName: workingFileName, fileContentParsed: workingFileContent } =
     useWorkingFileStore();
 
@@ -69,7 +75,7 @@ export function Backfill() {
   const handleWorkingFileUpload = useFileUpload('working');
   const handleReferenceFileUpload = useFileUpload('reference');
 
-  const performBackfill = () => {
+  const performBackfill = (): void => {
     if (
       !(
         workingMatchField &&
@@ -177,22 +183,49 @@ export function Backfill() {
             fileName={workingFileName}
           />
           {workingFileName && (
-            <Section.Items direction='row' className='grid grid-cols-2 gap-4'>
-              <FieldSelector
-                label='Field to match on'
-                fields={workingFileSchema}
-                selectedField={workingMatchField}
-                onFieldSelect={setWorkingMatchField}
-              />
-              <FieldSelector
-                label='Field to backfill data into'
-                fields={workingFileSchema}
-                selectedField={workingFillField}
-                onFieldSelect={setWorkingFillField}
-              />
-            </Section.Items>
+            <div className='mt-4'>
+              <div className='mb-4 flex gap-4'>
+                <div className='flex w-full flex-col gap-2'>
+                  <label htmlFor='matchField' className='font-medium text-sm'>
+                    Field to match on
+                  </label>
+                  <Select
+                    value={workingMatchField}
+                    onValueChange={setWorkingMatchField}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder='Select match field...' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {workingFileSchema.map(field => (
+                        <SelectItem key={field} value={field}>
+                          {field}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className='flex w-full flex-col gap-2'>
+                  <label htmlFor='fillField' className='font-medium text-sm'>
+                    Field to backfill data into
+                  </label>
+                  <Select value={workingFillField} onValueChange={setWorkingFillField}>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Select fill field...' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {workingFileSchema.map(field => (
+                        <SelectItem key={field} value={field}>
+                          {field}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
           )}
-        </div>
+        </Section>
 
         <Section>
           <Section.Title>Reference File</Section.Title>
@@ -202,22 +235,52 @@ export function Backfill() {
             fileName={referenceFileName}
           />
           {referenceFileName && (
-            <Section.Items direction='row' className='grid grid-cols-2 gap-4'>
-              <FieldSelector
-                label='Field to match on'
-                fields={referenceFileSchema}
-                selectedField={referenceMatchField}
-                onFieldSelect={setReferenceMatchField}
-              />
-              <FieldSelector
-                label='Field to retrieve data from'
-                fields={referenceFileSchema}
-                selectedField={referenceFillField}
-                onFieldSelect={setReferenceFillField}
-              />
-            </Section.Items>
+            <div className='mt-4'>
+              <div className='mb-4 flex gap-4'>
+                <div className='flex w-full flex-col gap-2'>
+                  <label htmlFor='matchField' className='font-medium text-sm'>
+                    Field to match on
+                  </label>
+                  <Select
+                    value={referenceMatchField}
+                    onValueChange={setReferenceMatchField}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder='Select match field...' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {referenceFileSchema.map(field => (
+                        <SelectItem key={field} value={field}>
+                          {field}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className='flex w-full flex-col gap-2'>
+                  <label htmlFor='fillField' className='font-medium text-sm'>
+                    Field to retrieve data from
+                  </label>
+                  <Select
+                    value={referenceFillField}
+                    onValueChange={setReferenceFillField}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder='Select data field...' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {referenceFileSchema.map(field => (
+                        <SelectItem key={field} value={field}>
+                          {field}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
           )}
-        </div>
+        </Section>
       </div>
 
       {workingFileName && referenceFileName && (

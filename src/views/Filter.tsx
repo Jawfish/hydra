@@ -1,5 +1,4 @@
 import { ActionSection } from '@/components/ActionSection';
-import { X } from 'lucide-react';
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
@@ -22,9 +21,10 @@ import {
   SelectValue
 } from '@/shadcn/components/ui/select';
 import { type FileType, useWorkingFileStore } from '@/store/store';
+import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
 import type { JSX } from 'react';
+import { toast } from 'sonner';
 
 type ComparisonType =
   | 'equals'
@@ -396,7 +396,7 @@ const ConditionRow = ({
   isOnlyCondition: boolean;
 }): JSX.Element => (
   <div className='relative flex items-center'>
-    <div className='grid w-full grid-flow-col items-center gap-4'>
+    <div className='grid w-full grid-cols-3 items-center gap-4'>
       <FieldSelector
         fields={workingFileSchema}
         selectedField={condition.field}
@@ -410,10 +410,9 @@ const ConditionRow = ({
         onValueChange={(value: ComparisonType): void =>
           updateCondition(index, { comparison: value })
         }
-        className='min-w-0'
       >
-        <SelectTrigger>
-          <SelectValue placeholder='Select comparison' />
+        <SelectTrigger className='w-full truncate'>
+          <SelectValue placeholder='Select comparison' className='truncate' />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value='equals'>Equals</SelectItem>

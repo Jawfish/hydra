@@ -37,8 +37,8 @@ export function FieldSelector({
       {label && (
         <Label htmlFor={label.toLowerCase().replace(/[^a-z-]/g, '')}>{label}</Label>
       )}
-      <Select value={selectedField} onValueChange={onFieldSelect} disabled={disabled} className='min-w-0'>
-        <SelectTrigger className='w-full truncate' disabled={disabled}>
+      <Select value={selectedField} onValueChange={onFieldSelect} disabled={disabled}>
+        <SelectTrigger className='w-full min-w-0 truncate' disabled={disabled}>
           <SelectValue placeholder={placeholder} className='truncate' />
         </SelectTrigger>
         <SelectContent>

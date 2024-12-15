@@ -6,15 +6,11 @@ type LabelProps = {
   className?: string;
 };
 
-export function Label({ 
-  htmlFor, 
-  children, 
-  className = '' 
-}: LabelProps) {
+export function Label({ htmlFor, children, className = '' }: LabelProps): JSX.Element {
   return (
-    <label 
-      htmlFor={htmlFor} 
-      className={`mb-2 block font-medium text-sm ${className}`}
+    <label
+      htmlFor={htmlFor}
+      className={`mb-2 block text-muted-foreground text-sm ${className}`}
     >
       {children}
     </label>

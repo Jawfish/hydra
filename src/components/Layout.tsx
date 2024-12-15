@@ -1,8 +1,9 @@
 import { AppSidebar } from '@/components/AppSidebar';
 import { WorkingFileDownloader } from '@/components/WorkingFileDownloader';
+import type { JSX } from 'react';
 import { Outlet } from 'react-router-dom';
 
-export function Layout() {
+export function Layout(): JSX.Element {
   return (
     <>
       <AppSidebar />

@@ -4,6 +4,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/shadcn/components/ui/tooltip';
+import { cn } from '@/shadcn/lib/utils';
 import { HelpCircle } from 'lucide-react';
 
 interface HelpTooltipProps {
@@ -11,14 +12,11 @@ interface HelpTooltipProps {
   className?: string;
 }
 
-export const HelpTooltip: React.FC<HelpTooltipProps> = ({
-  message,
-  className = 'w-4 h-4 text-muted-foreground'
-}) => (
+export const HelpTooltip: React.FC<HelpTooltipProps> = ({ message, className }) => (
   <TooltipProvider>
     <Tooltip>
       <TooltipTrigger>
-        <HelpCircle className={className} />
+        <HelpCircle className={cn(['h-4 w-4 text-muted-foreground', className])} />
       </TooltipTrigger>
       <TooltipContent>{message}</TooltipContent>
     </Tooltip>

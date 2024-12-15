@@ -2,15 +2,16 @@ import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Metadata } from '@/components/Metadata';
+import { Section } from '@/components/Section';
 import { UuidDisplay } from '@/components/UuidDisplay';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { getAllPaths, getValueByPath } from '@/lib/parse';
 import { extractUuids } from '@/lib/uuid';
-import { Separator } from '@/shadcn/components/ui/separator';
 import { useWorkingFileStore } from '@/store/store';
 import { useMemo, useState } from 'react';
+import type { JSX } from 'react';
 
-export function UuidExtractor() {
+export function UuidExtractor(): JSX.Element {
   const { fileName, fileContentParsed } = useWorkingFileStore();
 
   const [selectedField, setSelectedField] = useState('');
@@ -25,7 +26,7 @@ export function UuidExtractor() {
 
   const handleFileUpload = useFileUpload('working');
 
-  const handleFieldSelection = (field: string) => {
+  const handleFieldSelection = (field: string): void => {
     setSelectedField(field);
 
     const uuids = fileContentParsed.flatMap(row => {
@@ -52,7 +53,9 @@ export function UuidExtractor() {
       {fileContentParsed.length > 0 && (
         <Section>
           <Section.Title>Field Selection</Section.Title>
-          <Section.Description>Select the field to extract UUIDs from</Section.Description>
+          <Section.Description>
+            Select the field to extract UUIDs from
+          </Section.Description>
           <Section.Items>
             <FieldSelector
               fields={availableFields}
@@ -65,23 +68,17 @@ export function UuidExtractor() {
       )}
 
       {extractedUuids.length > 0 && (
-        <>
-          <Separator className='my-14 h-[1px]' />
-          <Section>
-            <Section.Title>Extraction Results</Section.Title>
-            <Metadata />
-            <UuidDisplay extractedUuids={extractedUuids} />
-          </Section>
-        </>
+        <Section>
+          <Section.Title>Extraction Results</Section.Title>
+          <Metadata />
+          <UuidDisplay extractedUuids={extractedUuids} />
+        </Section>
       )}
 
       {fileContentParsed.length > 0 && selectedField && extractedUuids.length === 0 && (
-        <>
-          <Separator className='my-14 h-[1px]' />
-          <div className='text-muted-foreground'>
-            <p>No UUIDs found</p>
-          </div>
-        </>
+        <div className='text-muted-foreground'>
+          <p>No UUIDs found</p>
+        </div>
       )}
     </div>
   );

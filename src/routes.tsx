@@ -77,5 +77,5 @@ export const routes: Route[] = [
 
 export const defaultRoute = {
   path: '/',
-  element: <Navigate to='/extract' replace={true} />
+  element: <Navigate to='/filter' replace={true} />
 };

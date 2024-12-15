@@ -50,7 +50,11 @@ export function Translate(): JSX.Element {
   const { fileName, fileContentRaw, fileContentParsed, setFileName, setFileContent } =
     useWorkingFileStore();
 
-  const handleFileUpload = (name: string, content: string, fileType: FileType) => {
+  const handleFileUpload = (
+    name: string,
+    content: string,
+    fileType: FileType
+  ): void => {
     setFileName(name);
     setFileContent(content, fileType);
   };
@@ -61,7 +65,7 @@ export function Translate(): JSX.Element {
     return localStorage.getItem('anthropicApiKey') || '';
   });
 
-  const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const newApiKey = e.target.value;
     setApiKey(newApiKey);
     localStorage.setItem('anthropicApiKey', newApiKey);
@@ -76,7 +80,7 @@ export function Translate(): JSX.Element {
     useState<string>('Translated Text');
   const [chunkSize, setChunkSize] = useState<number>(20);
 
-  const handleColumnSelect = (column: string) => {
+  const handleColumnSelect = (column: string): void => {
     setSelectedColumn(column);
   };
 
@@ -181,7 +185,7 @@ export function Translate(): JSX.Element {
         factor: 2,
         minTimeout: 1000, // 1 second
         maxTimeout: 60000, // 60 seconds
-        onRetry: (error, attempt) => {
+        onRetry: (error, attempt): void => {
           console.warn(`Translation retry attempt ${attempt}:`, {
             error: error instanceof Error ? error.message : String(error),
             text: text.slice(0, 100) + (text.length > 100 ? '...' : ''),
@@ -252,16 +256,17 @@ export function Translate(): JSX.Element {
   const downloadOutput = (
     processedRows: Record<string, string>[],
     fileType: FileType
-  ) => {
+  ): void => {
     const outputContent = serializeJson(processedRows, fileType);
-    const blob = new Blob([outputContent], {
-      type:
-        fileType === 'json'
-          ? 'application/json'
-          : fileType === 'jsonl'
-            ? 'application/jsonl'
-            : 'text/csv'
-    });
+    let mimeType = 'text/csv';
+
+    if (fileType === 'json') {
+      mimeType = 'application/json';
+    } else if (fileType === 'jsonl') {
+      mimeType = 'application/jsonl';
+    }
+
+    const blob = new Blob([outputContent], { type: mimeType });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -271,7 +276,7 @@ export function Translate(): JSX.Element {
     window.URL.revokeObjectURL(url);
   };
 
-  const processCsv = async () => {
+  const processCsv = async (): Promise<void> => {
     if (
       !validateInputs(
         selectedColumn,
@@ -400,7 +405,7 @@ const BatchSize = ({ chunkSize, setChunkSize }: BatchSizeProps): JSX.Element => 
         className='-mt-2'
         message='The number of translations to do at once. Higher values may result in faster processing, but are more likely to fail.'
       />
-    </Section>
+    </div>
     <Input
       type='number'
       min={1}
@@ -436,7 +441,7 @@ const ColumnConfig = ({
 }: ColumnConfigProps): JSX.Element => (
   <Section>
     <Section.Title>Field Config</Section.Title>
-    <Section.Items direction='row' className='grid grid-cols-2 gap-4'>
+    <Section.Items className='grid grid-cols-2 gap-4'>
       <FieldSelector
         label='Input Field to Translate'
         fields={csvHeaders}
@@ -484,7 +489,7 @@ const TranslateConfig = ({
 }: TranslateConfigProps): JSX.Element => (
   <Section>
     <Section.Title>Translation Config</Section.Title>
-    <Section.Items direction='row' className='grid grid-cols-3 gap-4'>
+    <Section.Items className='grid grid-cols-3 gap-4'>
       <div className='flex flex-col'>
         <Label htmlFor='languages'>Languages</Label>
         <DropdownMenu>
