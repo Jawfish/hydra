@@ -82,7 +82,7 @@ export function MapValues(): JSX.Element {
   };
 
   return (
-    <div className='mb-12 flex flex-col'>
+    <div className='mb-12 flex flex-col gap-16'>
       <Header>
         <Header.Title>Map Values</Header.Title>
         <Header.Description>
@@ -107,6 +107,7 @@ export function MapValues(): JSX.Element {
                 fields={availableFields}
                 selectedField={keyField}
                 onFieldSelect={handleKeyFieldSelect}
+                placeholder='Select key field'
               />
             </Section.Items>
           </Section>
@@ -133,9 +134,29 @@ export function MapValues(): JSX.Element {
           </Section>
           <ActionSection>
             <div className='flex gap-4'>
-              <ActionSection.Button
+              <ActionSection.Button 
                 onClick={generateMapping}
                 disabled={!keyField || valueFields.length === 0}
+              >
+                Generate Mapping
+              </ActionSection.Button>
+              <ActionSection.Button
+                onClick={copyToClipboard}
+                disabled={Object.keys(mappedValues).length === 0}
+                variant='outline'
+              >
+                Copy to Clipboard
+              </ActionSection.Button>
+            </div>
+            {mappedValues && (
+              <Textarea
+                id='mappedValues'
+                rows={12}
+                value={JSON.stringify(mappedValues, null, 2)}
+                readOnly={true}
+                className='resize-none rounded-md font-mono'
+              />
+            )}
               >
                 Generate Mapping
               </ActionSection.Button>
