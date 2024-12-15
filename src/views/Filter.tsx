@@ -344,6 +344,111 @@ const renderConditionValue = (
   );
 };
 
+// Mode Selector Component
+const FilterModeSelector = ({ 
+  mode, 
+  onModeChange 
+}: { 
+  mode: 'keep' | 'remove', 
+  onModeChange: (value: 'keep' | 'remove') => void 
+}): JSX.Element => (
+  <Select
+    value={mode}
+    onValueChange={onModeChange}
+  >
+    <SelectTrigger>
+      <SelectValue placeholder='Select mode' />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value='keep'>Keep matches</SelectItem>
+      <SelectItem value='remove'>Remove matches</SelectItem>
+    </SelectContent>
+  </Select>
+);
+
+// Logical Operator Selector Component
+const LogicalOperatorSelector = ({ 
+  operator, 
+  onOperatorChange 
+}: { 
+  operator: LogicalOperator, 
+  onOperatorChange: (value: LogicalOperator) => void 
+}): JSX.Element => (
+  <Select
+    value={operator}
+    onValueChange={onOperatorChange}
+  >
+    <SelectTrigger>
+      <SelectValue placeholder='Select operator' />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value='AND'>Match ALL conditions</SelectItem>
+      <SelectItem value='OR'>Match ANY condition</SelectItem>
+    </SelectContent>
+  </Select>
+);
+
+// Individual Condition Row Component
+const ConditionRow = ({
+  condition,
+  index,
+  workingFileSchema,
+  updateCondition,
+  removeCondition,
+  isOnlyCondition
+}: {
+  condition: FilterCondition,
+  index: number,
+  workingFileSchema: string[],
+  updateCondition: (index: number, updates: Partial<FilterCondition>) => void,
+  removeCondition: (index: number) => void,
+  isOnlyCondition: boolean
+}): JSX.Element => (
+  <div className='flex items-center gap-4'>
+    <FieldSelector
+      fields={workingFileSchema}
+      selectedField={condition.field}
+      onFieldSelect={(value): void => updateCondition(index, { field: value })}
+      placeholder='Select field'
+    />
+
+    <Select
+      value={condition.comparison}
+      onValueChange={(value: ComparisonType): void =>
+        updateCondition(index, { comparison: value })
+      }
+    >
+      <SelectTrigger className='w-[200px]'>
+        <SelectValue placeholder='Select comparison' />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value='equals'>Equals</SelectItem>
+        <SelectItem value='notEquals'>Does not equal</SelectItem>
+        <SelectItem value='contains'>Contains</SelectItem>
+        <SelectItem value='notContains'>Does not contain</SelectItem>
+        <SelectItem value='startsWith'>Starts with</SelectItem>
+        <SelectItem value='endsWith'>Ends with</SelectItem>
+        <SelectItem value='greaterThan'>Greater than</SelectItem>
+        <SelectItem value='lessThan'>Less than</SelectItem>
+        <SelectItem value='isEmpty'>Is Empty</SelectItem>
+        <SelectItem value='inFile'>In File</SelectItem>
+        <SelectItem value='notInFile'>Not in File</SelectItem>
+      </SelectContent>
+    </Select>
+
+    {renderConditionValue(condition, index, updateCondition)}
+
+    <Button
+      variant='destructive'
+      onClick={(): void => removeCondition(index)}
+      disabled={isOnlyCondition}
+      className='ml-auto'
+    >
+      Remove
+    </Button>
+  </div>
+);
+
 type FilterConditionsProps = {
   filterGroup: FilterGroup;
   updateCondition: (index: number, updates: Partial<FilterCondition>) => void;
@@ -364,79 +469,31 @@ const FilterConditions = ({
   <Section>
     <Section.Title>Filter Conditions</Section.Title>
     <Section.Items>
-      <Select
-        value={filterGroup.mode || 'keep'}
-        onValueChange={(value: 'keep' | 'remove'): void => {
+      <FilterModeSelector
+        mode={filterGroup.mode || 'keep'}
+        onModeChange={(value): void => {
           setFilterGroup({ ...filterGroup, mode: value });
         }}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder='Select mode' />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value='keep'>Keep maches</SelectItem>
-          <SelectItem value='remove'>Remove matches</SelectItem>
-        </SelectContent>
-      </Select>
-      <Select
-        value={filterGroup.operator}
-        onValueChange={(value: LogicalOperator): void => {
+      />
+      
+      <LogicalOperatorSelector
+        operator={filterGroup.operator}
+        onOperatorChange={(value): void => {
           setFilterGroup({ ...filterGroup, operator: value });
         }}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder='Select operator' />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value='AND'>Match ALL conditions</SelectItem>
-          <SelectItem value='OR'>Match ANY condition</SelectItem>
-        </SelectContent>
-      </Select>
+      />
+
       {filterGroup.conditions.map((condition, index) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: order is not expected to change
-        <div key={index} className='flex items-center gap-4'>
-          <FieldSelector
-            fields={workingFileSchema}
-            selectedField={condition.field}
-            onFieldSelect={(value): void => updateCondition(index, { field: value })}
-            placeholder='Select field'
-          />
-
-          <Select
-            value={condition.comparison}
-            onValueChange={(value: ComparisonType): void =>
-              updateCondition(index, { comparison: value })
-            }
-          >
-            <SelectTrigger className='w-[200px]'>
-              <SelectValue placeholder='Select comparison' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='equals'>Equals</SelectItem>
-              <SelectItem value='notEquals'>Does not equal</SelectItem>
-              <SelectItem value='contains'>Contains</SelectItem>
-              <SelectItem value='notContains'>Does not contain</SelectItem>
-              <SelectItem value='startsWith'>Starts with</SelectItem>
-              <SelectItem value='endsWith'>Ends with</SelectItem>
-              <SelectItem value='greaterThan'>Greater than</SelectItem>
-              <SelectItem value='lessThan'>Less than</SelectItem>
-              <SelectItem value='isEmpty'>Is Empty</SelectItem>
-              <SelectItem value='inFile'>In File</SelectItem>
-              <SelectItem value='notInFile'>Not in File</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {renderConditionValue(condition, index, updateCondition)}
-
-          <Button
-            variant='destructive'
-            onClick={(): void => removeCondition(index)}
-            disabled={filterGroup.conditions.length === 1}
-            className='ml-auto'
-          >
-            Remove
-          </Button>
-        </div>
+        <ConditionRow
+          key={index}
+          condition={condition}
+          index={index}
+          workingFileSchema={workingFileSchema}
+          updateCondition={updateCondition}
+          removeCondition={removeCondition}
+          isOnlyCondition={filterGroup.conditions.length === 1}
+        />
       ))}
 
       <div className='mt-4'>
