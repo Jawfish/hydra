@@ -1,15 +1,15 @@
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
-import { Metadata } from '@/components/Metadata';
 import { Section } from '@/components/Section';
-import { UuidDisplay } from '@/components/UuidDisplay';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { getAllPaths, getValueByPath } from '@/lib/parse';
 import { extractUuids } from '@/lib/uuid';
 import { useWorkingFileStore } from '@/store/store';
 import { useMemo, useState } from 'react';
 import type { JSX } from 'react';
+import { toast } from 'sonner';
+import { ActionSection } from '@/components/ActionSection';
 
 export function UuidExtractor(): JSX.Element {
   const { fileName, fileContentParsed } = useWorkingFileStore();
@@ -83,3 +83,66 @@ export function UuidExtractor(): JSX.Element {
     </div>
   );
 }
+
+interface UuidDisplayProps {
+  extractedUuids: string[];
+}
+
+const UuidDisplay = ({ extractedUuids }: UuidDisplayProps): JSX.Element => {
+  const handleCopy = (listType: 'python' | 'plaintext'): void => {
+    if (extractedUuids.length === 0) {
+      toast.warning('No UUIDs to copy');
+      return;
+    }
+
+    try {
+      if (listType === 'python') {
+        navigator.clipboard.writeText(
+          `[${extractedUuids.map(uuid => `'${uuid}'`).join(', ')}]`
+        );
+      } else {
+        navigator.clipboard.writeText(extractedUuids.join('\n'));
+      }
+
+      toast.success(`Copied ${extractedUuids.length} UUIDs to clipboard`);
+    } catch (error) {
+      toast.error(
+        `Error copying to clipboard: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  };
+
+  return (
+    <ActionSection>
+      {extractedUuids.length > 0 && (
+        <div className='flex gap-2'>
+          <ActionSection.Button onClick={(): void => handleCopy('python')}>
+            Copy as Python list
+          </ActionSection.Button>
+          <ActionSection.Button
+            onClick={(): void => handleCopy('plaintext')}
+            variant='outline'
+          >
+            Copy as plain text
+          </ActionSection.Button>
+        </div>
+      )}
+    </ActionSection>
+  );
+};
+
+const Metadata = (): JSX.Element => {
+  const { fileContentParsed, fileName } = useWorkingFileStore();
+
+  return (
+    <>
+      {fileName && (
+        <p className='mt-2 text-muted-foreground text-sm'>
+          {fileName.endsWith('.csv')
+            ? `CSV file contains ${fileContentParsed.length} data rows`
+            : `File contains ${fileContentParsed.length} objects`}
+        </p>
+      )}
+    </>
+  );
+};
