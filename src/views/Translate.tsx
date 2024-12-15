@@ -487,16 +487,16 @@ const TranslateConfig = ({
 }: TranslateConfigProps): JSX.Element => (
   <Section>
     <Section.Title>Translation Config</Section.Title>
-    <Section.Items direction='row'>
+    <Section.Items direction='row' className="grid grid-cols-3 gap-4">
       <div className='flex flex-col'>
         <label htmlFor='languages' className='mb-2 block font-medium text-sm'>
           Languages
         </label>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild={true} className='min-w-[200px]'>
+          <DropdownMenuTrigger asChild={true}>
             <Button variant='outline'>({selectedLanguages.size} selected)</Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className='w-[200px]'>
+          <DropdownMenuContent>
             <DropdownMenuLabel>Available Languages</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {ALL_LANGUAGES.map(language => (
@@ -520,7 +520,7 @@ const TranslateConfig = ({
         </DropdownMenu>
       </div>
       <BatchSize chunkSize={chunkSize} setChunkSize={setChunkSize} />
-      <form onSubmit={(e): void => e.preventDefault()} className='w-[200px]'>
+      <form onSubmit={(e): void => e.preventDefault()} className='flex flex-col'>
         {/* Hidden username field for password managers */}
         <Input
           type='text'
