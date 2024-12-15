@@ -98,29 +98,26 @@ export function MapValues() {
       </Section>
       {fileContentParsed.length > 0 && (
         <>
-          <Separator className='my-14 h-[1px]' />
-          <div className='flex flex-col gap-14'>
-            <div>
-              <div className='mb-5'>
-                <h3 className='font-semibold text-lg'>Key Field</h3>
-                <p className='text-muted-foreground text-sm'>
-                  Select a field to use as the key in the mapping
-                </p>
-              </div>
+          <Section>
+            <Section.Title>Key Field</Section.Title>
+            <Section.Description>
+              Select a field to use as the key in the mapping
+            </Section.Description>
+            <Section.Items>
               <FieldSelector
                 fields={availableFields}
                 selectedField={keyField}
                 onFieldSelect={handleKeyFieldSelect}
               />
-            </div>
-            <Separator />
-            <div>
-              <div className='mb-5'>
-                <h3 className='font-semibold text-lg'>Value Fields</h3>
-                <p className='text-muted-foreground text-sm'>
-                  Select one or more fields to use as values in the mapping
-                </p>
-              </div>
+            </Section.Items>
+          </Section>
+
+          <Section>
+            <Section.Title>Value Fields</Section.Title>
+            <Section.Description>
+              Select one or more fields to use as values in the mapping
+            </Section.Description>
+            <Section.Items>
               <div className='flex flex-wrap gap-2'>
                 {availableFields.map(field => (
                   <Button
@@ -133,10 +130,14 @@ export function MapValues() {
                   </Button>
                 ))}
               </div>
-            </div>
+            </Section.Items>
+          </Section>
             <ActionSection>
               <div className='flex gap-4'>
-                <ActionSection.Button onClick={generateMapping}>
+                <ActionSection.Button
+                  onClick={generateMapping}
+                  disabled={!keyField || valueFields.length === 0}
+                >
                   Generate Mapping
                 </ActionSection.Button>
                 <ActionSection.Button
