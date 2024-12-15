@@ -1,6 +1,8 @@
 import { ActionSection } from '@/components/ActionSection';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
+import { Label } from '@/components/Label';
+import { Section } from '@/components/Section';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { getAllPaths, normalizeString, serializeJson } from '@/lib/parse';
 import { getValueByPath } from '@/lib/parse';
@@ -137,7 +139,7 @@ export function Deduplicate() {
   };
 
   return (
-    <div className='mb-12 flex flex-col'>
+    <div className='mb-12 flex flex-col gap-16'>
       <Header>
         <Header.Title>Deduplicate Files</Header.Title>
         <Header.Description>
@@ -145,78 +147,64 @@ export function Deduplicate() {
         </Header.Description>
       </Header>
 
-      <div className='grid grid-cols-2 gap-8'>
-        <div>
-          <div className='mb-4'>
-            <h3 className='font-semibold text-lg'>Working File</h3>
-            <p className='text-muted-foreground text-sm'>
-              The file to remove duplicates from
-            </p>
-          </div>
-          <FileUpload
-            onFileUpload={handleWorkingFileUpload}
-            fileName={workingFileName}
-          />
-          {workingFileName && (
-            <div className='mt-4'>
-              <div className='flex flex-col gap-2'>
-                <label htmlFor='matchField' className='font-medium text-sm'>
-                  Field to match on
-                </label>
-                <Select value={workingMatchField} onValueChange={setWorkingMatchField}>
-                  <SelectTrigger>
-                    <SelectValue placeholder='Select match field...' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {workingFileSchema.map(field => (
-                      <SelectItem key={field} value={field}>
-                        {field}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+      <Section>
+        <Section.Title>Working File</Section.Title>
+        <Section.Description>The file to remove duplicates from</Section.Description>
+        <FileUpload
+          onFileUpload={handleWorkingFileUpload}
+          fileName={workingFileName}
+        />
+        {workingFileName && (
+          <Section.Items>
+            <div className='flex flex-col gap-2'>
+              <Label>Field to match on</Label>
+              <Select value={workingMatchField} onValueChange={setWorkingMatchField}>
+                <SelectTrigger>
+                  <SelectValue placeholder='Select match field...' />
+                </SelectTrigger>
+                <SelectContent>
+                  {workingFileSchema.map(field => (
+                    <SelectItem key={field} value={field}>
+                      {field}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          )}
-        </div>
+          </Section.Items>
+        )}
+      </Section>
 
-        <div>
-          <div className='mb-4'>
-            <h3 className='font-semibold text-lg'>Reference File</h3>
-            <p className='text-muted-foreground text-sm'>
-              The file to check for duplicates against
-            </p>
-          </div>
-          <FileUpload
-            onFileUpload={handleReferenceFileUpload}
-            fileName={referenceFileName}
-          />
-          {referenceFileName && (
-            <div className='mt-4'>
-              <div className='flex flex-col gap-2'>
-                <label htmlFor='matchField' className='font-medium text-sm'>
-                  Field to match on
-                </label>
-                <Select
-                  value={referenceMatchField}
-                  onValueChange={setReferenceMatchField}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder='Select match field...' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {referenceFileSchema.map(field => (
-                      <SelectItem key={field} value={field}>
-                        {field}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+      <Section>
+        <Section.Title>Reference File</Section.Title>
+        <Section.Description>The file to check for duplicates against</Section.Description>
+        <FileUpload
+          onFileUpload={handleReferenceFileUpload}
+          fileName={referenceFileName}
+        />
+        {referenceFileName && (
+          <Section.Items>
+            <div className='flex flex-col gap-2'>
+              <Label>Field to match on</Label>
+              <Select
+                value={referenceMatchField}
+                onValueChange={setReferenceMatchField}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder='Select match field...' />
+                </SelectTrigger>
+                <SelectContent>
+                  {referenceFileSchema.map(field => (
+                    <SelectItem key={field} value={field}>
+                      {field}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          )}
-        </div>
-      </div>
+          </Section.Items>
+        )}
+      </Section>
 
       {workingFileName && referenceFileName && (
         <ActionSection>
