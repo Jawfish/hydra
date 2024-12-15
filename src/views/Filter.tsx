@@ -410,7 +410,7 @@ const FilterConditions = ({
               type='text'
               placeholder='Value'
               value={condition.value}
-              onChange={e => updateCondition(index, { value: e.target.value })}
+              onChange={(e): void => updateCondition(index, { value: e.target.value })}
               className='w-[200px]'
             />
           )}
