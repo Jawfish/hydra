@@ -395,13 +395,12 @@ const ConditionRow = ({
   removeCondition: (index: number) => void;
   isOnlyCondition: boolean;
 }): JSX.Element => (
-  <div className='grid grid-cols-[2fr,2fr,3fr,1fr] gap-4 items-center'>
+  <div className='grid grid-cols-4 items-center gap-4'>
     <FieldSelector
       fields={workingFileSchema}
       selectedField={condition.field}
       onFieldSelect={(value): void => updateCondition(index, { field: value })}
       placeholder='Select field'
-      className='w-full'
     />
 
     <Select
