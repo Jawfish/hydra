@@ -68,7 +68,7 @@ export function UuidExtractor(): JSX.Element {
       )}
 
       {extractedUuids.length > 0 && (
-        <Section>
+        <Section className="mb-16">
           <Section.Title>Extraction Results</Section.Title>
           <Metadata />
           <UuidDisplay extractedUuids={extractedUuids} />
