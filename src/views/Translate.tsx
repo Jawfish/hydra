@@ -356,14 +356,16 @@ export function Translate(): JSX.Element {
         <>
           <Separator className='my-14 h-[1px]' />
           <div className='flex flex-col gap-8'>
-            <div>
-              <h3 className='mb-4 font-semibold text-lg'>Input</h3>
-              <FieldSelector
-                fields={csvHeaders}
-                selectedField={selectedColumn}
-                onFieldSelect={handleColumnSelect}
-              />
-            </div>
+            <Section>
+              <Section.Title>Input Field</Section.Title>
+              <Section.Items>
+                <FieldSelector
+                  fields={csvHeaders}
+                  selectedField={selectedColumn}
+                  onFieldSelect={handleColumnSelect}
+                />
+              </Section.Items>
+            </Section>
 
             <ColumnConfig
               languageColumnName={languageColumnName}

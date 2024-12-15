@@ -5,7 +5,6 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/shadcn/components/ui/select';
-import { Section } from './Section';
 
 interface FieldSelectorProps {
   fields: string[];
@@ -28,22 +27,17 @@ export function FieldSelector({
   }
 
   return (
-    <Section>
-      <Section.Title>Input Field</Section.Title>
-      <Section.Items>
-        <Select value={selectedField} onValueChange={onFieldSelect} disabled={disabled}>
-          <SelectTrigger className='w-full' disabled={disabled}>
-            <SelectValue placeholder={placeholder} />
-          </SelectTrigger>
-          <SelectContent>
-            {fields.map(field => (
-              <SelectItem key={field} value={field}>
-                {field}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </Section.Items>
-    </Section>
+    <Select value={selectedField} onValueChange={onFieldSelect} disabled={disabled}>
+      <SelectTrigger className='w-full' disabled={disabled}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        {fields.map(field => (
+          <SelectItem key={field} value={field}>
+            {field}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
