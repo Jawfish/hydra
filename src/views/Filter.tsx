@@ -302,7 +302,7 @@ const FilterConditions = ({
       <Select
         value={filterGroup.mode || 'keep'}
         onValueChange={(value: 'keep' | 'remove'): void =>
-          setFilterGroup((prev): void => ({ ...prev, mode: value }))
+          setFilterGroup((prev: FilterGroup): FilterGroup => ({ ...prev, mode: value }))
         }
       >
         <SelectTrigger>
@@ -316,7 +316,7 @@ const FilterConditions = ({
       <Select
         value={filterGroup.operator}
         onValueChange={(value: LogicalOperator): void =>
-          setFilterGroup((prev): void => ({ ...prev, operator: value }))
+          setFilterGroup((prev: FilterGroup): FilterGroup => ({ ...prev, operator: value }))
         }
       >
         <SelectTrigger>
