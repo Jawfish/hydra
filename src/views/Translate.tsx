@@ -27,10 +27,11 @@ const DEFAULT_ENABLED_LANGUAGES = [
   'Japanese',
   'Korean'
 ] as const;
+import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
-import { Label } from '@/components/Label';
 import { HelpTooltip } from '@/components/HelpTooltip';
+import { Label } from '@/components/Label';
 import { Section } from '@/components/Section';
 import { getAllPaths, serializeJson } from '@/lib/parse';
 import { Button } from '@/shadcn/components/ui/button';
@@ -45,7 +46,6 @@ import {
 import { Input } from '@/shadcn/components/ui/input';
 import { useWorkingFileStore } from '@/store/store';
 import { toast } from 'sonner';
-import { FieldSelector } from '@/components/FieldSelector';
 export function Translate(): JSX.Element {
   const { fileName, fileContentRaw, fileContentParsed, setFileName, setFileContent } =
     useWorkingFileStore();
@@ -395,9 +395,7 @@ type BatchSizeProps = {
 const BatchSize = ({ chunkSize, setChunkSize }: BatchSizeProps): JSX.Element => (
   <div>
     <div className='flex items-center gap-2'>
-      <Label htmlFor='chunkSize'>
-        Chunk Size
-      </Label>
+      <Label htmlFor='chunkSize'>Chunk Size</Label>
       <HelpTooltip
         className='-mt-2'
         message='The number of translations to do at once. Higher values may result in faster processing, but are more likely to fail.'
@@ -440,15 +438,13 @@ const ColumnConfig = ({
     <Section.Title>Field Config</Section.Title>
     <Section.Items direction='row' className='grid grid-cols-2 gap-4'>
       <FieldSelector
-        labelText='Input Field to Translate'
+        label='Input Field to Translate'
         fields={csvHeaders}
         selectedField={selectedColumn}
         onFieldSelect={handleColumnSelect}
       />
       <div>
-        <Label htmlFor='languageColumn'>
-          Output Language Field
-        </Label>
+        <Label htmlFor='languageColumn'>Output Language Field</Label>
         <Input
           id='languageColumn'
           placeholder='Language'
@@ -457,9 +453,7 @@ const ColumnConfig = ({
         />
       </div>
       <div>
-        <Label htmlFor='translationColumn'>
-          Output Translation Field
-        </Label>
+        <Label htmlFor='translationColumn'>Output Translation Field</Label>
         <Input
           id='translationColumn'
           placeholder='Translated Text'
@@ -492,9 +486,7 @@ const TranslateConfig = ({
     <Section.Title>Translation Config</Section.Title>
     <Section.Items direction='row' className='grid grid-cols-3 gap-4'>
       <div className='flex flex-col'>
-        <Label htmlFor='languages'>
-          Languages
-        </Label>
+        <Label htmlFor='languages'>Languages</Label>
         <DropdownMenu>
           <DropdownMenuTrigger asChild={true}>
             <Button variant='outline'>({selectedLanguages.size} selected)</Button>
@@ -533,9 +525,7 @@ const TranslateConfig = ({
           className='hidden'
           readOnly={true}
         />
-        <Label htmlFor='anthropicApiKey'>
-          Anthropic API Key
-        </Label>
+        <Label htmlFor='anthropicApiKey'>Anthropic API Key</Label>
         <Input
           className='w-full'
           id='anthropicApiKey'
