@@ -236,14 +236,14 @@ export function Filter(): JSX.Element {
         </Header.Description>
       </Header>
 
-      <div className='mb-4'>
-        <h3 className='font-semibold text-lg'>Working File</h3>
-        <p className='text-muted-foreground text-sm'>The file to apply filters to</p>
-      </div>
-      <FileUpload onFileUpload={handleWorkingFileUpload} fileName={workingFileName} />
+      <Section>
+        <Section.Title>Working File</Section.Title>
+        <Section.Description>The file to apply filters to</Section.Description>
+        <FileUpload onFileUpload={handleWorkingFileUpload} fileName={workingFileName} />
+      </Section>
 
       {workingFileName && (
-        <div>
+        <>
           <FilterConditions
             filterGroup={filterGroup}
             setFilterGroup={setFilterGroup}
@@ -273,7 +273,7 @@ export function Filter(): JSX.Element {
               Apply Filters
             </ActionSection.Button>
           </ActionSection>
-        </div>
+        </>
       )}
     </div>
   );
@@ -344,18 +344,14 @@ const renderConditionValue = (
   );
 };
 
-// Mode Selector Component
-const FilterModeSelector = ({ 
-  mode, 
-  onModeChange 
-}: { 
-  mode: 'keep' | 'remove', 
-  onModeChange: (value: 'keep' | 'remove') => void 
+const FilterModeSelector = ({
+  mode,
+  onModeChange
+}: {
+  mode: 'keep' | 'remove';
+  onModeChange: (value: 'keep' | 'remove') => void;
 }): JSX.Element => (
-  <Select
-    value={mode}
-    onValueChange={onModeChange}
-  >
+  <Select value={mode} onValueChange={onModeChange}>
     <SelectTrigger>
       <SelectValue placeholder='Select mode' />
     </SelectTrigger>
@@ -366,18 +362,14 @@ const FilterModeSelector = ({
   </Select>
 );
 
-// Logical Operator Selector Component
-const LogicalOperatorSelector = ({ 
-  operator, 
-  onOperatorChange 
-}: { 
-  operator: LogicalOperator, 
-  onOperatorChange: (value: LogicalOperator) => void 
+const LogicalOperatorSelector = ({
+  operator,
+  onOperatorChange
+}: {
+  operator: LogicalOperator;
+  onOperatorChange: (value: LogicalOperator) => void;
 }): JSX.Element => (
-  <Select
-    value={operator}
-    onValueChange={onOperatorChange}
-  >
+  <Select value={operator} onValueChange={onOperatorChange}>
     <SelectTrigger>
       <SelectValue placeholder='Select operator' />
     </SelectTrigger>
@@ -388,7 +380,6 @@ const LogicalOperatorSelector = ({
   </Select>
 );
 
-// Individual Condition Row Component
 const ConditionRow = ({
   condition,
   index,
@@ -397,12 +388,12 @@ const ConditionRow = ({
   removeCondition,
   isOnlyCondition
 }: {
-  condition: FilterCondition,
-  index: number,
-  workingFileSchema: string[],
-  updateCondition: (index: number, updates: Partial<FilterCondition>) => void,
-  removeCondition: (index: number) => void,
-  isOnlyCondition: boolean
+  condition: FilterCondition;
+  index: number;
+  workingFileSchema: string[];
+  updateCondition: (index: number, updates: Partial<FilterCondition>) => void;
+  removeCondition: (index: number) => void;
+  isOnlyCondition: boolean;
 }): JSX.Element => (
   <div className='flex items-center gap-4'>
     <FieldSelector
@@ -418,7 +409,7 @@ const ConditionRow = ({
         updateCondition(index, { comparison: value })
       }
     >
-      <SelectTrigger className='w-[200px]'>
+      <SelectTrigger>
         <SelectValue placeholder='Select comparison' />
       </SelectTrigger>
       <SelectContent>
@@ -468,24 +459,26 @@ const FilterConditions = ({
 }: FilterConditionsProps): JSX.Element => (
   <Section>
     <Section.Title>Filter Conditions</Section.Title>
-    <Section.Items>
-      <FilterModeSelector
-        mode={filterGroup.mode || 'keep'}
-        onModeChange={(value): void => {
-          setFilterGroup({ ...filterGroup, mode: value });
-        }}
-      />
-      
-      <LogicalOperatorSelector
-        operator={filterGroup.operator}
-        onOperatorChange={(value): void => {
-          setFilterGroup({ ...filterGroup, operator: value });
-        }}
-      />
+    <Section.Items className='grid-cols-1'>
+      <div className='flex items-center gap-4'>
+        <FilterModeSelector
+          mode={filterGroup.mode || 'keep'}
+          onModeChange={(value): void => {
+            setFilterGroup({ ...filterGroup, mode: value });
+          }}
+        />
+
+        <LogicalOperatorSelector
+          operator={filterGroup.operator}
+          onOperatorChange={(value): void => {
+            setFilterGroup({ ...filterGroup, operator: value });
+          }}
+        />
+      </div>
 
       {filterGroup.conditions.map((condition, index) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: order is not expected to change
         <ConditionRow
+          // biome-ignore lint/suspicious/noArrayIndexKey: order is not expected to change
           key={index}
           condition={condition}
           index={index}
