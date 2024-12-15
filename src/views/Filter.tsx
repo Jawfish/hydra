@@ -288,6 +288,71 @@ type FilterConditionsProps = {
   workingFileSchema: string[];
 };
 
+const renderConditionValue = (
+  condition: FilterCondition,
+  index: number,
+  updateCondition: (index: number, updates: Partial<FilterCondition>) => void
+): JSX.Element | null => {
+  if (['inFile', 'notInFile'].includes(condition.comparison)) {
+    return (
+      <>
+        {!condition.referenceFileName && (
+          <FileUpload
+            onFileUpload={(fileName, fileContent, fileType): void => {
+              try {
+                const parsedContent = getParsedContentFromFile(fileContent, fileType);
+                // Don't create lookup structure yet since we don't have
+                // the reference field
+                updateCondition(index, {
+                  referenceFileContent: parsedContent,
+                  referenceFileName: fileName,
+                  referenceField: '',
+                  lookupStructure: undefined
+                });
+              } catch (error) {
+                toast.error(
+                  `Error parsing file: ${error instanceof Error ? error.message : 'Unknown error'}`
+                );
+              }
+            }}
+            fileName={null}
+          />
+        )}
+        {condition.referenceFileContent && (
+          <FieldSelector
+            fields={getAllPaths(condition.referenceFileContent[0] || {})}
+            selectedField={condition.referenceField || ''}
+            onFieldSelect={(value): void => {
+              const newField = value;
+              updateCondition(index, {
+                referenceField: newField,
+                lookupStructure: condition.referenceFileContent
+                  ? createLookupMap(condition.referenceFileContent, newField)
+                  : undefined
+              });
+            }}
+            placeholder='Select reference field'
+          />
+        )}
+      </>
+    );
+  }
+
+  if (['isEmpty'].includes(condition.comparison)) {
+    return null;
+  }
+
+  return (
+    <Input
+      type='text'
+      placeholder='Value'
+      value={condition.value}
+      onChange={(e): void => updateCondition(index, { value: e.target.value })}
+      className='w-[200px]'
+    />
+  );
+};
+
 const FilterConditions = ({
   filterGroup,
   setFilterGroup,
@@ -361,59 +426,7 @@ const FilterConditions = ({
             </SelectContent>
           </Select>
 
-          {['inFile', 'notInFile'].includes(condition.comparison) ? (
-            <>
-              {!condition.referenceFileName && (
-                <FileUpload
-                  onFileUpload={(fileName, fileContent, fileType): void => {
-                    try {
-                      const parsedContent = getParsedContentFromFile(
-                        fileContent,
-                        fileType
-                      );
-                      // Don't create lookup structure yet since we don't have
-                      // the reference field
-                      updateCondition(index, {
-                        referenceFileContent: parsedContent,
-                        referenceFileName: fileName,
-                        referenceField: '',
-                        lookupStructure: undefined
-                      });
-                    } catch (error) {
-                      toast.error(
-                        `Error parsing file: ${error instanceof Error ? error.message : 'Unknown error'}`
-                      );
-                    }
-                  }}
-                  fileName={null}
-                />
-              )}
-              {condition.referenceFileContent && (
-                <FieldSelector
-                  fields={getAllPaths(condition.referenceFileContent[0] || {})}
-                  selectedField={condition.referenceField || ''}
-                  onFieldSelect={(value): void => {
-                    const newField = value;
-                    updateCondition(index, {
-                      referenceField: newField,
-                      lookupStructure: condition.referenceFileContent
-                        ? createLookupMap(condition.referenceFileContent, newField)
-                        : undefined
-                    });
-                  }}
-                  placeholder='Select reference field'
-                />
-              )}
-            </>
-          ) : ['isEmpty'].includes(condition.comparison) ? null : (
-            <Input
-              type='text'
-              placeholder='Value'
-              value={condition.value}
-              onChange={(e): void => updateCondition(index, { value: e.target.value })}
-              className='w-[200px]'
-            />
-          )}
+          {renderConditionValue(condition, index, updateCondition)}
 
           <Button
             variant='destructive'
