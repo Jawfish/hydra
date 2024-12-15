@@ -37,38 +37,44 @@ export function UuidExtractor() {
   };
 
   return (
-    <div className='mb-12 flex flex-col'>
+    <div className='mb-12 flex flex-col gap-16'>
       <Header>
         <Header.Title>Extract UUIDs</Header.Title>
         <Header.Description>Extract UUIDs from an uploaded file</Header.Description>
       </Header>
 
-      <div className='mb-4'>
-        <h3 className='font-semibold text-lg'>Working File</h3>
-        <p className='text-muted-foreground text-sm'>The file to extract UUIDs from</p>
-      </div>
-      <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
+      <Section>
+        <Section.Title>Working File</Section.Title>
+        <Section.Description>The file to extract UUIDs from</Section.Description>
+        <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
+      </Section>
+
       {fileContentParsed.length > 0 && (
-        <>
-          <h3 className='mt-10 mb-4 font-semibold'>
-            Select field to extract UUIDs from
-          </h3>
-          <FieldSelector
-            fields={availableFields}
-            selectedField={selectedField}
-            onFieldSelect={handleFieldSelection}
-            placeholder='Select field'
-          />
-        </>
+        <Section>
+          <Section.Title>Field Selection</Section.Title>
+          <Section.Description>Select the field to extract UUIDs from</Section.Description>
+          <Section.Items>
+            <FieldSelector
+              fields={availableFields}
+              selectedField={selectedField}
+              onFieldSelect={handleFieldSelection}
+              placeholder='Select field'
+            />
+          </Section.Items>
+        </Section>
       )}
+
       {extractedUuids.length > 0 && (
         <>
           <Separator className='my-14 h-[1px]' />
-          <h3 className='font-semibold'>Extraction results</h3>
-          <Metadata />
-          <UuidDisplay extractedUuids={extractedUuids} />
+          <Section>
+            <Section.Title>Extraction Results</Section.Title>
+            <Metadata />
+            <UuidDisplay extractedUuids={extractedUuids} />
+          </Section>
         </>
       )}
+
       {fileContentParsed.length > 0 && selectedField && extractedUuids.length === 0 && (
         <>
           <Separator className='my-14 h-[1px]' />
