@@ -395,12 +395,13 @@ const ConditionRow = ({
   removeCondition: (index: number) => void;
   isOnlyCondition: boolean;
 }): JSX.Element => (
-  <div className='flex items-center gap-4'>
+  <div className='grid grid-cols-[2fr,2fr,3fr,1fr] gap-4 items-center'>
     <FieldSelector
       fields={workingFileSchema}
       selectedField={condition.field}
       onFieldSelect={(value): void => updateCondition(index, { field: value })}
       placeholder='Select field'
+      className='w-full'
     />
 
     <Select
@@ -409,7 +410,7 @@ const ConditionRow = ({
         updateCondition(index, { comparison: value })
       }
     >
-      <SelectTrigger>
+      <SelectTrigger className='w-full'>
         <SelectValue placeholder='Select comparison' />
       </SelectTrigger>
       <SelectContent>
@@ -427,13 +428,15 @@ const ConditionRow = ({
       </SelectContent>
     </Select>
 
-    {renderConditionValue(condition, index, updateCondition)}
+    <div className='w-full'>
+      {renderConditionValue(condition, index, updateCondition)}
+    </div>
 
     <Button
       variant='destructive'
       onClick={(): void => removeCondition(index)}
       disabled={isOnlyCondition}
-      className='ml-auto'
+      className='justify-self-end'
     >
       Remove
     </Button>
