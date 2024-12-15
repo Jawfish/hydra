@@ -352,8 +352,8 @@ const FilterModeSelector = ({
   onModeChange: (value: 'keep' | 'remove') => void;
 }): JSX.Element => (
   <Select value={mode} onValueChange={onModeChange}>
-    <SelectTrigger>
-      <SelectValue placeholder='Select mode' />
+    <SelectTrigger className='w-full truncate'>
+      <SelectValue placeholder='Select mode' className='truncate' />
     </SelectTrigger>
     <SelectContent>
       <SelectItem value='keep'>Keep matches</SelectItem>
@@ -370,8 +370,8 @@ const LogicalOperatorSelector = ({
   onOperatorChange: (value: LogicalOperator) => void;
 }): JSX.Element => (
   <Select value={operator} onValueChange={onOperatorChange}>
-    <SelectTrigger>
-      <SelectValue placeholder='Select operator' />
+    <SelectTrigger className='w-full truncate'>
+      <SelectValue placeholder='Select operator' className='truncate' />
     </SelectTrigger>
     <SelectContent>
       <SelectItem value='AND'>Match ALL conditions</SelectItem>
@@ -402,7 +402,7 @@ const ConditionRow = ({
         selectedField={condition.field}
         onFieldSelect={(value): void => updateCondition(index, { field: value })}
         placeholder='Select field'
-        className='w-full'
+        className='w-full min-w-0'
       />
 
       <Select
@@ -410,6 +410,7 @@ const ConditionRow = ({
         onValueChange={(value: ComparisonType): void =>
           updateCondition(index, { comparison: value })
         }
+        className='min-w-0'
       >
         <SelectTrigger>
           <SelectValue placeholder='Select comparison' />
