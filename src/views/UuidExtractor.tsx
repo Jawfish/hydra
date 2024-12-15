@@ -91,7 +91,7 @@ export function UuidExtractor(): JSX.Element {
           </Section>
 
           {selectedField && (
-            <Section>
+            <Section className="mb-16">
               <Section.Title>Extraction Results</Section.Title>
               <Section.Description>
                 {extractedUuids.length > 0
