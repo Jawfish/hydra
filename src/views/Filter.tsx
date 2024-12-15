@@ -436,7 +436,7 @@ const ConditionRow = ({
     {!isOnlyCondition && (
       <X
         size={20}
-        className='absolute right-0 -mr-8 cursor-pointer text-red-500 hover:text-red-700'
+        className='-mr-8 absolute right-0 cursor-pointer text-red-500 hover:text-red-700'
         onClick={(): void => removeCondition(index)}
       />
     )}

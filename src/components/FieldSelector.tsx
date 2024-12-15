@@ -38,12 +38,12 @@ export function FieldSelector({
         <Label htmlFor={label.toLowerCase().replace(/[^a-z-]/g, '')}>{label}</Label>
       )}
       <Select value={selectedField} onValueChange={onFieldSelect} disabled={disabled}>
-        <SelectTrigger className="w-full truncate" disabled={disabled}>
-          <SelectValue placeholder={placeholder} className="truncate overflow-hidden" />
+        <SelectTrigger className='w-full truncate' disabled={disabled}>
+          <SelectValue placeholder={placeholder} className='overflow-hidden truncate' />
         </SelectTrigger>
         <SelectContent>
           {fields.map(field => (
-            <SelectItem key={field} value={field} className="w-full truncate">
+            <SelectItem key={field} value={field} className='w-full truncate'>
               {field}
             </SelectItem>
           ))}
