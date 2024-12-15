@@ -91,13 +91,11 @@ export function MapValues() {
         </Header.Description>
       </Header>
 
-      <div className='mb-4'>
-        <h3 className='font-semibold text-lg'>Working File</h3>
-        <p className='text-muted-foreground text-sm'>
-          The file to generate a mapping from
-        </p>
-      </div>
-      <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
+      <Section>
+        <Section.Title>Working File</Section.Title>
+        <Section.Description>The file to generate a mapping from</Section.Description>
+        <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
+      </Section>
       {fileContentParsed.length > 0 && (
         <>
           <Separator className='my-14 h-[1px]' />
