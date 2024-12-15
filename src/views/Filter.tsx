@@ -397,13 +397,12 @@ const ConditionRow = ({
   isOnlyCondition: boolean;
 }): JSX.Element => (
   <div className='relative flex items-center'>
-    <div className='grid grid-cols-[2fr,2fr,3fr] gap-4 items-center w-full'>
+    <div className='grid w-full grid-flow-col items-center gap-4'>
       <FieldSelector
         fields={workingFileSchema}
         selectedField={condition.field}
         onFieldSelect={(value): void => updateCondition(index, { field: value })}
         placeholder='Select field'
-        className='w-full'
       />
 
       <Select
@@ -435,9 +434,9 @@ const ConditionRow = ({
       </div>
     </div>
     {!isOnlyCondition && (
-      <X 
+      <X
         size={20}
-        className='ml-4 text-red-500 hover:text-red-700 cursor-pointer' 
+        className='ml-4 cursor-pointer text-red-500 hover:text-red-700'
         onClick={(): void => removeCondition(index)}
       />
     )}
