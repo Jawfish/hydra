@@ -3,6 +3,8 @@ import { getValueByPath } from '@/lib/parse';
 import type { FileType } from '@/store/store';
 import Anthropic from '@anthropic-ai/sdk';
 import retry from 'async-retry';
+import type React from 'react';
+import type { JSX } from 'react';
 import { useState } from 'react';
 
 const ALL_LANGUAGES = [
@@ -29,23 +31,23 @@ const DEFAULT_ENABLED_LANGUAGES = [
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
-import { HelpTooltip } from '@/components/HelpTooltip';
+import { Section } from '@/components/Section';
 import { getAllPaths, serializeJson } from '@/lib/parse';
-import { Button } from '@/shadcn/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/shadcn/components/ui/dropdown-menu';
 import { Input } from '@/shadcn/components/ui/input';
 import { Separator } from '@/shadcn/components/ui/separator';
 import { useWorkingFileStore } from '@/store/store';
 import { toast } from 'sonner';
-
-export function Translate() {
+import { Button } from '@/shadcn/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem
+} from '@/shadcn/components/ui/dropdown-menu';
+import { HelpTooltip } from '@/components/HelpTooltip';
+export function Translate(): JSX.Element {
   const { fileName, fileContentRaw, fileContentParsed, setFileName, setFileContent } =
     useWorkingFileStore();
 
@@ -355,37 +357,7 @@ export function Translate() {
           <Separator className='my-14 h-[1px]' />
           <div className='flex flex-col gap-8'>
             <div>
-              <h3 className='mb-4 font-semibold text-lg'>Anthropic API Key</h3>
-              <form onSubmit={e => e.preventDefault()} className='max-w-md'>
-                {/* Hidden username field for password managers */}
-                <input
-                  type='text'
-                  name='username'
-                  autoComplete='username'
-                  value='anthropic-api'
-                  className='hidden'
-                  readOnly={true}
-                />
-                <label
-                  htmlFor='anthropicApiKey'
-                  className='mb-2 hidden font-medium text-sm'
-                >
-                  Anthropic API Key
-                </label>
-                <Input
-                  id='anthropicApiKey'
-                  type='password'
-                  placeholder='Enter your Anthropic API key'
-                  autoComplete='current-password'
-                  value={apiKey}
-                  onChange={handleApiKeyChange}
-                  className='w-full'
-                />
-              </form>
-            </div>
-
-            <div>
-              <h3 className='mb-4 font-semibold text-lg'>Select Column to Process</h3>
+              <h3 className='mb-4 font-semibold text-lg'>Input</h3>
               <FieldSelector
                 fields={csvHeaders}
                 selectedField={selectedColumn}
@@ -393,94 +365,21 @@ export function Translate() {
               />
             </div>
 
-            <div>
-              <h3 className='mb-4 font-semibold text-lg'>Output Column Names</h3>
-              <div className='flex max-w-md flex-col gap-4'>
-                <div>
-                  <label
-                    htmlFor='languageColumn'
-                    className='mb-2 block font-medium text-sm'
-                  >
-                    Language Column Name
-                  </label>
-                  <Input
-                    id='languageColumn'
-                    placeholder='Language'
-                    value={languageColumnName}
-                    onChange={e => setLanguageColumnName(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor='translationColumn'
-                    className='mb-2 block font-medium text-sm'
-                  >
-                    Translation Column Name
-                  </label>
-                  <Input
-                    id='translationColumn'
-                    placeholder='Translated Text'
-                    value={translationColumnName}
-                    onChange={e => setTranslationColumnName(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
+            <ColumnConfig
+              languageColumnName={languageColumnName}
+              setLanguageColumnName={setLanguageColumnName}
+              translationColumnName={translationColumnName}
+              setTranslationColumnName={setTranslationColumnName}
+            />
 
-            <div>
-              <div className='mb-4 flex gap-2'>
-                <h3 className='text-lg'>Batch Size</h3>
-                <HelpTooltip
-                  className='mt-1 h-4 w-4 text-muted-foreground'
-                  message='How many items to translate at once. Higher values are faster but more prone to failure.'
-                />
-              </div>
-              <Input
-                type='number'
-                min={1}
-                max={100}
-                value={chunkSize}
-                onChange={e => setChunkSize(Number(e.target.value))}
-                placeholder='Enter chunk size (default 20)'
-                className='max-w-md'
-              />
-            </div>
+            <TranslateConfig
+              selectedLanguages={selectedLanguages}
+              setSelectedLanguages={setSelectedLanguages}
+              chunkSize={chunkSize}
+              setChunkSize={setChunkSize}
+            />
 
-            <div>
-              <h3 className='mb-4 font-semibold text-lg'>Languages to Translate To</h3>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild={true}>
-                  <Button variant='outline'>
-                    Select Languages
-                    <span className='text-muted-foreground text-xs'>
-                      ({selectedLanguages.size} selected)
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className='w-[200px]'>
-                  <DropdownMenuLabel>Available Languages</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {ALL_LANGUAGES.map(language => (
-                    <DropdownMenuCheckboxItem
-                      key={language}
-                      checked={selectedLanguages.has(language)}
-                      onCheckedChange={checked => {
-                        const newSelected = new Set(selectedLanguages);
-                        if (checked) {
-                          newSelected.add(language);
-                        } else {
-                          newSelected.delete(language);
-                        }
-                        setSelectedLanguages(newSelected);
-                      }}
-                    >
-                      {language}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
+            <Separator />
             <ActionSection>
               <ActionSection.Button
                 onClick={processCsv}
@@ -488,7 +387,7 @@ export function Translate() {
               >
                 Translate
               </ActionSection.Button>
-              <ActionSection.Progress value={progress} />
+              {isProcessing && <ActionSection.Progress value={progress} />}
             </ActionSection>
           </div>
         </>
@@ -496,3 +395,154 @@ export function Translate() {
     </div>
   );
 }
+
+type BatchSizeProps = {
+  chunkSize: number;
+  setChunkSize: (value: number) => void;
+};
+
+const BatchSize = ({ chunkSize, setChunkSize }: BatchSizeProps): JSX.Element => (
+  <div>
+    <div className='flex items-center gap-2'>
+      <label htmlFor='chunkSize' className='mb-2 block font-medium text-sm'>
+        Chunk Size
+      </label>
+      <HelpTooltip
+        className='-mt-2'
+        message='The number of translations to do at once. Higher values may result in faster processing, but are more likely to fail.'
+      />
+    </div>
+    <Input
+      type='number'
+      min={1}
+      max={100}
+      value={chunkSize}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
+        setChunkSize(Number(e.target.value))
+      }
+      placeholder='Enter chunk size (default 20)'
+      className='min-w-[200px]'
+    />
+  </div>
+);
+
+type ColumnConfigProps = {
+  languageColumnName: string;
+  setLanguageColumnName: (value: string) => void;
+  translationColumnName: string;
+  setTranslationColumnName: (value: string) => void;
+};
+
+const ColumnConfig = ({
+  languageColumnName,
+  setLanguageColumnName,
+  translationColumnName,
+  setTranslationColumnName
+}: ColumnConfigProps): JSX.Element => (
+  <Section>
+    <Section.Title>Field Config</Section.Title>
+    <div className='flex gap-4'>
+      <div>
+        <label htmlFor='languageColumn' className='mb-2 block font-medium text-sm'>
+          Language Column Name
+        </label>
+        <Input
+          id='languageColumn'
+          placeholder='Language'
+          value={languageColumnName}
+          onChange={(e): void => setLanguageColumnName(e.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor='translationColumn' className='mb-2 block font-medium text-sm'>
+          Translation Column Name
+        </label>
+        <Input
+          id='translationColumn'
+          placeholder='Translated Text'
+          value={translationColumnName}
+          onChange={(e): void => setTranslationColumnName(e.target.value)}
+        />
+      </div>
+    </div>
+  </Section>
+);
+
+type TranslateConfigProps = {
+  selectedLanguages: Set<string>;
+  setSelectedLanguages: (value: Set<string>) => void;
+  chunkSize: number;
+  setChunkSize: (value: number) => void;
+  apiKey: string;
+  handleApiKeyChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
+const TranslateConfig = ({
+  selectedLanguages,
+  setSelectedLanguages,
+  chunkSize,
+  setChunkSize,
+  apiKey,
+  handleApiKeyChange
+}: TranslateConfigProps): JSX.Element => (
+  <Section>
+    <Section.Title>Translation Config</Section.Title>
+    <Section.Items direction='row'>
+      <div className='flex flex-col'>
+        <label htmlFor='languages' className='mb-2 block font-medium text-sm'>
+          Languages
+        </label>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild={true} className='min-w-[200px]'>
+            <Button variant='outline'>({selectedLanguages.size} selected)</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className='w-[200px]'>
+            <DropdownMenuLabel>Available Languages</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {ALL_LANGUAGES.map(language => (
+              <DropdownMenuCheckboxItem
+                key={language}
+                checked={selectedLanguages.has(language)}
+                onCheckedChange={(checked): void => {
+                  const newSelected = new Set(selectedLanguages);
+                  if (checked) {
+                    newSelected.add(language);
+                  } else {
+                    newSelected.delete(language);
+                  }
+                  setSelectedLanguages(newSelected);
+                }}
+              >
+                {language}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <BatchSize chunkSize={chunkSize} setChunkSize={setChunkSize} />
+      <form onSubmit={(e): void => e.preventDefault()} className='w-[200px]'>
+        {/* Hidden username field for password managers */}
+        <Input
+          type='text'
+          name='username'
+          autoComplete='username'
+          value='anthropic-api'
+          className='hidden'
+          readOnly={true}
+        />
+        <label htmlFor='anthropicApiKey' className='mb-2 block font-medium text-sm'>
+          Anthropic API Key
+        </label>
+        <Input
+          className='w-full'
+          id='anthropicApiKey'
+          type='password'
+          placeholder='Enter API key'
+          autoComplete='current-password'
+          value={apiKey}
+          onChange={handleApiKeyChange}
+        />
+      </form>
+    </Section.Items>
+  </Section>
+);
