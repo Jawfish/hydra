@@ -91,7 +91,7 @@ export function UuidExtractor(): JSX.Element {
           </Section>
 
           {selectedField && (
-            <Section className="mb-16">
+            <Section>
               <Section.Title>Extraction Results</Section.Title>
               <Section.Description>
                 {extractedUuids.length > 0
@@ -99,31 +99,28 @@ export function UuidExtractor(): JSX.Element {
                   : 'No UUIDs found in selected field'}
               </Section.Description>
               <Metadata />
-              {extractedUuids.length > 0 && (
-                <ActionSection>
-                  <div className='flex gap-2'>
-                    <ActionSection.Button onClick={(): void => handleCopy('python')}>
-                      Copy as Python list
-                    </ActionSection.Button>
-                    <ActionSection.Button
-                      onClick={(): void => handleCopy('plaintext')}
-                      variant='outline'
-                    >
-                      Copy as plain text
-                    </ActionSection.Button>
-                  </div>
-                </ActionSection>
-              )}
             </Section>
+          )}
+
+          {extractedUuids.length > 0 && (
+            <ActionSection>
+              <div className='flex gap-2'>
+                <ActionSection.Button onClick={(): void => handleCopy('python')}>
+                  Copy as Python list
+                </ActionSection.Button>
+                <ActionSection.Button
+                  onClick={(): void => handleCopy('plaintext')}
+                  variant='outline'
+                >
+                  Copy as plain text
+                </ActionSection.Button>
+              </div>
+            </ActionSection>
           )}
         </>
       )}
     </div>
   );
-}
-
-interface UuidDisplayProps {
-  extractedUuids: string[];
 }
 
 const Metadata = (): JSX.Element => {
