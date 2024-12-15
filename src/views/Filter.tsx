@@ -1,4 +1,5 @@
 import { ActionSection } from '@/components/ActionSection';
+import { X } from 'lucide-react';
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
@@ -395,50 +396,50 @@ const ConditionRow = ({
   removeCondition: (index: number) => void;
   isOnlyCondition: boolean;
 }): JSX.Element => (
-  <div className='grid grid-cols-4 items-center gap-4'>
-    <FieldSelector
-      fields={workingFileSchema}
-      selectedField={condition.field}
-      onFieldSelect={(value): void => updateCondition(index, { field: value })}
-      placeholder='Select field'
-    />
+  <div className='relative flex items-center'>
+    <div className='grid grid-cols-[2fr,2fr,3fr] gap-4 items-center w-full'>
+      <FieldSelector
+        fields={workingFileSchema}
+        selectedField={condition.field}
+        onFieldSelect={(value): void => updateCondition(index, { field: value })}
+        placeholder='Select field'
+        className='w-full'
+      />
 
-    <Select
-      value={condition.comparison}
-      onValueChange={(value: ComparisonType): void =>
-        updateCondition(index, { comparison: value })
-      }
-    >
-      <SelectTrigger className='w-full'>
-        <SelectValue placeholder='Select comparison' />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value='equals'>Equals</SelectItem>
-        <SelectItem value='notEquals'>Does not equal</SelectItem>
-        <SelectItem value='contains'>Contains</SelectItem>
-        <SelectItem value='notContains'>Does not contain</SelectItem>
-        <SelectItem value='startsWith'>Starts with</SelectItem>
-        <SelectItem value='endsWith'>Ends with</SelectItem>
-        <SelectItem value='greaterThan'>Greater than</SelectItem>
-        <SelectItem value='lessThan'>Less than</SelectItem>
-        <SelectItem value='isEmpty'>Is Empty</SelectItem>
-        <SelectItem value='inFile'>In File</SelectItem>
-        <SelectItem value='notInFile'>Not in File</SelectItem>
-      </SelectContent>
-    </Select>
+      <Select
+        value={condition.comparison}
+        onValueChange={(value: ComparisonType): void =>
+          updateCondition(index, { comparison: value })
+        }
+      >
+        <SelectTrigger className='w-full'>
+          <SelectValue placeholder='Select comparison' />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value='equals'>Equals</SelectItem>
+          <SelectItem value='notEquals'>Does not equal</SelectItem>
+          <SelectItem value='contains'>Contains</SelectItem>
+          <SelectItem value='notContains'>Does not contain</SelectItem>
+          <SelectItem value='startsWith'>Starts with</SelectItem>
+          <SelectItem value='endsWith'>Ends with</SelectItem>
+          <SelectItem value='greaterThan'>Greater than</SelectItem>
+          <SelectItem value='lessThan'>Less than</SelectItem>
+          <SelectItem value='isEmpty'>Is Empty</SelectItem>
+          <SelectItem value='inFile'>In File</SelectItem>
+          <SelectItem value='notInFile'>Not in File</SelectItem>
+        </SelectContent>
+      </Select>
 
-    <div className='w-full'>
-      {renderConditionValue(condition, index, updateCondition)}
+      <div className='w-full'>
+        {renderConditionValue(condition, index, updateCondition)}
+      </div>
     </div>
-
-    <Button
-      variant='destructive'
-      onClick={(): void => removeCondition(index)}
-      disabled={isOnlyCondition}
-      className='justify-self-end'
-    >
-      Remove
-    </Button>
+    {!isOnlyCondition && (
+      <X 
+        className='absolute -right-8 cursor-pointer text-destructive hover:opacity-75' 
+        onClick={(): void => removeCondition(index)}
+      />
+    )}
   </div>
 );
 
