@@ -1,4 +1,5 @@
 import type { JSX } from 'react';
+import { Label } from '@/components/Label';
 
 import {
   Select,
@@ -31,12 +32,9 @@ export function FieldSelector({
 
   return (
     <div>
-      <label
-        htmlFor={labelText.toLowerCase().replace(/[^a-z-]/g, '')}
-        className='mb-2 block font-medium text-sm'
-      >
+      <Label htmlFor={labelText.toLowerCase().replace(/[^a-z-]/g, '')}>
         {labelText}
-      </label>
+      </Label>
       <Select value={selectedField} onValueChange={onFieldSelect} disabled={disabled}>
         <SelectTrigger disabled={disabled}>
           <SelectValue placeholder={placeholder} />

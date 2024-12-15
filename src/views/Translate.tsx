@@ -29,6 +29,7 @@ const DEFAULT_ENABLED_LANGUAGES = [
 ] as const;
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
+import { Label } from '@/components/Label';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { Section } from '@/components/Section';
 import { getAllPaths, serializeJson } from '@/lib/parse';
@@ -394,9 +395,9 @@ type BatchSizeProps = {
 const BatchSize = ({ chunkSize, setChunkSize }: BatchSizeProps): JSX.Element => (
   <div>
     <div className='flex items-center gap-2'>
-      <label htmlFor='chunkSize' className='mb-2 block font-medium text-sm'>
+      <Label htmlFor='chunkSize'>
         Chunk Size
-      </label>
+      </Label>
       <HelpTooltip
         className='-mt-2'
         message='The number of translations to do at once. Higher values may result in faster processing, but are more likely to fail.'
@@ -445,9 +446,9 @@ const ColumnConfig = ({
         onFieldSelect={handleColumnSelect}
       />
       <div>
-        <label htmlFor='languageColumn' className='mb-2 block font-medium text-sm'>
+        <Label htmlFor='languageColumn'>
           Output Language Field
-        </label>
+        </Label>
         <Input
           id='languageColumn'
           placeholder='Language'
@@ -456,9 +457,9 @@ const ColumnConfig = ({
         />
       </div>
       <div>
-        <label htmlFor='translationColumn' className='mb-2 block font-medium text-sm'>
+        <Label htmlFor='translationColumn'>
           Output Translation Field
-        </label>
+        </Label>
         <Input
           id='translationColumn'
           placeholder='Translated Text'
@@ -491,9 +492,9 @@ const TranslateConfig = ({
     <Section.Title>Translation Config</Section.Title>
     <Section.Items direction='row' className='grid grid-cols-3 gap-4'>
       <div className='flex flex-col'>
-        <label htmlFor='languages' className='mb-2 block font-medium text-sm'>
+        <Label htmlFor='languages'>
           Languages
-        </label>
+        </Label>
         <DropdownMenu>
           <DropdownMenuTrigger asChild={true}>
             <Button variant='outline'>({selectedLanguages.size} selected)</Button>
@@ -532,9 +533,9 @@ const TranslateConfig = ({
           className='hidden'
           readOnly={true}
         />
-        <label htmlFor='anthropicApiKey' className='mb-2 block font-medium text-sm'>
+        <Label htmlFor='anthropicApiKey'>
           Anthropic API Key
-        </label>
+        </Label>
         <Input
           className='w-full'
           id='anthropicApiKey'
