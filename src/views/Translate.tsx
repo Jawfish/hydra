@@ -400,7 +400,7 @@ const BatchSize = ({ chunkSize, setChunkSize }: BatchSizeProps): JSX.Element => 
         className='-mt-2'
         message='The number of translations to do at once. Higher values may result in faster processing, but are more likely to fail.'
       />
-    </div>
+    </Section>
     <Input
       type='number'
       min={1}

@@ -1,10 +1,9 @@
 import { ActionSection } from '@/components/ActionSection';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
+import { Section } from '@/components/Section';
 import { useFileUpload } from '@/hooks/useFileUpload';
-import { getAllPaths, normalizeString } from '@/lib/parse';
-import { getValueByPath } from '@/lib/parse';
-import { serializeJson } from '@/lib/parse';
+import { getAllPaths, normalizeString, getValueByPath, serializeJson } from '@/lib/parse';
 import {
   Select,
   SelectContent,
@@ -161,7 +160,7 @@ export function Backfill() {
   };
 
   return (
-    <div className='mb-12 flex flex-col'>
+    <div className='mb-12 flex flex-col gap-16'>
       <Header>
         <Header.Title>Backfill</Header.Title>
         <Header.Description>
@@ -170,13 +169,9 @@ export function Backfill() {
       </Header>
 
       <div className='grid grid-cols-2 gap-8'>
-        <div>
-          <div className='mb-4'>
-            <h3 className='font-semibold text-lg'>Working File</h3>
-            <p className='text-muted-foreground text-sm'>
-              The file to backfill data into
-            </p>
-          </div>
+        <Section>
+          <Section.Title>Working File</Section.Title>
+          <Section.Description>The file to backfill data into</Section.Description>
           <FileUpload
             onFileUpload={handleWorkingFileUpload}
             fileName={workingFileName}
@@ -226,13 +221,9 @@ export function Backfill() {
           )}
         </div>
 
-        <div>
-          <div className='mb-4'>
-            <h3 className='font-semibold text-lg'>Reference File</h3>
-            <p className='text-muted-foreground text-sm'>
-              The file to retrieve data from
-            </p>
-          </div>
+        <Section>
+          <Section.Title>Reference File</Section.Title>
+          <Section.Description>The file to retrieve data from</Section.Description>
           <FileUpload
             onFileUpload={handleReferenceFileUpload}
             fileName={referenceFileName}
