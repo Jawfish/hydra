@@ -224,7 +224,7 @@ export const Stats: React.FC = () => {
   const handleFileUpload = useFileUpload('working');
 
   return (
-    <div className='mb-12 flex flex-col'>
+    <div className='mb-12 flex flex-col gap-16'>
       <Header>
         <Header.Title>File Statistics</Header.Title>
         <Header.Description>
@@ -232,13 +232,11 @@ export const Stats: React.FC = () => {
         </Header.Description>
       </Header>
 
-      <div className='mb-4'>
-        <h3 className='font-semibold text-lg'>Working File</h3>
-        <p className='text-muted-foreground text-sm'>The file to analyze</p>
-      </div>
-      <div className='mb-6'>
+      <Section>
+        <Section.Title>Working File</Section.Title>
+        <Section.Description>The file to analyze</Section.Description>
         <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
-      </div>
+      </Section>
       {fileName && fileContentParsed.length > 0 && (
         <div className='flex flex-col gap-6'>
           <div className='grid grid-cols-2 gap-4'>
