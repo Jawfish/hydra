@@ -126,7 +126,6 @@ interface UuidDisplayProps {
   extractedUuids: string[];
 }
 
-
 const Metadata = (): JSX.Element => {
   const { fileContentParsed, fileName } = useWorkingFileStore();
 
