@@ -396,29 +396,28 @@ const ConditionRow = ({
   isOnlyCondition: boolean;
 }): JSX.Element => (
   <div className='relative w-full'>
-    {!isOnlyCondition && (
-      <>
-        {['inFile', 'notInFile'].includes(condition.comparison) && (
-          <RefreshCw
-            size={20}
-            className='-right-16 -translate-y-1/2 absolute top-1/2 cursor-pointer text-blue-500 hover:text-blue-700'
-            onClick={(): void => {
-              updateCondition(index, {
-                referenceFileName: undefined,
-                referenceFileContent: undefined,
-                referenceField: '',
-                lookupStructure: undefined
-              });
-            }}
-          />
-        )}
-        <X
-          size={20}
-          className='-right-8 -translate-y-1/2 absolute top-1/2 cursor-pointer text-red-500 hover:text-red-700'
-          onClick={(): void => removeCondition(index)}
-        />
-      </>
-    )}
+    <>
+      <X
+        size={20}
+        className='-right-8 -translate-y-1/2 absolute top-1/2 cursor-pointer '
+        onClick={(): void => removeCondition(index)}
+      />
+      <RefreshCw
+        size={20}
+        className='-right-16 -translate-y-1/2 absolute top-1/2 cursor-pointer text-primary'
+        onClick={(): void => {
+          updateCondition(index, {
+            referenceFileName: undefined,
+            referenceFileContent: undefined,
+            referenceField: '',
+            lookupStructure: undefined,
+            field: '',
+            value: '',
+            comparison: undefined
+          });
+        }}
+      />
+    </>
     <div className='grid w-full grid-cols-[1fr_1fr_1fr] items-center gap-4'>
       <FieldSelector
         fields={workingFileSchema}
@@ -448,17 +447,21 @@ const ConditionRow = ({
           <SelectItem value='lessThan'>Less than</SelectItem>
           <SelectItem value='isEmpty'>Is Empty</SelectItem>
           <SelectItem value='inFile'>
-            {condition.referenceFileName 
-              ? `In File (${condition.referenceFileName.length > 24 
-                ? condition.referenceFileName.substring(0, 21) + '...' 
-                : condition.referenceFileName})` 
+            {condition.referenceFileName
+              ? `In File (${
+                  condition.referenceFileName.length > 24
+                    ? `${condition.referenceFileName.substring(0, 21)}...`
+                    : condition.referenceFileName
+                })`
               : 'In File'}
           </SelectItem>
           <SelectItem value='notInFile'>
-            {condition.referenceFileName 
-              ? `Not in File (${condition.referenceFileName.length > 24 
-                ? condition.referenceFileName.substring(0, 21) + '...' 
-                : condition.referenceFileName})` 
+            {condition.referenceFileName
+              ? `Not in File (${
+                  condition.referenceFileName.length > 24
+                    ? `${condition.referenceFileName.substring(0, 21)}...`
+                    : condition.referenceFileName
+                })`
               : 'Not in File'}
           </SelectItem>
         </SelectContent>
