@@ -21,7 +21,7 @@ import {
   SelectValue
 } from '@/shadcn/components/ui/select';
 import { type FileType, useWorkingFileStore } from '@/store/store';
-import { X } from 'lucide-react';
+import { RefreshCw, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { JSX } from 'react';
 import { toast } from 'sonner';
@@ -397,11 +397,27 @@ const ConditionRow = ({
 }): JSX.Element => (
   <div className='relative w-full'>
     {!isOnlyCondition && (
-      <X
-        size={20}
-        className='-right-8 -translate-y-1/2 absolute top-1/2 cursor-pointer text-red-500 hover:text-red-700'
-        onClick={(): void => removeCondition(index)}
-      />
+      <>
+        {['inFile', 'notInFile'].includes(condition.comparison) && (
+          <RefreshCw
+            size={20}
+            className='-right-16 -translate-y-1/2 absolute top-1/2 cursor-pointer text-blue-500 hover:text-blue-700'
+            onClick={(): void => {
+              updateCondition(index, {
+                referenceFileName: undefined,
+                referenceFileContent: undefined,
+                referenceField: '',
+                lookupStructure: undefined
+              });
+            }}
+          />
+        )}
+        <X
+          size={20}
+          className='-right-8 -translate-y-1/2 absolute top-1/2 cursor-pointer text-red-500 hover:text-red-700'
+          onClick={(): void => removeCondition(index)}
+        />
+      </>
     )}
     <div className='grid w-full grid-cols-[1fr_1fr_1fr] items-center gap-4'>
       <FieldSelector
