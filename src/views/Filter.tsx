@@ -396,7 +396,14 @@ const ConditionRow = ({
   isOnlyCondition: boolean;
 }): JSX.Element => (
   <div className='relative w-full'>
-    <div className='grid w-full grid-cols-[1fr_1fr_1fr_auto] items-center gap-4'>
+    {!isOnlyCondition && (
+      <X
+        size={20}
+        className='absolute -right-8 top-1/2 -translate-y-1/2 cursor-pointer text-red-500 hover:text-red-700'
+        onClick={(): void => removeCondition(index)}
+      />
+    )}
+    <div className='grid w-full grid-cols-[1fr_1fr_1fr] items-center gap-4'>
       <FieldSelector
         fields={workingFileSchema}
         selectedField={condition.field}
@@ -432,14 +439,6 @@ const ConditionRow = ({
       <div className='w-full'>
         {renderConditionValue(condition, index, updateCondition)}
       </div>
-
-      {!isOnlyCondition && (
-        <X
-          size={20}
-          className='cursor-pointer text-red-500 hover:text-red-700'
-          onClick={(): void => removeCondition(index)}
-        />
-      )}
     </div>
   </div>
 );
