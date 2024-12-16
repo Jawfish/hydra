@@ -8,6 +8,7 @@ import {
   SidebarSeparator
 } from '@/shadcn/components/ui/sidebar';
 import React from 'react';
+import type { JSX } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
@@ -15,7 +16,7 @@ const SidebarRouteItem: React.FC<{ route: Route }> = ({ route }) => {
   const location = useLocation();
   const isActive = location.pathname === route.path;
 
-  const handleRouteClick = () => {
+  const handleRouteClick = (): void => {
     document.title = `${APP_CONFIG.name} - ${route.title}`;
   };
 
@@ -33,7 +34,7 @@ const SidebarRouteItem: React.FC<{ route: Route }> = ({ route }) => {
   );
 };
 
-export function AppSidebar() {
+export function AppSidebar(): JSX.Element {
   // Sort routes alphabetically by title
   const sortedRoutes = [...routes].sort((a, b) => a.title.localeCompare(b.title));
 

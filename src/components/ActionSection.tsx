@@ -20,9 +20,7 @@ interface ActionSectionProgressProps {
 }
 
 export const ActionSection = ({ children }: ActionSectionProps): JSX.Element => (
-  <div className='-mx-6 flex items-center gap-6 rounded-md bg-muted p-6'>
-    {children}
-  </div>
+  <div className='-mx-6 flex items-center gap-6 rounded-md p-6'>{children}</div>
 );
 
 ActionSection.Button = ({

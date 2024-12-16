@@ -9,27 +9,30 @@ import {
 } from '@/shadcn/components/ui/select';
 import { type FileType, useWorkingFileStore } from '@/store/store';
 import { useState } from 'react';
+import type { JSX } from 'react';
 import { toast } from 'sonner';
 
-export function WorkingFileDownloader() {
+export function WorkingFileDownloader(): JSX.Element | null {
   const { fileName, fileContentParsed } = useWorkingFileStore();
   const [selectedFormat, setSelectedFormat] = useState<FileType>('csv');
 
-  const handleDownload = () => {
+  const handleDownload = (): void => {
     if (fileContentParsed.length === 0) {
       return;
     }
 
     try {
       const output = serializeJson(fileContentParsed, selectedFormat);
-      const blob = new Blob([output], {
-        type:
-          selectedFormat === 'json'
-            ? 'application/json'
-            : selectedFormat === 'jsonl'
-              ? 'application/jsonl'
-              : 'text/csv'
-      });
+      let mimeType = 'text/csv';
+
+      if (selectedFormat === 'json') {
+        mimeType = 'application/json';
+      } else if (selectedFormat === 'jsonl') {
+        mimeType = 'application/jsonl';
+      }
+
+      const blob = new Blob([output], { type: mimeType });
+
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -56,7 +59,7 @@ export function WorkingFileDownloader() {
         <span className='text-muted-foreground text-sm'>Convert to:</span>
         <Select
           value={selectedFormat}
-          onValueChange={(value: string) => setSelectedFormat(value as FileType)}
+          onValueChange={(value: string): void => setSelectedFormat(value as FileType)}
         >
           <SelectTrigger className='w-[100px]'>
             <SelectValue placeholder='Format' />

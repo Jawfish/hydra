@@ -101,7 +101,7 @@ describe('Converting CSV to an array of objects', () => {
 
 describe('Serializing JSON', () => {
   // Normalize line breaks to '\n' for comparison
-  const normalizeLineBreaks = (str: string) =>
+  const normalizeLineBreaks = (str: string): string =>
     str.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
   it('converts array of objects into csv string', () => {
@@ -653,7 +653,7 @@ describe('String normalization', () => {
     const cases = [
       { input: 42, expected: '42' },
       { input: true, expected: 'true' },
-      { input: { toString: () => 'object' }, expected: 'object' }
+      { input: { toString: (): string => 'object' }, expected: 'object' }
     ];
 
     for (const { input, expected } of cases) {

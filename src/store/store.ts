@@ -1,6 +1,7 @@
 import { getParsedContentFromFile } from '@/lib/parse';
-import { create } from 'zustand';
+import { type StoreApi, type UseBoundStore, create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
+// import type { WithImmer } from 'zustand/middleware';
 
 export type FileType = 'jsonl' | 'csv' | 'json' | 'unknown';
 
@@ -24,17 +25,17 @@ const initialState: FileState = {
   fileContentParsed: []
 };
 
-const createFileStore = () =>
+const createFileStore = (): UseBoundStore<StoreApi<FileStore>> =>
   create<FileStore>()(
     immer(set => ({
       ...initialState,
-      setFileName: name => {
-        set(state => {
+      setFileName: (name): void => {
+        set((state): void => {
           console.debug(`Setting file name to ${name}`);
           state.fileName = name;
         });
       },
-      setFileContent: (content, fileType) => {
+      setFileContent: (content, fileType): void => {
         set(state => {
           console.debug(`Setting file content for ${fileType}`);
 
@@ -58,7 +59,7 @@ const createFileStore = () =>
           }
         });
       },
-      resetFileState: () => {
+      resetFileState: (): void => {
         set(() => initialState);
       }
     }))

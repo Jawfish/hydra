@@ -3,7 +3,6 @@ import {
   Bot,
   Filter as FileFilter,
   FileText,
-  FileX,
   IdCard,
   type LucideProps,
   Map as MapIcon
@@ -12,7 +11,6 @@ import type { ForwardRefExoticComponent, ReactNode, RefAttributes } from 'react'
 import { Navigate } from 'react-router-dom';
 
 import { Backfill } from '@/views/Backfill';
-import { Deduplicate } from '@/views/Deduplicate';
 import { Filter } from '@/views/Filter';
 import { MapValues } from '@/views/MapValues';
 import { Stats } from '@/views/Stats';
@@ -54,12 +52,6 @@ export const routes: Route[] = [
     element: <Backfill />,
     title: 'Backfill',
     icon: FileText
-  },
-  {
-    path: '/deduplicate',
-    element: <Deduplicate />,
-    title: 'Deduplicate',
-    icon: FileX
   },
   {
     path: '/stats',

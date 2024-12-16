@@ -2,6 +2,7 @@ import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { HelpTooltip } from '@/components/HelpTooltip';
+import { Section } from '@/components/Section';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import {
   type FieldAnalysisDetail,
@@ -109,6 +110,7 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
   setSelectedAnalysisField: (value: string) => void;
   fieldAnalysis: FieldAnalysisDetail[];
 }) => {
+  // biome-ignore lint/nursery/noSecrets: not a secret
   console.debug('DetailedAnalysisSection props:', {
     selectedIdentifier,
     selectedAnalysisField,

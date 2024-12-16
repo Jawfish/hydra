@@ -1,7 +1,7 @@
 import { Button } from '@/shadcn/components/ui/button';
 import type { FileType } from '@/store/store';
 import type React from 'react';
-
+import type { JSX } from 'react';
 type FileUploadProps = {
   onFileUpload: (fileName: string, fileContent: string, fileType: FileType) => void;
   fileName: string | null;
@@ -27,8 +27,10 @@ const getFileType = (file: File): FileType => {
   }
 };
 
-export function FileUpload({ onFileUpload, fileName }: FileUploadProps) {
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+export function FileUpload({ onFileUpload, fileName }: FileUploadProps): JSX.Element {
+  const handleFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): Promise<void> => {
     const file = e.target.files?.[0];
     if (file) {
       const content = await file.text();
@@ -39,7 +41,7 @@ export function FileUpload({ onFileUpload, fileName }: FileUploadProps) {
   };
 
   // Truncate the file name if it's too long, but preserve the extension
-  const truncateFileName = (name: string) => {
+  const truncateFileName = (name: string): string => {
     const parts = name.split('.');
     const extension = parts.at(-1);
     const nameOnly = parts[0];

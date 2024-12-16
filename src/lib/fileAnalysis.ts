@@ -47,6 +47,7 @@ export const analyzeFieldDetails = (
   identifierField: string
 ): FieldAnalysisDetail[] => {
   if (!(data && field && identifierField)) {
+    // biome-ignore lint/nursery/noSecrets: not a secret
     console.debug('analyzeFieldDetails: Missing required parameters', {
       data: !!data,
       field,
@@ -55,6 +56,7 @@ export const analyzeFieldDetails = (
     return [];
   }
 
+  // biome-ignore lint/nursery/noSecrets: not a secret
   console.debug('analyzeFieldDetails: Starting analysis', {
     totalRows: data.length,
     field,
@@ -83,6 +85,7 @@ export const analyzeFieldDetails = (
   }
 
   const emptyDetails = details.filter(d => d.isEmpty);
+  // biome-ignore lint/nursery/noSecrets: not a secret
   console.debug('analyzeFieldDetails: Analysis complete', {
     totalAnalyzed: details.length,
     emptyCount: emptyDetails.length,

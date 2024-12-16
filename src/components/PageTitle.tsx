@@ -5,7 +5,7 @@ interface PageTitleProps {
   title: string;
 }
 
-export function PageTitle({ title }: PageTitleProps) {
+export function PageTitle({ title }: PageTitleProps): null {
   useEffect(() => {
     document.title = `${APP_CONFIG.name} - ${title}`;
   }, [title]);

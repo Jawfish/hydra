@@ -2,10 +2,12 @@ import { useReferenceFileStore, useWorkingFileStore } from '@/store/store';
 import type { FileType } from '@/store/store';
 import { toast } from 'sonner';
 
-export function useFileUpload(storeType: 'working' | 'reference') {
+export function useFileUpload(
+  storeType: 'working' | 'reference'
+): (name: string, content: string, fileType: string) => void {
   const store = storeType === 'working' ? useWorkingFileStore : useReferenceFileStore;
 
-  const handleFileUpload = (name: string, content: string, fileType: string) => {
+  const handleFileUpload = (name: string, content: string, fileType: string): void => {
     try {
       console.debug(`Uploading ${storeType} File:`, {
         name,
