@@ -463,8 +463,8 @@ const FilterConditions = ({
 }: FilterConditionsProps): JSX.Element => (
   <Section>
     <Section.Title>Filter Conditions</Section.Title>
-    <Section.Items className='grid grid-cols-1 gap-4'>
-      <div className='grid grid-cols-2 items-center gap-4'>
+    <Section.Items className='grid-cols-1'>
+      <div className='flex gap-4'>
         <FilterModeSelector
           mode={filterGroup.mode || 'keep'}
           onModeChange={(value): void => {
@@ -480,18 +480,20 @@ const FilterConditions = ({
         />
       </div>
 
-      {filterGroup.conditions.map((condition, index) => (
-        <ConditionRow
-          // biome-ignore lint/suspicious/noArrayIndexKey: order is not expected to change
-          key={index}
-          condition={condition}
-          index={index}
-          workingFileSchema={workingFileSchema}
-          updateCondition={updateCondition}
-          removeCondition={removeCondition}
-          isOnlyCondition={filterGroup.conditions.length === 1}
-        />
-      ))}
+      <div className='grid w-full items-center gap-4'>
+        {filterGroup.conditions.map((condition, index) => (
+          <ConditionRow
+            // biome-ignore lint/suspicious/noArrayIndexKey: order is not expected to change
+            key={index}
+            condition={condition}
+            index={index}
+            workingFileSchema={workingFileSchema}
+            updateCondition={updateCondition}
+            removeCondition={removeCondition}
+            isOnlyCondition={filterGroup.conditions.length === 1}
+          />
+        ))}
+      </div>
 
       <div className='mt-4'>
         <Button onClick={addCondition} variant='outline'>
