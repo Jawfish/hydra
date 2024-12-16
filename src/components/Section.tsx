@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import type { JSX } from 'react';
 
 type SectionProps = {
@@ -31,10 +31,6 @@ Section.Description = ({ children }: SectionDescriptionProps): JSX.Element => (
   <p className='text-muted-foreground text-sm'>{children}</p>
 );
 
-Section.Items = ({ children, className }: SectionItemsProps): JSX.Element => {
-  const childCount = React.Children.count(children);
-  const gridClass =
-    childCount === 1 ? 'grid-cols-1' : `grid-cols-${Math.min(childCount, 3)}`;
-
-  return <div className={`grid ${gridClass} gap-4 ${className || ''}`}>{children}</div>;
-};
+Section.Items = ({ children, className }: SectionItemsProps): JSX.Element => (
+  <div className={`grid gap-4 ${className || ''}`}>{children}</div>
+);
