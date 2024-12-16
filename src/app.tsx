@@ -33,7 +33,7 @@ function App(): JSX.Element {
           </Route>
         </Routes>
       </SidebarProvider>
-      <Toaster position='top-right' richColors={true} />
+      <Toaster className='-z-10 mb-12' position='bottom-center' richColors={true} />
     </ThemeProvider>
   );
 }
