@@ -395,7 +395,7 @@ const ConditionRow = ({
   removeCondition: (index: number) => void;
   isOnlyCondition: boolean;
 }): JSX.Element => (
-  <div className='relative flex items-center'>
+  <div className='relative w-full'>
     <div className='grid w-full grid-cols-3 items-center gap-4'>
       <FieldSelector
         fields={workingFileSchema}
@@ -436,7 +436,7 @@ const ConditionRow = ({
     {!isOnlyCondition && (
       <X
         size={20}
-        className='-mr-8 absolute right-0 cursor-pointer text-red-500 hover:text-red-700'
+        className='absolute right-0 top-1/2 -translate-y-1/2 cursor-pointer text-red-500 hover:text-red-700'
         onClick={(): void => removeCondition(index)}
       />
     )}
@@ -462,8 +462,8 @@ const FilterConditions = ({
 }: FilterConditionsProps): JSX.Element => (
   <Section>
     <Section.Title>Filter Conditions</Section.Title>
-    <Section.Items className='grid-cols-1'>
-      <div className='flex items-center gap-4'>
+    <Section.Items className='grid grid-cols-1 gap-4'>
+      <div className='grid grid-cols-2 items-center gap-4'>
         <FilterModeSelector
           mode={filterGroup.mode || 'keep'}
           onModeChange={(value): void => {
