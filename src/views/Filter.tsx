@@ -314,7 +314,6 @@ const renderConditionValue = (
           <FieldSelector
             fields={getAllPaths(condition.referenceFileContent[0] || {})}
             selectedField={condition.referenceField || ''}
-            label='Select reference field'
             onFieldSelect={(value): void => {
               const newField = value;
               updateCondition(index, {
