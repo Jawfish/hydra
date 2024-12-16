@@ -385,39 +385,35 @@ const ConditionRow = ({
   index,
   workingFileSchema,
   updateCondition,
-  removeCondition,
-  isOnlyCondition
+  removeCondition
 }: {
   condition: FilterCondition;
   index: number;
   workingFileSchema: string[];
   updateCondition: (index: number, updates: Partial<FilterCondition>) => void;
   removeCondition: (index: number) => void;
-  isOnlyCondition: boolean;
 }): JSX.Element => (
   <div className='relative w-full'>
-    <>
-      <X
-        size={20}
-        className='-right-8 -translate-y-1/2 absolute top-1/2 cursor-pointer '
-        onClick={(): void => removeCondition(index)}
-      />
-      <RefreshCw
-        size={20}
-        className='-right-16 -translate-y-1/2 absolute top-1/2 cursor-pointer text-primary'
-        onClick={(): void => {
-          updateCondition(index, {
-            referenceFileName: undefined,
-            referenceFileContent: undefined,
-            referenceField: '',
-            lookupStructure: undefined,
-            field: '',
-            value: '',
-            comparison: undefined
-          });
-        }}
-      />
-    </>
+    <X
+      size={16}
+      className='-right-14 -translate-y-1/2 absolute top-1/2 cursor-pointer text-primary/75'
+      onClick={(): void => removeCondition(index)}
+    />
+    <RefreshCw
+      size={16}
+      className='-right-7 -translate-y-1/2 absolute top-1/2 cursor-pointer text-primary/75'
+      onClick={(): void => {
+        updateCondition(index, {
+          referenceFileName: undefined,
+          referenceFileContent: undefined,
+          referenceField: '',
+          lookupStructure: undefined,
+          field: '',
+          value: '',
+          comparison: undefined
+        });
+      }}
+    />
     <div className='grid w-full grid-cols-[1fr_1fr_1fr] items-center gap-4'>
       <FieldSelector
         fields={workingFileSchema}
@@ -520,7 +516,6 @@ const FilterConditions = ({
             workingFileSchema={workingFileSchema}
             updateCondition={updateCondition}
             removeCondition={removeCondition}
-            isOnlyCondition={filterGroup.conditions.length === 1}
           />
         ))}
       </div>
