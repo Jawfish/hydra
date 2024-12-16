@@ -314,6 +314,9 @@ const renderConditionValue = (
           <FieldSelector
             fields={getAllPaths(condition.referenceFileContent[0] || {})}
             selectedField={condition.referenceField || ''}
+            label={condition.referenceFileName 
+              ? `Select reference field (${condition.referenceFileName})` 
+              : 'Select reference field'}
             onFieldSelect={(value): void => {
               const newField = value;
               updateCondition(index, {
@@ -431,8 +434,16 @@ const ConditionRow = ({
           <SelectItem value='greaterThan'>Greater than</SelectItem>
           <SelectItem value='lessThan'>Less than</SelectItem>
           <SelectItem value='isEmpty'>Is Empty</SelectItem>
-          <SelectItem value='inFile'>In File</SelectItem>
-          <SelectItem value='notInFile'>Not in File</SelectItem>
+          <SelectItem value='inFile'>
+            {condition.referenceFileName 
+              ? `In File (${condition.referenceFileName})` 
+              : 'In File'}
+          </SelectItem>
+          <SelectItem value='notInFile'>
+            {condition.referenceFileName 
+              ? `Not in File (${condition.referenceFileName})` 
+              : 'Not in File'}
+          </SelectItem>
         </SelectContent>
       </Select>
 
