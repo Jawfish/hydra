@@ -5,7 +5,8 @@ import {
   FileText,
   IdCard,
   type LucideProps,
-  Map as MapIcon
+  Map as MapIcon,
+  Scissors
 } from 'lucide-react';
 import type { ForwardRefExoticComponent, ReactNode, RefAttributes } from 'react';
 import { Navigate } from 'react-router-dom';
@@ -14,6 +15,7 @@ import { Backfill } from '@/views/Backfill';
 import { Filter } from '@/views/Filter';
 import { MapValues } from '@/views/MapValues';
 import { Stats } from '@/views/Stats';
+import { Split } from '@/views/Split';
 import { Translate } from '@/views/Translate';
 import { UuidExtractor } from '@/views/UuidExtractor';
 
@@ -64,6 +66,12 @@ export const routes: Route[] = [
     element: <Filter />,
     title: 'Filter',
     icon: FileFilter
+  },
+  {
+    path: '/split',
+    element: <Split />,
+    title: 'Split',
+    icon: Scissors
   }
 ];
 
