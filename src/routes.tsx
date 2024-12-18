@@ -6,7 +6,8 @@ import {
   IdCard,
   type LucideProps,
   Map as MapIcon,
-  Scissors
+  Scissors,
+  FileDown
 } from 'lucide-react';
 import type { ForwardRefExoticComponent, ReactNode, RefAttributes } from 'react';
 import { Navigate } from 'react-router-dom';
@@ -15,6 +16,7 @@ import { Backfill } from '@/views/Backfill';
 import { Filter } from '@/views/Filter';
 import { MapValues } from '@/views/MapValues';
 import { Split } from '@/views/Split';
+import { Convert } from '@/views/Convert';
 import { Stats } from '@/views/Stats';
 import { Translate } from '@/views/Translate';
 import { UuidExtractor } from '@/views/UuidExtractor';
@@ -72,6 +74,12 @@ export const routes: Route[] = [
     element: <Split />,
     title: 'Split',
     icon: Scissors
+  },
+  {
+    path: '/convert',
+    element: <Convert />,
+    title: 'Convert',
+    icon: FileDown
   }
 ];
 

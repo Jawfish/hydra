@@ -156,8 +156,9 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
       {fieldAnalysis.length > 0 && (
         <div>
           <h4 className='mb-2 font-medium text-sm'>
-            {fieldAnalysis.length} empty '{selectedAnalysisField}' listed by '
-            {selectedIdentifier}':
+            {fieldAnalysis.length} empty
+            <strong> {selectedAnalysisField}</strong> listed by
+            <strong> {selectedIdentifier}</strong>:
           </h4>
           <ScrollArea className='h-[200px]'>
             <ul className='space-y-2'>
