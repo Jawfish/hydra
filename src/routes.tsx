@@ -14,8 +14,8 @@ import { Navigate } from 'react-router-dom';
 import { Backfill } from '@/views/Backfill';
 import { Filter } from '@/views/Filter';
 import { MapValues } from '@/views/MapValues';
-import { Stats } from '@/views/Stats';
 import { Split } from '@/views/Split';
+import { Stats } from '@/views/Stats';
 import { Translate } from '@/views/Translate';
 import { UuidExtractor } from '@/views/UuidExtractor';
 

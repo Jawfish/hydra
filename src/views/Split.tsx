@@ -1,17 +1,19 @@
-import { useState, useEffect } from 'react';
+import { ActionSection } from '@/components/ActionSection';
+import { FieldSelector } from '@/components/FieldSelector';
+import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Section } from '@/components/Section';
-import { FileUpload } from '@/components/FileUpload';
-import { FieldSelector } from '@/components/FieldSelector';
-import { ActionSection } from '@/components/ActionSection';
 import { useFileUpload } from '@/hooks/useFileUpload';
-import { useWorkingFileStore } from '@/store/store';
 import { getAllPaths, serializeJson } from '@/lib/parse';
+import { type FileType, useWorkingFileStore } from '@/store/store';
+import jsZip from 'jszip';
+import { useEffect, useState } from 'react';
+import type { JSX } from 'react';
 import { toast } from 'sonner';
-import JSZip from 'jszip';
 
 export function Split(): JSX.Element {
-  const { fileName: workingFileName, fileContentParsed: workingFileContent } = useWorkingFileStore();
+  const { fileName: workingFileName, fileContentParsed: workingFileContent } =
+    useWorkingFileStore();
   const [workingFileSchema, setWorkingFileSchema] = useState<string[]>([]);
   const [selectedField, setSelectedField] = useState<string>('');
 
@@ -23,6 +25,51 @@ export function Split(): JSX.Element {
       setWorkingFileSchema(schema);
     }
   }, [workingFileContent]);
+
+  const groupRecordsByField = (
+    records: Record<string, unknown>[],
+    field: string
+  ): Record<string, Record<string, unknown>[]> => {
+    const splitGroups: Record<string, Record<string, unknown>[]> = {};
+
+    for (const record of records) {
+      const fieldValue = record[field] ?? 'undefined';
+      const key = String(fieldValue);
+
+      if (!splitGroups[key]) {
+        splitGroups[key] = [];
+      }
+      splitGroups[key].push(record);
+    }
+
+    return splitGroups;
+  };
+
+  const createZipFromGroups = async (
+    splitGroups: Record<string, Record<string, unknown>[]>,
+    selectedField: string,
+    fileType: FileType
+  ): Promise<Blob> => {
+    const zip = new jsZip();
+
+    for (const [key, groupRecords] of Object.entries(splitGroups)) {
+      const sanitizedKey = key.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      const filename = `${selectedField}_${sanitizedKey}.${fileType}`;
+      const fileContent = serializeJson(groupRecords, fileType);
+      zip.file(filename, fileContent);
+    }
+
+    return await zip.generateAsync({ type: 'blob' });
+  };
+
+  const downloadZipFile = (zipBlob: Blob, selectedField: string): void => {
+    const url = window.URL.createObjectURL(zipBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `split_${selectedField}_${new Date().toISOString().replace(/[:.]/g, '-')}.zip`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
 
   const processSplit = async (): Promise<void> => {
     if (!workingFileName) {
@@ -36,45 +83,24 @@ export function Split(): JSX.Element {
     }
 
     try {
-      const splitGroups: Record<string, Record<string, unknown>[]> = {};
-
       // Group records by selected field
-      workingFileContent.forEach(record => {
-        const fieldValue = record[selectedField] ?? 'undefined';
-        const key = String(fieldValue);
-        
-        if (!splitGroups[key]) {
-          splitGroups[key] = [];
-        }
-        splitGroups[key].push(record);
-      });
-
-      const zip = new JSZip();
+      const splitGroups = groupRecordsByField(workingFileContent, selectedField);
 
       // Determine file type from original file
-      const fileType = (workingFileName?.split('.').pop()) || 'csv';
+      const fileType = (workingFileName?.split('.').pop() || 'csv') as FileType;
 
-      // Create files for each group
-      Object.entries(splitGroups).forEach(([key, groupRecords]) => {
-        const sanitizedKey = key.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        const filename = `${selectedField}_${sanitizedKey}.${fileType}`;
-        const fileContent = serializeJson(groupRecords, fileType);
-        zip.file(filename, fileContent);
-      });
+      // Create zip file
+      const zipBlob = await createZipFromGroups(splitGroups, selectedField, fileType);
 
-      // Generate and download zip
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
-      const url = window.URL.createObjectURL(zipBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `split_${selectedField}_${new Date().toISOString().replace(/[:.]/g, '-')}.zip`;
-      a.click();
-      window.URL.revokeObjectURL(url);
+      // Download zip file
+      downloadZipFile(zipBlob, selectedField);
 
       toast.success(`Split into ${Object.keys(splitGroups).length} files`);
     } catch (error) {
       console.error('Split Error:', error);
-      toast.error(`Error splitting file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(
+        `Error splitting file: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   };
 
@@ -97,7 +123,9 @@ export function Split(): JSX.Element {
         <>
           <Section>
             <Section.Title>Split Field</Section.Title>
-            <Section.Description>Select the field to split records by</Section.Description>
+            <Section.Description>
+              Select the field to split records by
+            </Section.Description>
             <FieldSelector
               fields={workingFileSchema}
               selectedField={selectedField}
@@ -107,10 +135,7 @@ export function Split(): JSX.Element {
           </Section>
 
           <ActionSection>
-            <ActionSection.Button
-              onClick={processSplit}
-              disabled={!selectedField}
-            >
+            <ActionSection.Button onClick={processSplit} disabled={!selectedField}>
               Split File
             </ActionSection.Button>
           </ActionSection>
