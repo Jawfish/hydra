@@ -1,5 +1,4 @@
 import { Button } from '@/shadcn/components/ui/button';
-import { Progress } from '@/shadcn/components/ui/progress';
 import type React from 'react';
 import type { JSX } from 'react';
 
@@ -13,10 +12,6 @@ interface ActionSectionButtonProps {
   variant?: 'default' | 'outline' | 'destructive';
   onClick?: () => void;
   disabled?: boolean;
-}
-
-interface ActionSectionProgressProps {
-  value: number;
 }
 
 export const ActionSection = ({ children }: ActionSectionProps): JSX.Element => (
@@ -37,8 +32,4 @@ ActionSection.Button = ({
   >
     {children}
   </Button>
-);
-
-ActionSection.Progress = ({ value }: ActionSectionProgressProps): JSX.Element => (
-  <Progress value={value} />
 );

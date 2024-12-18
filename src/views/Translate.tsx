@@ -7,6 +7,48 @@ import type React from 'react';
 import type { JSX } from 'react';
 import { useState } from 'react';
 
+type ProgressInfo = {
+  percentage: number;
+  estimatedTimeRemaining: number;
+};
+
+const formatTimeRemaining = (milliseconds: number): string => {
+  const totalSeconds = Math.round(milliseconds / 1000);
+
+  if (totalSeconds < 60) {
+    return `${totalSeconds.toString().padStart(2, '0')} sec`;
+  }
+
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${minutes.toString().padStart(2, '0')} min ${seconds.toString().padStart(2, '0')} sec`;
+};
+
+const calculateProgress = (
+  completedOperations: number,
+  totalOperations: number,
+  startTime: number
+): ProgressInfo => {
+  const currentTime = Date.now();
+  const elapsedTime = currentTime - startTime;
+
+  const percentage =
+    totalOperations > 0 ? Math.round((completedOperations / totalOperations) * 100) : 0;
+
+  let estimatedTimeRemaining = 0;
+  if (completedOperations > 0) {
+    const averageTimePerOperation = elapsedTime / completedOperations;
+    const remainingOperations = totalOperations - completedOperations;
+    estimatedTimeRemaining = Math.round(averageTimePerOperation * remainingOperations);
+  }
+
+  return {
+    percentage,
+    estimatedTimeRemaining
+  };
+};
+
 const ALL_LANGUAGES = [
   'English',
   'German',
@@ -44,6 +86,7 @@ import {
   DropdownMenuTrigger
 } from '@/shadcn/components/ui/dropdown-menu';
 import { Input } from '@/shadcn/components/ui/input';
+import { Progress } from '@/shadcn/components/ui/progress';
 import { useWorkingFileStore } from '@/store/store';
 import { toast } from 'sonner';
 export function Translate(): JSX.Element {
@@ -71,7 +114,10 @@ export function Translate(): JSX.Element {
     localStorage.setItem('anthropicApiKey', newApiKey);
   };
   const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState<number>(0);
+  const [progress, setProgress] = useState<ProgressInfo>({
+    percentage: 0,
+    estimatedTimeRemaining: 0
+  });
   const [selectedLanguages, setSelectedLanguages] = useState<Set<string>>(
     new Set(DEFAULT_ENABLED_LANGUAGES)
   );
@@ -302,9 +348,7 @@ export function Translate(): JSX.Element {
 
       const totalRows = rows.length;
       const totalOperations = totalRows * selectedLanguages.size;
-      console.debug(
-        `Processing ${totalRows} rows into ${selectedLanguages.size} languages`
-      );
+      const startTime = Date.now();
       let completedOperations = 0;
 
       console.debug(
@@ -322,7 +366,12 @@ export function Translate(): JSX.Element {
           anthropic,
           () => {
             completedOperations++;
-            setProgress(Math.round((completedOperations / totalOperations) * 100));
+            const progressInfo = calculateProgress(
+              completedOperations,
+              totalOperations,
+              startTime
+            );
+            setProgress(progressInfo);
           },
           chunkSize
         );
@@ -339,7 +388,7 @@ export function Translate(): JSX.Element {
       );
     } finally {
       setIsProcessing(false);
-      setProgress(0);
+      setProgress({ percentage: 0, estimatedTimeRemaining: 0 });
     }
   };
 
@@ -384,7 +433,15 @@ export function Translate(): JSX.Element {
             >
               Translate
             </ActionSection.Button>
-            {isProcessing && <ActionSection.Progress value={progress} />}
+            {isProcessing && (
+              <div className='flex w-full flex-col gap-2'>
+                <Progress value={progress.percentage} />
+                <div className='flex justify-between text-muted-foreground text-sm'>
+                  <div>{progress.percentage}%</div>
+                  <div>{formatTimeRemaining(progress.estimatedTimeRemaining || 0)}</div>
+                </div>
+              </div>
+            )}
           </ActionSection>
         </>
       )}
