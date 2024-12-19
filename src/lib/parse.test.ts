@@ -37,6 +37,78 @@ describe('CSV counting', () => {
   });
 });
 
+describe('Special character handling', () => {
+  it('handles UTF-8 characters in CSV', () => {
+    const csvWithUtf8 = 'name,city\nJosé,São Paulo\nMarie,Münich';
+    const parsed = csvToJson(csvWithUtf8);
+
+    expect(parsed).toEqual([
+      { name: 'José', city: 'São Paulo' },
+      { name: 'Marie', city: 'Münich' }
+    ]);
+  });
+
+  it('handles escaped characters in JSON', () => {
+    const jsonWithEscapes = '[{"name":"Line\\nBreak","path":"C:\\\\Windows"}]';
+    const parsed = parseJson(jsonWithEscapes);
+
+    expect(parsed).toEqual([
+      {
+        name: 'Line\nBreak',
+        path: 'C:\\Windows'
+      }
+    ]);
+  });
+
+  it('handles emoji and special characters', () => {
+    const data = [
+      { name: '👨‍💻 John', status: '✅' },
+      { name: '👩‍🔬 Jane', status: '⭐' }
+    ];
+
+    const serialized = serializeJson(data, 'json');
+    const parsed = parseJson(serialized);
+
+    expect(parsed).toEqual(data);
+  });
+});
+
+describe('Special character handling', () => {
+  it('handles UTF-8 characters in CSV', () => {
+    const csvWithUtf8 = 'name,city\nJosé,São Paulo\nMarie,Münich';
+    const parsed = csvToJson(csvWithUtf8);
+
+    expect(parsed).toEqual([
+      { name: 'José', city: 'São Paulo' },
+      { name: 'Marie', city: 'Münich' }
+    ]);
+  });
+
+  it('handles escaped characters in JSON', () => {
+    const jsonWithEscapes = '[{"name":"Line\\nBreak","path":"C:\\\\Windows"}]';
+    const parsed = parseJson(jsonWithEscapes);
+
+    expect(parsed).toEqual([
+      {
+        name: 'Line\nBreak',
+        path: 'C:\\Windows'
+      }
+    ]);
+  });
+
+  it('handles emoji and special characters', () => {
+    const data = [
+      { name: '👨‍💻 John', status: '✅' },
+      { name: '👩‍🔬 Jane', status: '⭐' }
+    ];
+
+    const serialized = serializeJson(data, 'json');
+    const parsed = parseJson(serialized);
+
+    expect(parsed).toEqual(data);
+  });
+});
+
 describe('CSV parsing edge cases', () => {
   it('handles CSV with a single header row and no data', () => {
     const csvWithOnlyHeader = 'name,age';
@@ -542,6 +614,122 @@ describe('Object flattening', () => {
       'metrics.isActive': true,
       'metrics.label': 'test'
     });
+  });
+});
+
+describe('JSON parsing error handling', () => {
+  it('throws error for malformed JSON', () => {
+    const malformedJson = '{"name": "John", unclosed: "quote}';
+    expect(() => parseJson(malformedJson)).toThrow();
+  });
+
+  it('throws error for trailing comma', () => {
+    const trailingCommaJson = '{"name": "John",}';
+    expect(() => parseJson(trailingCommaJson)).toThrow();
+  });
+
+  it('throws error for missing quotes around property names', () => {
+    const missingQuotesJson = '{name: "John"}';
+    expect(() => parseJson(missingQuotesJson)).toThrow();
+  });
+});
+
+describe('Serialization roundtrip tests', () => {
+  it('preserves data through serialize-parse cycle for CSV', () => {
+    const originalData = [
+      { name: 'John', age: 30, nested: { city: 'NY' } },
+      { name: 'Jane', age: 25, nested: { city: 'SF' } }
+    ];
+
+    const serialized = serializeJson(originalData, 'csv');
+    const parsed = csvToJson(serialized);
+
+    expect(parsed).toEqual([
+      { name: 'John', age: 30, 'nested.city': 'NY' },
+      { name: 'Jane', age: 25, 'nested.city': 'SF' }
+    ]);
+  });
+
+  it('preserves data through serialize-parse cycle for JSON', () => {
+    const originalData = [
+      { name: 'John', nested: { deep: { value: 42 } } },
+      { name: 'Jane', nested: { deep: { value: 43 } } }
+    ];
+
+    const serialized = serializeJson(originalData, 'json');
+    const parsed = parseJson(serialized);
+
+    expect(parsed).toEqual(originalData);
+  });
+
+  it('preserves data through serialize-parse cycle for JSONL', () => {
+    const originalData = [
+      { name: 'John', complex: { array: [1, 2, 3], null: null } },
+      { name: 'Jane', complex: { array: [4, 5, 6], null: null } }
+    ];
+
+    const serialized = serializeJson(originalData, 'jsonl');
+    const parsed = jsonlToJson(serialized);
+
+    expect(parsed).toEqual(originalData);
+  });
+});
+
+describe('JSON parsing error handling', () => {
+  it('throws error for malformed JSON', () => {
+    const malformedJson = '{"name": "John", unclosed: "quote}';
+    expect(() => parseJson(malformedJson)).toThrow();
+  });
+
+  it('throws error for trailing comma', () => {
+    const trailingCommaJson = '{"name": "John",}';
+    expect(() => parseJson(trailingCommaJson)).toThrow();
+  });
+
+  it('throws error for missing quotes around property names', () => {
+    const missingQuotesJson = '{name: "John"}';
+    expect(() => parseJson(missingQuotesJson)).toThrow();
+  });
+});
+
+describe('Serialization roundtrip tests', () => {
+  it('preserves data through serialize-parse cycle for CSV', () => {
+    const originalData = [
+      { name: 'John', age: 30, nested: { city: 'NY' } },
+      { name: 'Jane', age: 25, nested: { city: 'SF' } }
+    ];
+
+    const serialized = serializeJson(originalData, 'csv');
+    const parsed = csvToJson(serialized);
+
+    expect(parsed).toEqual([
+      { name: 'John', age: 30, 'nested.city': 'NY' },
+      { name: 'Jane', age: 25, 'nested.city': 'SF' }
+    ]);
+  });
+
+  it('preserves data through serialize-parse cycle for JSON', () => {
+    const originalData = [
+      { name: 'John', nested: { deep: { value: 42 } } },
+      { name: 'Jane', nested: { deep: { value: 43 } } }
+    ];
+
+    const serialized = serializeJson(originalData, 'json');
+    const parsed = parseJson(serialized);
+
+    expect(parsed).toEqual(originalData);
+  });
+
+  it('preserves data through serialize-parse cycle for JSONL', () => {
+    const originalData = [
+      { name: 'John', complex: { array: [1, 2, 3], null: null } },
+      { name: 'Jane', complex: { array: [4, 5, 6], null: null } }
+    ];
+
+    const serialized = serializeJson(originalData, 'jsonl');
+    const parsed = jsonlToJson(serialized);
+
+    expect(parsed).toEqual(originalData);
   });
 });
 

@@ -22,21 +22,36 @@ export const analyzeField = (
   let emptyCount = 0;
 
   for (const row of data) {
+    // Guard against null, undefined, or non-object inputs
+    if (row == null || typeof row !== 'object') {
+      emptyCount++;
+      continue;
+    }
+
     // Prefer direct access first, fallback to getValueByPath only if direct access fails
     const value = row[field] !== undefined ? row[field] : getValueByPath(row, field);
 
+    // Check for special non-empty object types first
+    const isNonEmptyObject =
+      value instanceof Date || value instanceof RegExp || typeof value === 'function';
+
     const isEmpty =
-      value === null ||
-      value === undefined ||
-      (typeof value === 'string' && value.trim() === '') ||
-      (Array.isArray(value) && value.length === 0) ||
-      (typeof value === 'object' && value !== null && Object.keys(value).length === 0);
+      !isNonEmptyObject &&
+      (value === null ||
+        value === undefined ||
+        (typeof value === 'string' && value.trim() === '') ||
+        (Array.isArray(value) && value.length === 0) ||
+        (typeof value === 'object' &&
+          value !== null &&
+          Object.keys(value).length === 0));
 
     if (isEmpty) {
       emptyCount++;
     } else {
       nonEmptyCount++;
-      uniqueValues.add(String(value).trim());
+      // Use appropriate string representation based on value type
+      const stringValue = isNonEmptyObject ? value.toString() : String(value).trim();
+      uniqueValues.add(stringValue);
     }
   }
 
