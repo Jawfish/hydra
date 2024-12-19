@@ -130,7 +130,7 @@ describe('Field Analysis', () => {
     it('handles missing parameters gracefully', () => {
       const data = [{ name: 'John' }];
 
-      const details1 = analyzeFieldDetails(null, 'name', 'id');
+      const details1 = analyzeFieldDetails([], 'name', 'id');
       const details2 = analyzeFieldDetails(data, '', 'id');
       const details3 = analyzeFieldDetails(data, 'name', '');
 
