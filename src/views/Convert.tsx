@@ -12,10 +12,11 @@ import {
   SelectValue
 } from '@/shadcn/components/ui/select';
 import { type FileType, useWorkingFileStore } from '@/store/store';
+import type React from 'react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-export function Convert(): JSX.Element {
+export function Convert(): React.JSX.Element {
   const { fileName, fileContentParsed } = useWorkingFileStore();
   const [selectedFormat, setSelectedFormat] = useState<FileType>('csv');
 
