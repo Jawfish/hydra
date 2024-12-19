@@ -55,7 +55,7 @@
   "scripts": {
     "build": "tsc && bun fix && vite build",
     "dev": "vite",
-    "lint": "biome check",
+    "lint": "biome check && tsc --noEmit",
     "fix": "biome check --fix --unsafe",
     "preview": "vite preview",
     "test": "vitest --reporter=verbose",
