@@ -58,7 +58,7 @@
     "lint": "biome check",
     "fix": "biome check --fix --unsafe",
     "preview": "vite preview",
-    "test": "vitest -r tests",
+    "test": "vitest --reporter=verbose",
     "test:ui": "vitest --ui --open"
   },
   "type": "module",

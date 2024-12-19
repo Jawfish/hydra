@@ -25,13 +25,18 @@ export const analyzeField = (
     // Prefer direct access first, fallback to getValueByPath only if direct access fails
     const value = row[field] !== undefined ? row[field] : getValueByPath(row, field);
 
-    const stringValue = String(value).trim();
+    const isEmpty =
+      value === null ||
+      value === undefined ||
+      (typeof value === 'string' && value.trim() === '') ||
+      (Array.isArray(value) && value.length === 0) ||
+      (typeof value === 'object' && value !== null && Object.keys(value).length === 0);
 
-    if (stringValue === '' || value === null || value === undefined) {
+    if (isEmpty) {
       emptyCount++;
     } else {
       nonEmptyCount++;
-      uniqueValues.add(stringValue);
+      uniqueValues.add(String(value).trim());
     }
   }
 

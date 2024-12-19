@@ -78,17 +78,34 @@ export const csvToJson = (csv: string): Record<string, unknown>[] => {
   if (!csv.trim()) {
     return [];
   }
-  // Include header row to return an array of objects keyed by header names
+
   const result = Papa.parse<Record<string, unknown>>(csv, {
     header: true,
-    dynamicTyping: true
+    dynamicTyping: true,
+    skipEmptyLines: true
   }).data;
 
-  if (!result || result.length === 0) {
-    return [];
-  }
+  return result.filter(row => {
+    // Exclude rows with __parsed_extra field
+    if (row.__parsed_extra) {
+      return false;
+    }
 
-  return result;
+    // Check if any value in the row is non-empty
+    return Object.entries(row).some(([key, value]) => {
+      // Skip the __parsed_extra key
+      if (key === '__parsed_extra') {
+        return false;
+      }
+
+      return (
+        value !== null &&
+        value !== undefined &&
+        value !== '' &&
+        !(Array.isArray(value) && value.length === 0)
+      );
+    });
+  });
 };
 
 /**

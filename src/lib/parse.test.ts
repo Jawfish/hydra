@@ -37,6 +37,38 @@ describe('CSV counting', () => {
   });
 });
 
+describe('CSV parsing edge cases', () => {
+  it('handles CSV with a single header row and no data', () => {
+    const csvWithOnlyHeader = 'name,age';
+
+    const parsed = csvToJson(csvWithOnlyHeader);
+
+    expect(parsed).toEqual([]);
+  });
+
+  it('handles CSV with multiple empty rows', () => {
+    const csvWithEmptyRows = 'name,age\n\n\n\nJohn,30\n\nJane,25\n\n';
+
+    const parsed = csvToJson(csvWithEmptyRows);
+
+    expect(parsed).toEqual([
+      { name: 'John', age: 30 },
+      { name: 'Jane', age: 25 }
+    ]);
+  });
+
+  it('handles CSV with rows containing only null or empty values', () => {
+    const csvWithEmptyValues = 'name,age\n,\nJohn,30\n,\nJane,25\n,,';
+
+    const parsed = csvToJson(csvWithEmptyValues);
+
+    expect(parsed).toEqual([
+      { name: 'John', age: 30 },
+      { name: 'Jane', age: 25 }
+    ]);
+  });
+});
+
 describe('Converting CSV to an array of objects', () => {
   it('successfully converts csv rows into objects', () => {
     const csv = 'name,age\nJohn,30\nJane,25';
