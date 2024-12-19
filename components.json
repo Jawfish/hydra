@@ -13,7 +13,7 @@
   "tailwind": {
     "baseColor": "neutral",
     "config": "tailwind.config.cjs",
-    "css": "src/index.scss",
+    "css": "src/index.css",
     "cssVariables": true,
     "prefix": ""
   },
