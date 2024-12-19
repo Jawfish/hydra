@@ -1,6 +1,8 @@
 import { analyzeField, analyzeFieldDetails } from '@/lib/fileAnalysis';
 import { describe, expect, it } from 'vitest';
 
+const REGEX_TEST = /regex/;
+
 describe('Field Analysis', () => {
   describe('Basic Field Analysis', () => {
     it('correctly counts non-empty and empty values', () => {
@@ -183,9 +185,9 @@ describe('Edge Cases and Performance', () => {
 
 describe('Error Handling and Edge Cases', () => {
   it('handles malformed input data gracefully', () => {
-    const malformedData = [
-      null as unknown,
-      undefined as unknown,
+    const malformedData: Record<string, unknown>[] = [
+      null as unknown as Record<string, unknown>,
+      undefined as unknown as Record<string, unknown>,
       {} as Record<string, unknown>,
       { field: 'valid' }
     ];
@@ -198,7 +200,7 @@ describe('Error Handling and Edge Cases', () => {
   it('handles deeply nested objects without stack overflow', () => {
     const createDeepObject = (depth: number): Record<string, unknown> => {
       if (depth === 0) {
-        return 'value';
+        return { value: 'value' };
       }
       return { nested: createDeepObject(depth - 1) };
     };
@@ -302,7 +304,15 @@ describe('Type Handling Edge Cases', () => {
   });
 
   it('handles function and complex object inputs', () => {
-    const data = [{ field: () => {} }, { field: new Date() }, { field: /regex/ }];
+    const data = [
+      {
+        field: (): void => {
+          /* no-op */
+        }
+      },
+      { field: new Date() },
+      { field: REGEX_TEST }
+    ];
 
     const analysis = analyzeField(data, 'field');
     expect(analysis.nonEmptyCount).toBe(3);
@@ -322,7 +332,7 @@ describe('Complex Path Resolution', () => {
   });
 
   it('handles paths with non-existent intermediate keys', () => {
-    const data = [{ some: {} }];
+    const data = [{ some: { nonexistent: { path: null } } }];
 
     const analysis = analyzeField(data, 'some.nonexistent.path');
     expect(analysis.emptyCount).toBe(1);

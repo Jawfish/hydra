@@ -1,5 +1,26 @@
 import { getValueByPath } from '@/lib/parse';
 
+const isEmptyValue = (value: unknown): boolean => {
+  const isNonEmptyObject =
+    value instanceof Date || value instanceof RegExp || typeof value === 'function';
+
+  return (
+    !isNonEmptyObject &&
+    (value === null ||
+      value === undefined ||
+      (typeof value === 'string' && value.trim() === '') ||
+      (Array.isArray(value) && value.length === 0) ||
+      (typeof value === 'object' && value !== null && Object.keys(value).length === 0))
+  );
+};
+
+const getStringValue = (value: unknown): string => {
+  const isNonEmptyObject =
+    value instanceof Date || value instanceof RegExp || typeof value === 'function';
+
+  return isNonEmptyObject ? value.toString() : String(value).trim();
+};
+
 export interface FieldAnalysis {
   name: string;
   nonEmptyCount: number;
@@ -31,27 +52,11 @@ export const analyzeField = (
     // Prefer direct access first, fallback to getValueByPath only if direct access fails
     const value = row[field] !== undefined ? row[field] : getValueByPath(row, field);
 
-    // Check for special non-empty object types first
-    const isNonEmptyObject =
-      value instanceof Date || value instanceof RegExp || typeof value === 'function';
-
-    const isEmpty =
-      !isNonEmptyObject &&
-      (value === null ||
-        value === undefined ||
-        (typeof value === 'string' && value.trim() === '') ||
-        (Array.isArray(value) && value.length === 0) ||
-        (typeof value === 'object' &&
-          value !== null &&
-          Object.keys(value).length === 0));
-
-    if (isEmpty) {
+    if (isEmptyValue(value)) {
       emptyCount++;
     } else {
       nonEmptyCount++;
-      // Use appropriate string representation based on value type
-      const stringValue = isNonEmptyObject ? value.toString() : String(value).trim();
-      uniqueValues.add(stringValue);
+      uniqueValues.add(getStringValue(value));
     }
   }
 
