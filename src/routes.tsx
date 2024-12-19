@@ -1,22 +1,22 @@
 import {
   BarChart,
   Bot,
+  FileDown,
   Filter as FileFilter,
   FileText,
   IdCard,
   type LucideProps,
   Map as MapIcon,
-  Scissors,
-  FileDown
+  Scissors
 } from 'lucide-react';
 import type { ForwardRefExoticComponent, ReactNode, RefAttributes } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { Backfill } from '@/views/Backfill';
+import { Convert } from '@/views/Convert';
 import { Filter } from '@/views/Filter';
 import { MapValues } from '@/views/MapValues';
 import { Split } from '@/views/Split';
-import { Convert } from '@/views/Convert';
 import { Stats } from '@/views/Stats';
 import { Translate } from '@/views/Translate';
 import { UuidExtractor } from '@/views/UuidExtractor';

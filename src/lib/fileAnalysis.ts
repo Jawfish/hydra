@@ -22,7 +22,9 @@ export const analyzeField = (
   let emptyCount = 0;
 
   for (const row of data) {
-    const value = typeof row === 'object' ? getValueByPath(row, field) : row[field];
+    // Prefer direct access first, fallback to getValueByPath only if direct access fails
+    const value = row[field] !== undefined ? row[field] : getValueByPath(row, field);
+
     const stringValue = String(value).trim();
 
     if (stringValue === '' || value === null || value === undefined) {
@@ -79,7 +81,7 @@ export const analyzeFieldDetails = (
 
     details.push({
       identifier: String(identifier),
-      value: String(fieldValue ?? ''),
+      value: isEmpty ? '' : String(fieldValue ?? ''),
       isEmpty
     });
   }
