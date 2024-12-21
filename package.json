@@ -26,16 +26,16 @@
     "papaparse": "^5.4.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.0.2",
+    "react-router-dom": "^7.1.0",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
-    "tailwindcss": "^4.0.0-beta.8",
+    "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
     "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@tailwindcss/vite": "^4.0.0-beta.8",
+    "@tailwindcss/vite": "^0.0.0-development.1",
     "@types/bun": "^1.1.14",
     "@types/node": "^22.10.2",
     "@types/papaparse": "^5.3.15",
@@ -46,7 +46,7 @@
     "autoprefixer": "^10.4.20",
     "biome": "^0.3.3",
     "typescript": "^5.7.2",
-    "vite": "^6.0.4",
+    "vite": "^6.0.5",
     "vitest": "^2.1.8"
   },
   "license": "MIT",
