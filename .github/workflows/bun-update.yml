@@ -38,7 +38,7 @@ jobs:
         run: bun update --latest && bun install tailwindcss@next @tailwindcss/vite@next
 
       - name: Confirm we can still build
-        run: bun run build
+        run: bun install && bun run build
 
       - name: Check for changes and commit
         if: steps.check_outdated.outputs.has_updates == 'true'
