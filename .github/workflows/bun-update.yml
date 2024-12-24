@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   update-bun:
@@ -40,18 +41,39 @@ jobs:
       - name: Confirm we can still build
         run: bun install && bun run build
 
-      - name: Check for changes and commit
+      - name: Create PR branch and push changes
         if: steps.check_outdated.outputs.has_updates == 'true'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+          BRANCH_NAME="deps/bun-update-$(date +%Y-%m-%d)"
+          git checkout -b $BRANCH_NAME
+
           if [[ -n "$(git status --porcelain)" ]]; then
             git add package.json bun.lockb
             git commit -m "Automated dependency update by GitHub Actions"
-            git push
+            git push origin $BRANCH_NAME
           else
             echo "No changes to commit"
+            exit 0
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Pull Request
+        if: steps.check_outdated.outputs.has_updates == 'true'
+        uses: peter-evans/create-pull-request@v5
+        id: cpr
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Automated dependency update by GitHub Actions
+          title: 'chore(deps): update dependencies'
+          body: Automated dependency update by GitHub Actions
+          branch: deps/bun-update-$(date +%Y-%m-%d)
+          base: main
+          delete-branch: true
+
+      - name: Auto-approve Pull Request
+        if: steps.cpr.outputs.pull-request-number
+        uses: hmarr/auto-approve-action@v4
+        with:
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
