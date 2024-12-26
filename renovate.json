@@ -1,6 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended"
+  ],
   "lockFileMaintenance": {
     "automerge": true,
     "enabled": true
@@ -9,7 +11,9 @@
     {
       "automerge": true,
       "ignoreTests": false,
-      "matchPackagePatterns": ["*"]
+      "matchPackageNames": [
+        "*"
+      ]
     }
   ]
 }
