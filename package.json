@@ -42,12 +42,12 @@
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
-    "@vitest/ui": "^2.1.8",
+    "@vitest/ui": "^3.0.1",
     "autoprefixer": "^10.4.20",
     "biome": "^0.3.3",
     "typescript": "^5.7.3",
     "vite": "^6.0.7",
-    "vitest": "^2.1.8"
+    "vitest": "^3.0.1"
   },
   "license": "MIT",
   "name": "react-typescript-template",
