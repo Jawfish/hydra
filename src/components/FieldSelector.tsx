@@ -27,8 +27,11 @@ export function FieldSelector({
   disabled = false,
   className
 }: FieldSelectorProps): JSX.Element | null {
-  // Only return null if there are NO fields
-  if (fields.length === 0) {
+  // Filter out empty fields and ensure they're strings
+  const validFields = fields.filter(field => field && field.trim() !== '');
+
+  // Only return null if there are NO valid fields
+  if (validFields.length === 0) {
     return null;
   }
 
@@ -42,7 +45,7 @@ export function FieldSelector({
           <SelectValue placeholder={placeholder} className='truncate' />
         </SelectTrigger>
         <SelectContent>
-          {fields.map(field => (
+          {validFields.map(field => (
             <SelectItem key={field} value={field} className='w-full truncate'>
               {field}
             </SelectItem>
