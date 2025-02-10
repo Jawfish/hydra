@@ -1,4 +1,5 @@
 export type FileInfo = {
+  id: string;
   fileName: string | null;
   content: Record<string, unknown>[];
   idField: string;
