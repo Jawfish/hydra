@@ -1,6 +1,7 @@
 import {
   BarChart,
   Bot,
+  Combine as CombineIcon,
   FileDown,
   Filter as FileFilter,
   FileText,
@@ -14,6 +15,7 @@ import type { ForwardRefExoticComponent, ReactNode, RefAttributes } from 'react'
 import { Navigate } from 'react-router-dom';
 
 import { Backfill } from '@/views/Backfill';
+import { Combine } from '@/views/Combine';
 import { Convert } from '@/views/Convert';
 import { FieldRemover } from '@/views/FieldRemover';
 import { Filter } from '@/views/Filter';
@@ -88,6 +90,12 @@ export const routes: Route[] = [
     element: <FieldRemover />,
     title: 'Field Remover',
     icon: Trash2
+  },
+  {
+    path: '/combine',
+    element: <Combine />,
+    title: 'Combine',
+    icon: CombineIcon
   }
 ];
 
