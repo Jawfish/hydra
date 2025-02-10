@@ -7,13 +7,15 @@ import {
   IdCard,
   type LucideProps,
   Map as MapIcon,
-  Scissors
+  Scissors,
+  Trash2
 } from 'lucide-react';
 import type { ForwardRefExoticComponent, ReactNode, RefAttributes } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { Backfill } from '@/views/Backfill';
 import { Convert } from '@/views/Convert';
+import { FieldRemover } from '@/views/FieldRemover';
 import { Filter } from '@/views/Filter';
 import { MapValues } from '@/views/MapValues';
 import { Split } from '@/views/Split';
@@ -80,6 +82,12 @@ export const routes: Route[] = [
     element: <Convert />,
     title: 'Convert',
     icon: FileDown
+  },
+  {
+    path: '/field-remover',
+    element: <FieldRemover />,
+    title: 'Field Remover',
+    icon: Trash2
   }
 ];
 
