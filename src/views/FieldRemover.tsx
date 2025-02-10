@@ -51,7 +51,7 @@ export function FieldRemover(): JSX.Element {
   const [workingFileSchema, setWorkingFileSchema] = useState<string[]>([]);
   const [filterGroup, setFilterGroup] = useState<FieldFilterGroup>({
     operator: 'AND',
-    conditions: [{ field: '', comparison: 'equals', value: '' }]
+    conditions: [{ field: '', comparison: 'always', value: '' }]
   });
 
   useEffect(() => {
