@@ -5,11 +5,13 @@ describe('combineFiles', () => {
   it('properly merges entries with same ID across files', () => {
     const files: FileInfo[] = [
       {
+        id: crypto.randomUUID(),
         fileName: 'file1.json',
         content: [{ id: '1', name: 'John', age: 30 }],
         idField: 'id'
       },
       {
+        id: crypto.randomUUID(),
         fileName: 'file2.json',
         content: [{ id: '1', location: 'NY', name: 'John' }],
         idField: 'id'
@@ -30,11 +32,13 @@ describe('combineFiles', () => {
   it('handles missing ID fields', () => {
     const files: FileInfo[] = [
       {
+        id: crypto.randomUUID(),
         fileName: 'file1.json',
         content: [{ id: '1', name: 'John' }, { name: 'Jane' }],
         idField: 'id'
       },
       {
+        id: crypto.randomUUID(),
         fileName: 'file2.json',
         content: [{ id: '1', age: 30 }],
         idField: 'id'
@@ -50,11 +54,13 @@ describe('combineFiles', () => {
   it('throws error on value conflicts', () => {
     const files: FileInfo[] = [
       {
+        id: crypto.randomUUID(),
         fileName: 'file1.json',
         content: [{ id: '1', name: 'John' }],
         idField: 'id'
       },
       {
+        id: crypto.randomUUID(),
         fileName: 'file2.json',
         content: [{ id: '1', name: 'Jane' }],
         idField: 'id'
@@ -69,11 +75,13 @@ describe('combineFiles', () => {
   it('handles ID fields that contain spaces', () => {
     const files: FileInfo[] = [
       {
+        id: crypto.randomUUID(),
         fileName: 'file1.json',
         content: [{ 'User ID': '1', name: 'John' }],
         idField: 'User ID'
       },
       {
+        id: crypto.randomUUID(),
         fileName: 'file2.json',
         content: [{ 'User ID': '1', age: 30 }],
         idField: 'User ID'
