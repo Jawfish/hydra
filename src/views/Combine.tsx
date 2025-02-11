@@ -90,15 +90,16 @@ export function Combine(): JSX.Element {
       <Header>
         <Header.Title>Combine Files</Header.Title>
         <Header.Description>
-          Combine two files based on a common ID field. Fields with the same name must
-          have matching values
+          Combine files based on a common ID field. Fields with the same name can be
+          given a prefix per-file.
         </Header.Description>
       </Header>
 
       <Section>
         <Section.Title>Files to Combine</Section.Title>
         <Section.Description>
-          Add files and select which ID to use match entries between files
+          Add files, select which ID to use to check for matches, and add a prefix for
+          fields with the same name but different values
         </Section.Description>
         <Section.Items>
           {files.map((file, index) => (
