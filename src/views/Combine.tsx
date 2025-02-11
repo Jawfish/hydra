@@ -91,7 +91,7 @@ export function Combine(): JSX.Element {
         <Header.Title>Combine Files</Header.Title>
         <Header.Description>
           Combine files based on a common ID field. Fields with the same name can be
-          given a prefix per-file.
+          given a prefix per-file
         </Header.Description>
       </Header>
 
@@ -135,9 +135,9 @@ export function Combine(): JSX.Element {
               </div>
             </div>
           ))}
-          <Button onClick={addFile} variant='outline' className='mt-4'>
+          <Button onClick={addFile} variant='outline' className='mt-4 w-min'>
             <Plus className='mr-2 h-4 w-4' />
-            Add File
+            Add Another File
           </Button>
         </Section.Items>
       </Section>
