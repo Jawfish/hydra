@@ -46,7 +46,7 @@
     "autoprefixer": "^10.4.20",
     "biome": "^0.3.3",
     "typescript": "^5.8.2",
-    "vite": "^6.2.0",
+    "vite": "^6.2.1",
     "vitest": "^3.0.8"
   },
   "license": "MIT",
