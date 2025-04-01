@@ -37,7 +37,7 @@
     "@biomejs/biome": "1.9.4",
     "@tailwindcss/vite": "^4.0.17",
     "@types/bun": "^1.2.8",
-    "@types/node": "^22.13.16",
+    "@types/node": "^22.13.17",
     "@types/papaparse": "^5.3.15",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
