@@ -1,17 +1,17 @@
+import { Plus } from 'lucide-react';
+import type { JSX } from 'react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { ActionSection } from '@/components/ActionSection';
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
 import { Section } from '@/components/Section';
-import { type FileInfo, combineFiles } from '@/lib/combine';
+import { combineFiles, type FileInfo } from '@/lib/combine';
 import { getParsedContentFromFile, serializeJson } from '@/lib/parse';
 import { Button } from '@/shadcn/components/ui/button';
 import { Input } from '@/shadcn/components/ui/input';
 import type { FileType } from '@/store/store';
-import { Plus } from 'lucide-react';
-import { useState } from 'react';
-import type { JSX } from 'react';
-import { toast } from 'sonner';
 
 export function Combine(): JSX.Element {
   const [files, setFiles] = useState<FileInfo[]>([

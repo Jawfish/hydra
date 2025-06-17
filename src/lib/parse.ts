@@ -1,5 +1,6 @@
-import type { FileType } from '@/store/store';
 import Papa from 'papaparse';
+import type { FileType } from '@/store/store';
+
 const BOM_REGEX = /^\uFEFF/;
 const CRLF_REGEX = /\r\n/g;
 
@@ -38,7 +39,7 @@ export const getAllPaths = (obj: object, prefix = ''): string[] => {
   }
 
   for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+    if (Object.hasOwn(obj, key)) {
       const value = (obj as { [key: string]: unknown })[key];
       const newPath = prefix ? `${prefix}.${key}` : key;
 
@@ -125,7 +126,7 @@ export const flattenObject = (
       // Recursively flatten nested objects
       const flattened = flattenObject(obj[key] as Record<string, unknown>, prefixedKey);
       for (const key in flattened) {
-        if (Object.prototype.hasOwnProperty.call(flattened, key)) {
+        if (Object.hasOwn(flattened, key)) {
           acc[key] = flattened[key];
         }
       }

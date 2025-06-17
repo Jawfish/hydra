@@ -1,3 +1,6 @@
+import type { JSX } from 'react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { ActionSection } from '@/components/ActionSection';
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
@@ -7,9 +10,6 @@ import { useFileUpload } from '@/hooks/useFileUpload';
 import { getAllPaths, getValueByPath } from '@/lib/parse';
 import { Button } from '@/shadcn/components/ui/button';
 import { useWorkingFileStore } from '@/store/store';
-import { useState } from 'react';
-import type { JSX } from 'react';
-import { toast } from 'sonner';
 
 export function MapValues(): JSX.Element {
   const { fileContentParsed, fileName } = useWorkingFileStore();

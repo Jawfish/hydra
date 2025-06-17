@@ -1,5 +1,5 @@
-import { analyzeField, analyzeFieldDetails } from '@/lib/fileAnalysis';
 import { describe, expect, it } from 'vitest';
+import { analyzeField, analyzeFieldDetails } from '@/lib/fileAnalysis';
 
 const REGEX_TEST = /regex/;
 

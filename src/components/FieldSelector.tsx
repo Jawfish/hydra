@@ -1,5 +1,5 @@
-import { Label } from '@/components/Label';
 import type { JSX } from 'react';
+import { Label } from '@/components/Label';
 
 import {
   Select,
@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/shadcn/components/ui/select';
+
 interface FieldSelectorProps {
   fields: string[];
   selectedField: string;

@@ -1,7 +1,7 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
   "files": {
-    "ignore": ["src/shadcn", "dist"],
+    "includes": ["**", "!**/src/shadcn", "!**/dist"],
     "ignoreUnknown": false
   },
   "formatter": {
@@ -32,9 +32,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "all": true,
       "style": {
-        "all": true,
         "useFilenamingConvention": {
           "level": "error",
           "options": {
@@ -42,10 +40,19 @@
             "requireAscii": true,
             "strictCase": true
           }
-        }
+        },
+        "noParameterAssign": "error",
+        "useAsConstAssertion": "error",
+        "useDefaultParameterLast": "error",
+        "useEnumInitializers": "error",
+        "useSelfClosingElements": "error",
+        "useSingleVarDeclarator": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useNumberNamespace": "error",
+        "noInferrableTypes": "error",
+        "noUselessElse": "error"
       },
       "nursery": {
-        "all": true,
         "useSortedClasses": {
           "level": "warn",
           "fix": "safe",
@@ -53,7 +60,6 @@
         }
       },
       "suspicious": {
-        "all": true,
         "noConsole": {
           "level": "warn",
           "options": {
@@ -73,9 +79,7 @@
       }
     }
   },
-  "organizeImports": {
-    "enabled": true
-  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
 
   "vcs": {
     "clientKind": "git",
@@ -84,7 +88,7 @@
   },
   "overrides": [
     {
-      "include": ["tailwind.config.cjs"],
+      "includes": ["**/tailwind.config.cjs"],
       "linter": {
         "rules": {
           "style": {
@@ -97,7 +101,7 @@
       }
     },
     {
-      "include": ["src/vite-env.d.ts", "src/context"],
+      "includes": ["**/src/vite-env.d.ts", "**/src/context/**"],
       "linter": {
         "rules": {
           "style": {

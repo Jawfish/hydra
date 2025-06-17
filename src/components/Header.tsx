@@ -1,6 +1,6 @@
-import { Separator } from '@/shadcn/components/ui/separator';
 import type React from 'react';
 import type { JSX } from 'react';
+import { Separator } from '@/shadcn/components/ui/separator';
 
 interface HeaderProps {
   children: React.ReactNode;

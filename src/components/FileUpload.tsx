@@ -1,7 +1,8 @@
-import { Button } from '@/shadcn/components/ui/button';
-import type { FileType } from '@/store/store';
 import type React from 'react';
 import type { JSX } from 'react';
+import { Button } from '@/shadcn/components/ui/button';
+import type { FileType } from '@/store/store';
+
 type FileUploadProps = {
   onFileUpload: (fileName: string, fileContent: string, fileType: FileType) => void;
   fileName: string | null;

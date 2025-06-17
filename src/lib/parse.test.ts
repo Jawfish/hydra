@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import {
   countCsvRows,
   csvToJson,
@@ -10,7 +11,7 @@ import {
   serializeJson
 } from '@/lib/parse';
 import type { FileType } from '@/store/store';
-import { describe, expect, it } from 'vitest';
+
 describe('CSV counting', () => {
   it('counts single row in csv file', () => {
     const singleRowCsv = 'name,age\nJohn,30';
