@@ -1,11 +1,11 @@
-import { ActionSection } from '@/components/ActionSection';
-import { getValueByPath } from '@/lib/parse';
-import type { FileType } from '@/store/store';
 import Anthropic from '@anthropic-ai/sdk';
 import retry from 'async-retry';
 import type React from 'react';
 import type { JSX } from 'react';
-import { useState } from 'react';
+import { useId, useState } from 'react';
+import { ActionSection } from '@/components/ActionSection';
+import { getValueByPath } from '@/lib/parse';
+import type { FileType } from '@/store/store';
 
 type ProgressInfo = {
   percentage: number;
@@ -69,6 +69,8 @@ const DEFAULT_ENABLED_LANGUAGES = [
   'Japanese',
   'Korean'
 ] as const;
+
+import { toast } from 'sonner';
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
@@ -88,7 +90,6 @@ import {
 import { Input } from '@/shadcn/components/ui/input';
 import { Progress } from '@/shadcn/components/ui/progress';
 import { useWorkingFileStore } from '@/store/store';
-import { toast } from 'sonner';
 export function Translate(): JSX.Element {
   const { fileName, fileContentRaw, fileContentParsed, setFileName, setFileContent } =
     useWorkingFileStore();
@@ -495,37 +496,42 @@ const ColumnConfig = ({
   csvHeaders,
   selectedColumn,
   handleColumnSelect
-}: ColumnConfigProps): JSX.Element => (
-  <Section>
-    <Section.Title>Field Config</Section.Title>
-    <Section.Items className='grid grid-cols-2 gap-4'>
-      <FieldSelector
-        label='Input Field to Translate'
-        fields={csvHeaders}
-        selectedField={selectedColumn}
-        onFieldSelect={handleColumnSelect}
-      />
-      <div>
-        <Label htmlFor='languageColumn'>Output Language Field</Label>
-        <Input
-          id='languageColumn'
-          placeholder='Language'
-          value={languageColumnName}
-          onChange={(e): void => setLanguageColumnName(e.target.value)}
+}: ColumnConfigProps): JSX.Element => {
+  const languageFieldId = useId();
+  const translationFieldId = useId();
+
+  return (
+    <Section>
+      <Section.Title>Field Config</Section.Title>
+      <Section.Items className='grid grid-cols-2 gap-4'>
+        <FieldSelector
+          label='Input Field to Translate'
+          fields={csvHeaders}
+          selectedField={selectedColumn}
+          onFieldSelect={handleColumnSelect}
         />
-      </div>
-      <div>
-        <Label htmlFor='translationColumn'>Output Translation Field</Label>
-        <Input
-          id='translationColumn'
-          placeholder='Translated Text'
-          value={translationColumnName}
-          onChange={(e): void => setTranslationColumnName(e.target.value)}
-        />
-      </div>
-    </Section.Items>
-  </Section>
-);
+        <div>
+          <Label htmlFor={languageFieldId}>Output Language Field</Label>
+          <Input
+            id={languageFieldId}
+            placeholder='Language'
+            value={languageColumnName}
+            onChange={(e): void => setLanguageColumnName(e.target.value)}
+          />
+        </div>
+        <div>
+          <Label htmlFor={translationFieldId}>Output Translation Field</Label>
+          <Input
+            id={translationFieldId}
+            placeholder='Translated Text'
+            value={translationColumnName}
+            onChange={(e): void => setTranslationColumnName(e.target.value)}
+          />
+        </div>
+      </Section.Items>
+    </Section>
+  );
+};
 
 type TranslateConfigProps = {
   selectedLanguages: Set<string>;
@@ -543,61 +549,65 @@ const TranslateConfig = ({
   setChunkSize,
   apiKey,
   handleApiKeyChange
-}: TranslateConfigProps): JSX.Element => (
-  <Section>
-    <Section.Title>Translation Config</Section.Title>
-    <Section.Items className='grid grid-cols-3 gap-4'>
-      <div className='flex flex-col'>
-        <Label htmlFor='languages'>Languages</Label>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild={true}>
-            <Button variant='outline'>({selectedLanguages.size} selected)</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>Available Languages</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {ALL_LANGUAGES.map(language => (
-              <DropdownMenuCheckboxItem
-                key={language}
-                checked={selectedLanguages.has(language)}
-                onCheckedChange={(checked): void => {
-                  const newSelected = new Set(selectedLanguages);
-                  if (checked) {
-                    newSelected.add(language);
-                  } else {
-                    newSelected.delete(language);
-                  }
-                  setSelectedLanguages(newSelected);
-                }}
-              >
-                {language}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <BatchSize chunkSize={chunkSize} setChunkSize={setChunkSize} />
-      <form onSubmit={(e): void => e.preventDefault()} className='flex flex-col'>
-        {/* Hidden username field for password managers */}
-        <Input
-          type='text'
-          name='username'
-          autoComplete='username'
-          value='anthropic-api'
-          className='hidden'
-          readOnly={true}
-        />
-        <Label htmlFor='anthropicApiKey'>Anthropic API Key</Label>
-        <Input
-          className='w-full'
-          id='anthropicApiKey'
-          type='password'
-          placeholder='Enter API key'
-          autoComplete='current-password'
-          value={apiKey}
-          onChange={handleApiKeyChange}
-        />
-      </form>
-    </Section.Items>
-  </Section>
-);
+}: TranslateConfigProps): JSX.Element => {
+  const apiKeyFieldId = useId();
+
+  return (
+    <Section>
+      <Section.Title>Translation Config</Section.Title>
+      <Section.Items className='grid grid-cols-3 gap-4'>
+        <div className='flex flex-col'>
+          <Label htmlFor='languages'>Languages</Label>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild={true}>
+              <Button variant='outline'>({selectedLanguages.size} selected)</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Available Languages</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {ALL_LANGUAGES.map(language => (
+                <DropdownMenuCheckboxItem
+                  key={language}
+                  checked={selectedLanguages.has(language)}
+                  onCheckedChange={(checked): void => {
+                    const newSelected = new Set(selectedLanguages);
+                    if (checked) {
+                      newSelected.add(language);
+                    } else {
+                      newSelected.delete(language);
+                    }
+                    setSelectedLanguages(newSelected);
+                  }}
+                >
+                  {language}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <BatchSize chunkSize={chunkSize} setChunkSize={setChunkSize} />
+        <form onSubmit={(e): void => e.preventDefault()} className='flex flex-col'>
+          {/* Hidden username field for password managers */}
+          <Input
+            type='text'
+            name='username'
+            autoComplete='username'
+            value='anthropic-api'
+            className='hidden'
+            readOnly={true}
+          />
+          <Label htmlFor={apiKeyFieldId}>Anthropic API Key</Label>
+          <Input
+            id={apiKeyFieldId}
+            className='w-full'
+            type='password'
+            placeholder='Enter API key'
+            autoComplete='current-password'
+            value={apiKey}
+            onChange={handleApiKeyChange}
+          />
+        </form>
+      </Section.Items>
+    </Section>
+  );
+};

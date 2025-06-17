@@ -1,3 +1,4 @@
+import { HelpCircle } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -5,7 +6,6 @@ import {
   TooltipTrigger
 } from '@/shadcn/components/ui/tooltip';
 import { cn } from '@/shadcn/lib/utils';
-import { HelpCircle } from 'lucide-react';
 
 interface HelpTooltipProps {
   message: string;

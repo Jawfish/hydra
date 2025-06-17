@@ -1,6 +1,6 @@
-import { getParsedContentFromFile } from '@/lib/parse';
-import { type StoreApi, type UseBoundStore, create } from 'zustand';
+import { create, type StoreApi, type UseBoundStore } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
+import { getParsedContentFromFile } from '@/lib/parse';
 // import type { WithImmer } from 'zustand/middleware';
 
 export type FileType = 'jsonl' | 'csv' | 'json' | 'unknown';

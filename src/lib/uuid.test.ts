@@ -1,5 +1,5 @@
-import { extractUuids, extractUuidsFromCsv, extractUuidsFromJsonl } from '@/lib/uuid';
 import { describe, expect, it } from 'vitest';
+import { extractUuids, extractUuidsFromCsv, extractUuidsFromJsonl } from '@/lib/uuid';
 
 describe('UUID extraction from text', () => {
   it('finds valid uuid in simple text', () => {

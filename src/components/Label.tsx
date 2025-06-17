@@ -1,5 +1,4 @@
-import type { ReactNode } from 'react';
-import type { JSX } from 'react';
+import type { JSX, ReactNode } from 'react';
 
 type LabelProps = {
   htmlFor: string;

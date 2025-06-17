@@ -1,3 +1,6 @@
+import type { JSX } from 'react';
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { APP_CONFIG } from '@/config';
 import { type Route, routes } from '@/routes';
 import {
@@ -7,10 +10,6 @@ import {
   SidebarMenuItem,
   SidebarSeparator
 } from '@/shadcn/components/ui/sidebar';
-import React from 'react';
-import type { JSX } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 
 const SidebarRouteItem: React.FC<{ route: Route }> = ({ route }) => {
   const location = useLocation();

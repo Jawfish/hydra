@@ -1,5 +1,5 @@
-import { APP_CONFIG } from '@/config';
 import { useEffect } from 'react';
+import { APP_CONFIG } from '@/config';
 
 interface PageTitleProps {
   title: string;

@@ -1,12 +1,12 @@
+import type { JSX } from 'react';
+import { useEffect } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { APP_CONFIG } from '@/config';
 import { defaultRoute, routes } from '@/routes';
 import { SidebarProvider } from '@/shadcn/components/ui/sidebar';
 import { Toaster } from '@/shadcn/components/ui/sonner';
-import { useEffect } from 'react';
-import type { JSX } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
 
 function App(): JSX.Element {
   const location = useLocation();

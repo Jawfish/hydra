@@ -1,3 +1,7 @@
+import jsZip from 'jszip';
+import type { JSX } from 'react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { ActionSection } from '@/components/ActionSection';
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
@@ -6,10 +10,6 @@ import { Section } from '@/components/Section';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { getAllPaths, serializeJson } from '@/lib/parse';
 import { type FileType, useWorkingFileStore } from '@/store/store';
-import jsZip from 'jszip';
-import { useEffect, useState } from 'react';
-import type { JSX } from 'react';
-import { toast } from 'sonner';
 
 export function Split(): JSX.Element {
   const { fileName: workingFileName, fileContentParsed: workingFileContent } =

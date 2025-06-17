@@ -1,5 +1,5 @@
-import { type FileInfo, combineFiles } from '@/lib/combine';
 import { describe, expect, it } from 'vitest';
+import { combineFiles, type FileInfo } from '@/lib/combine';
 
 describe('combineFiles', () => {
   it('properly merges entries with same ID across files', () => {

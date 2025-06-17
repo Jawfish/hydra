@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
@@ -5,14 +6,13 @@ import { HelpTooltip } from '@/components/HelpTooltip';
 import { Section } from '@/components/Section';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import {
-  type FieldAnalysisDetail,
   analyzeField,
-  analyzeFieldDetails
+  analyzeFieldDetails,
+  type FieldAnalysisDetail
 } from '@/lib/fileAnalysis';
 import { getAllPaths } from '@/lib/parse';
 import { ScrollArea } from '@/shadcn/components/ui/scroll-area';
 import { useWorkingFileStore } from '@/store/store';
-import { useEffect, useState } from 'react';
 
 interface FileStatisticsProps {
   fileName: string;

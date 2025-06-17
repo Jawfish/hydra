@@ -1,3 +1,6 @@
+import type { JSX } from 'react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { ActionSection } from '@/components/ActionSection';
 import { FileUpload } from '@/components/FileUpload';
 import { Header } from '@/components/Header';
@@ -21,9 +24,6 @@ import {
   useReferenceFileStore,
   useWorkingFileStore
 } from '@/store/store';
-import { useEffect, useState } from 'react';
-import type { JSX } from 'react';
-import { toast } from 'sonner';
 
 export function Backfill(): JSX.Element {
   const { fileName: workingFileName, fileContentParsed: workingFileContent } =

@@ -1,6 +1,6 @@
-import { useReferenceFileStore, useWorkingFileStore } from '@/store/store';
-import type { FileType } from '@/store/store';
 import { toast } from 'sonner';
+import type { FileType } from '@/store/store';
+import { useReferenceFileStore, useWorkingFileStore } from '@/store/store';
 
 export function useFileUpload(
   storeType: 'working' | 'reference'

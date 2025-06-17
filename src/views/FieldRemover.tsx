@@ -1,3 +1,7 @@
+import { RefreshCw, X } from 'lucide-react';
+import type { JSX } from 'react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { ActionSection } from '@/components/ActionSection';
 import { FieldSelector } from '@/components/FieldSelector';
 import { FileUpload } from '@/components/FileUpload';
@@ -15,10 +19,6 @@ import {
   SelectValue
 } from '@/shadcn/components/ui/select';
 import { type FileType, useWorkingFileStore } from '@/store/store';
-import { RefreshCw, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import type { JSX } from 'react';
-import { toast } from 'sonner';
 
 type ComparisonType =
   | 'equals'
