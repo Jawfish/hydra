@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -27,7 +27,21 @@ function App(): JSX.Element {
         <Routes>
           <Route element={<Layout />}>
             {routes.map(route => (
-              <Route key={route.path} path={route.path} element={route.element} />
+              <Route
+                key={route.path}
+                path={route.path}
+                element={
+                  <Suspense
+                    fallback={
+                      <div className='flex h-full items-center justify-center'>
+                        Loading...
+                      </div>
+                    }
+                  >
+                    {route.element}
+                  </Suspense>
+                }
+              />
             ))}
             <Route path={defaultRoute.path} element={defaultRoute.element} />
           </Route>
@@ -38,5 +52,4 @@ function App(): JSX.Element {
   );
 }
 
-// biome-ignore lint/style/noDefaultExport: React convention
 export default App;

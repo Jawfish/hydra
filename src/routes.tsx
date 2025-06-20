@@ -11,19 +11,44 @@ import {
   Scissors,
   Trash2
 } from 'lucide-react';
-import type { ForwardRefExoticComponent, ReactNode, RefAttributes } from 'react';
+import {
+  type ForwardRefExoticComponent,
+  lazy,
+  type ReactNode,
+  type RefAttributes
+} from 'react';
 import { Navigate } from 'react-router-dom';
 
-import { Backfill } from '@/views/Backfill';
-import { Combine } from '@/views/Combine';
-import { Convert } from '@/views/Convert';
-import { FieldRemover } from '@/views/FieldRemover';
-import { Filter } from '@/views/Filter';
-import { MapValues } from '@/views/MapValues';
-import { Split } from '@/views/Split';
-import { Stats } from '@/views/Stats';
-import { Translate } from '@/views/Translate';
-import { UuidExtractor } from '@/views/UuidExtractor';
+const Backfill = lazy(() =>
+  import('@/views/Backfill').then(module => ({ default: module.Backfill }))
+);
+const Combine = lazy(() =>
+  import('@/views/Combine').then(module => ({ default: module.Combine }))
+);
+const Convert = lazy(() =>
+  import('@/views/Convert').then(module => ({ default: module.Convert }))
+);
+const FieldRemover = lazy(() =>
+  import('@/views/FieldRemover').then(module => ({ default: module.FieldRemover }))
+);
+const Filter = lazy(() =>
+  import('@/views/Filter').then(module => ({ default: module.Filter }))
+);
+const MapValues = lazy(() =>
+  import('@/views/MapValues').then(module => ({ default: module.MapValues }))
+);
+const Split = lazy(() =>
+  import('@/views/Split').then(module => ({ default: module.Split }))
+);
+const Stats = lazy(() =>
+  import('@/views/Stats').then(module => ({ default: module.Stats }))
+);
+const Translate = lazy(() =>
+  import('@/views/Translate').then(module => ({ default: module.Translate }))
+);
+const UuidExtractor = lazy(() =>
+  import('@/views/UuidExtractor').then(module => ({ default: module.UuidExtractor }))
+);
 
 type Icon = ForwardRefExoticComponent<
   Omit<LucideProps, 'ref'> & RefAttributes<SVGSVGElement>

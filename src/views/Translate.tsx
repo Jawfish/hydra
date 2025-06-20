@@ -195,7 +195,6 @@ export function Translate(): JSX.Element {
         try {
           const response = await anthropic.messages.create({
             model: 'claude-3-5-sonnet-20241022',
-            // biome-ignore lint/style/useNamingConvention: api structure
             max_tokens: 4096,
             messages: [
               {
