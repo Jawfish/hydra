@@ -110,7 +110,6 @@ const DetailedAnalysisSection: React.FC<DetailedAnalysisSectionProps> = ({
   setSelectedAnalysisField: (value: string) => void;
   fieldAnalysis: FieldAnalysisDetail[];
 }) => {
-  // biome-ignore lint/nursery/noSecrets: not a secret
   console.debug('DetailedAnalysisSection props:', {
     selectedIdentifier,
     selectedAnalysisField,

@@ -52,10 +52,11 @@
   "license": "MIT",
   "name": "react-typescript-template",
   "scripts": {
-    "build": "tsc && bun fix && vite build",
+    "build": "tsc && vite build",
+    "build:with-fix": "tsc && bun fix && vite build",
     "dev": "vite",
-    "lint": "biome check && tsc --noEmit",
-    "fix": "biome check --fix --unsafe",
+    "lint": "bunx @biomejs/biome check && tsc --noEmit",
+    "fix": "bunx @biomejs/biome check --fix --unsafe",
     "preview": "vite preview",
     "test": "vitest --reporter=verbose",
     "test:ui": "vitest --ui --open"
